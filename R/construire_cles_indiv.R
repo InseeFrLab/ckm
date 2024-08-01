@@ -7,13 +7,13 @@
 #' le programme calcule un nombre idéal de décimales pour la clé aléatoire.
 #'
 #' @return jeu de données de départ transformé en data.table avec la variable
-#' `rkeys` représentant la clé aléatoire individuelle en plus.
+#' `rkey` représentant la clé aléatoire individuelle en plus.
 #'
 #' @export
 #'
 #' @examples
 #' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
-#' str(dtest)
+#' hist(dtest_avec_cles$rkeys)
 construire_cles_indiv <- function(microdata, seed, nb_decim = NULL){
 
   N <- nrow(microdata)
@@ -21,7 +21,7 @@ construire_cles_indiv <- function(microdata, seed, nb_decim = NULL){
 
   mdata <- data.table::as.data.table(microdata)
 
-  mdata$rkeys <- cellKey::ck_generate_rkeys(
+  mdata$rkey <- cellKey::ck_generate_rkeys(
     dat = mdata,
     nr_digits = nb_decim,
     seed = seed
