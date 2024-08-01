@@ -1,10 +1,45 @@
-creer_matrice_transition <- function(D, V, js, ...){
+#' Wrapper de la fonction `ptable::create_cnt_ptable`
+#'
+#'
+#' @param D Déviation
+#' @param V Variance
+#' @param js Seuil des valeurs interdites
+#' @param ... autres arguments de la fonction `ptable::create_cnt_ptable`
+#'
+#' @return objet `ptable` contenant la matrice de transition
+#' @export
+#' @import data.table
+#' @examples
+#' library(ptable)
+#' mat_trans <- creer_matrice_transition(D = 5, V = 2)
+#' plot(mat_trans, type="d") |> print()
+creer_matrice_transition <- function(D, V, js = 0, ...){
 
-  p_table <- ptable::create_cnt_ptable(D = D, V = V, ...)
+  tryCatch(
+    expr = {
+      p_table <- ptable::create_cnt_ptable(D = D, V = V, js = js, ...)
+    },
+    error = function(e){
+      print(e)
+      return(NULL)
+    },
+    warning = function(w){
+      print(w)
+    }
+  )
 
-  return(p_table)
 }
 
+#' Title
+#'
+#' @param matrice_transition objet créé par `creer_matrice_transition()`
+#'
+#' @return
+#' @export
+#' @import data.table
+#' @examples
+#' mat_trans <- creer_matrice_transition(D = 5, V = 2)
+#' tab_pert <- creer_table_perturbation(mat_trans)
 creer_table_perturbation <- function(matrice_transition){
 
   require(data.table)

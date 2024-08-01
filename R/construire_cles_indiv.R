@@ -10,7 +10,7 @@
 #' `rkey` représentant la clé aléatoire individuelle en plus.
 #'
 #' @export
-#'
+#' @import data.table
 #' @examples
 #' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
 #' hist(dtest_avec_cles$rkeys)
