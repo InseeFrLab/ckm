@@ -6,26 +6,32 @@
 #' Il s'agit nécessairement d'un nombre décimal compris entre 0 et 1. La clé
 #' d'une cellule doit correspondre à la partie décimale de la somme des
 #' clés des individus qui composent la cellule.
-#' @param D
-#' @param V
-#' @param js
-#' @param ...
+#' @inheritParams creer_matrice_transition
 #'
-#' @return
+#' @return liste comprenant la table perturbée et la matrice de transition
 #' @export
 #' @import data.table
 #' @examples
-#' library(dplyr)
+#' data("dtest")
 #' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
-#' tab_avant <-  dtest_avec_cles |>
-#'   group_by(DEP, TYPE, SEXE, AGE) |>
-#'   summarise(nb_obs = n(), ckey = (sum(rkey) %% 1), .groups = 'drop')
 #'
-#' tab_apres <- appliquer_ckm(tab_avant, D = 5, V = 2)
-#' str(tab_apres)
-appliquer_ckm <- function(tab_data, cnt_var = "nb_obs", ck_var = "ckey", D, V, js, ...) {
-
-  require(data.table)
+#' tab_avant <- tabulate_cnt_micro_data(
+#'   df = dtest_avec_cles,
+#'   cat_vars = c("DIPLOME", "SEXE", "AGE"),
+#'   hrc_vars = list(GEO = c("REG", "DEP")),
+#'   marge_label = "Total"
+#' )
+#'
+#' res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
+#' str(res_ckm$tab)
+appliquer_ckm <- function(
+    tab_data,
+    cnt_var = "nb_obs",
+    ck_var = "ckey",
+    D,
+    V,
+    js = 0,
+    ...) {
 
   assertthat::assert_that(
     min(tab_data[[ck_var]]) >= 0 | max(tab_data[[ck_var]]) <= 1,
@@ -34,7 +40,7 @@ appliquer_ckm <- function(tab_data, cnt_var = "nb_obs", ck_var = "ckey", D, V, j
 
   # Construction de la table de perturbation
   args_add <- c(...)
-  args_trans <- if(length(args_add) == 0) as.list(c(D=2, V=3)) else as.list(c(D=2, V=3, args_add))
+  args_trans <- if(length(args_add) == 0) as.list(c(D = D, V = V, js = js)) else as.list(c(D = D, V = V, js = js, args_add))
 
   mat_trans <- do.call("creer_matrice_transition", args_trans)
   tab_pert <- creer_table_perturbation(mat_trans)
@@ -60,14 +66,23 @@ appliquer_ckm <- function(tab_data, cnt_var = "nb_obs", ck_var = "ckey", D, V, j
     nrow(res[get(ck_var) > p_int_ub | get(ck_var) < p_int_lb,]) == 0) {
 
     return(
-      res |>
-        tibble::as_tibble() |>
-        dplyr::mutate(nb_obs_ckm = nb_obs + v) |>
-        dplyr::select(-ck_end, -i, -v, -p_int_lb, -p_int_ub, - {{ ck_var }})
+      list(
+        tab = res |>
+          as.data.frame() |>
+          tibble::as_tibble() |>
+          dplyr::mutate(nb_obs_ckm = nb_obs + v) |>
+          dplyr::select(-ck_end, -i, -v, -p_int_lb, -p_int_ub, - {{ ck_var }}),
+        ptab = mat_trans
+      )
     )
 
-  } else {
+  }else {
     warning("Le résultat de la fusion est inconsistant. Vérifiez votre résultat.")
-    return(res)
+    return(
+      list(
+        tab = res,
+        ptab = mat_trans
+      )
+    )
   }
 }

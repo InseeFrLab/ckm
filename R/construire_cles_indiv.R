@@ -13,7 +13,7 @@
 #' @import data.table
 #' @examples
 #' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
-#' hist(dtest_avec_cles$rkeys)
+#' hist(dtest_avec_cles$rkey)
 construire_cles_indiv <- function(microdata, seed, nb_decim = NULL){
 
   N <- nrow(microdata)

@@ -1,6 +1,6 @@
 Package: ckm
 Type: Package
-Title: Appliquer la méthode des clés aléatoires (Cell Key Method) pour protéger des données tabulées.
+Title: Appliquer la méthode des clés aléatoires (Cell Key Method) pour protéger des données tabulées
 Version: 0.1.0
 Authors@R: c(
     person("Julien", "Jamme", , "julien.jamme@insee.fr", role = c("aut", "cre")),
@@ -12,5 +12,14 @@ Description: More about what it does (maybe more than one line)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: xz
 Depends: 
     R (>= 2.10)
+Imports: 
+    assertthat,
+    cellKey,
+    data.table,
+    dplyr,
+    ptable,
+    tibble
+RoxygenNote: 7.3.2
