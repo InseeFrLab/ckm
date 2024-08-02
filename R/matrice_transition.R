@@ -26,6 +26,9 @@ creer_matrice_transition <- function(D, V, js = 0, ...){
     },
     warning = function(w){
       print(w)
+    },
+    finally = {
+      return(p_table)
     }
   )
 
