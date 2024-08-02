@@ -14,7 +14,7 @@ pkg_check:
   tags:
     - docker
   script:
-    - R -e "install.packages(c('openxlsx', 'kableExtra', 'rmarkdown', 'dplyr', 'tidyr', 'knitr'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable', 'cellKey'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
     - R -e 'devtools::check(check_dir = ".",
                             error_on  = "error",
                             cran      = FALSE,
@@ -30,7 +30,7 @@ testing:
   allow_failure: true
   when: on_success
   script:
-    - R -e "install.packages(c('openxlsx', 'kableExtra', 'rmarkdown','dplyr', 'tidyr', 'knitr'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable', 'cellKey'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
     - R -e 'devtools::test()'
   only:
     - main
