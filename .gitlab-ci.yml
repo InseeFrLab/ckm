@@ -4,11 +4,14 @@ variables:
   HTTPS_PROXY: http://proxy-app.insee.fr:3128
   NO_PROXY: insee.test,insee.intra,insee.fr,localhost
   PKG_NAME: "ckm"
+
 image: inseefrlab/onyxia-rstudio:latest
+
 stages:
   - check
   - test
   - deploy
+
 pkg_check:
   stage: check
   tags:
@@ -23,6 +26,7 @@ pkg_check:
   artifacts:
     paths:
       - "${PKG_NAME}_*.tar.gz"
+
 testing:
   stage: test
   tags:
@@ -34,6 +38,7 @@ testing:
     - R -e 'devtools::test()'
   only:
     - main
+
 pages:
   stage: deploy
   dependencies:
