@@ -1,0 +1,19 @@
+---
+title: Package ‘tabloid’
+subtitle: Historique des modifications
+output: rmarkdown::html_vignette
+---
+
+
+## ckm 0.1.0
+
+[02/08/24]
+
+Première version contenant les fonctions :
+
+- `construire_cles_indiv`
+- `tabulate_cnt_micro_data`
+- `tabuler_et_appliquer_ckm`
+- `appliquer_ckm`
+- `creer_matrice_transition`
+- `creer_table_perturbation`
