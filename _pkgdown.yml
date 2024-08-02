@@ -24,10 +24,11 @@ reference:
     contents:
       - construire_cles_indiv
   - title: Construire un tableau de comptage
-    desc:  La fonction agrège les données individuelles selon les
-    variables de croisements renseignées. Elle prend en compte les
-    hiérarchies éventuelles. Le tableau fournit contient également la clé
-    aléatoire de chaque cellule.
+    desc: |
+      La fonction agrège les données individuelles selon les
+      variables de croisements renseignées. Elle prend en compte les
+      hiérarchies éventuelles. Le tableau fournit contient également la clé
+      aléatoire de chaque cellule.
     contents:
       - tabulate_cnt_micro_data
   - title: Appliquer la CKM à un tableau de données
@@ -35,12 +36,10 @@ reference:
     contents:
       - appliquer_ckm
   - title: Appliquer toutes les étapes en une
-    desc:  La fonction construit le tableau agrégé et
-    applique la CKM sur le tableau fourni.
+    desc:  La fonction construit le tableau agrégé et applique la CKM sur le tableau fourni.
     contents:
       - tabuler_et_appliquer_ckm
-  - title: Construire la matrice de transition et préparer la table de
-  perturbation
+  - title: Construire la matrice de transition et préparer la table de perturbation
     desc:  Les fonctions permettent de récupérer la matrice de transition.
     contents:
       - creer_matrice_transition
