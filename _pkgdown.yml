@@ -5,7 +5,6 @@ navbar:
     left:
       - home
       - reference
-      - articles
   components:
     reference:
       text: Contenu du package
@@ -19,7 +18,7 @@ home:
   title: Package R pour appliquer la méthode des clés aléatoires
 
 reference:
-  - title: Générer les clés individuelles dans un je de microdonnées
+  - title: Générer les clés individuelles dans un jeu de microdonnées
     desc:  Une fonction pour créer la clé associée à chaque individu
     contents:
       - construire_cles_indiv
@@ -49,6 +48,4 @@ reference:
     contents:
       - dtest
 
-articles:
-  title: Package R pour appliquer la méthode des clés aléatoires
-  
+
