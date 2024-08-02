@@ -48,3 +48,7 @@ reference:
     desc: Jeu de données fictives pour tester les fonctions du package
     contents:
       - dtest
+
+articles:
+  title: Package R pour appliquer la méthode des clés aléatoires
+  
