@@ -1,0 +1,54 @@
+variables:
+  GIT_SSL_NO_VERIFY: "1"
+  HTTP_PROXY: http://proxy-app.insee.fr:3128
+  HTTPS_PROXY: http://proxy-app.insee.fr:3128
+  NO_PROXY: insee.test,insee.intra,insee.fr,localhost
+  PKG_NAME: "ckm"
+image: inseefrlab/onyxia-rstudio:latest
+stages:
+  - check
+  - test
+  - deploy
+pkg_check:
+  stage: check
+  tags:
+    - docker
+  script:
+    - R -e "install.packages(c('openxlsx', 'kableExtra', 'rmarkdown', 'dplyr', 'tidyr', 'knitr'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - R -e 'devtools::check(check_dir = ".",
+                            error_on  = "error",
+                            cran      = FALSE,
+                            document  = FALSE,
+                            manual    = FALSE)'
+  artifacts:
+    paths:
+      - "${PKG_NAME}_*.tar.gz"
+testing:
+  stage: test
+  tags:
+    - docker
+  allow_failure: true
+  when: on_success
+  script:
+    - R -e "install.packages(c('openxlsx', 'kableExtra', 'rmarkdown','dplyr', 'tidyr', 'knitr'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - R -e 'devtools::test()'
+  only:
+    - main
+pages:
+  stage: deploy
+  dependencies:
+    - testing
+  tags:
+    - docker
+  script:
+    - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable', 'cellKey'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - R -e 'devtools::install(dependencies = FALSE)'
+    - R -e 'options(pkgdown.internet = FALSE) ; pkgdown::build_site()'
+    - R -e 'covr::gitlab(file = "public/coverage.html", quiet = FALSE)'
+  coverage: '/Coverage: \d+\.\d+/'
+  artifacts:
+    paths:
+      - public
+  when: manual
+  only:
+    - main
