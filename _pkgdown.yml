@@ -1,0 +1,51 @@
+destination: public
+
+navbar:
+  structure:
+    left:
+      - home
+      - reference
+      - articles
+  components:
+    reference:
+      text: Contenu du package
+      href: reference/index.html
+  right:
+    - text: Code source
+      href: https://gitlab.insee.fr/outilsconfidentialite/ckm
+      icon: fa-gitlab
+
+home:
+  title: Package R pour appliquer la méthode des clés aléatoires
+
+reference:
+  - title: Générer les clés individuelles dans un je de microdonnées
+    desc:  Une fonction pour créer la clé associée à chaque individu
+    contents:
+      - construire_cles_indiv
+  - title: Construire un tableau de comptage
+    desc:  La fonction agrège les données individuelles selon les
+    variables de croisements renseignées. Elle prend en compte les
+    hiérarchies éventuelles. Le tableau fournit contient également la clé
+    aléatoire de chaque cellule.
+    contents:
+      - tabulate_cnt_micro_data
+  - title: Appliquer la CKM à un tableau de données
+    desc:  La fonction applique la CKM sur un tableau agrégé fourni.
+    contents:
+      - appliquer_ckm
+  - title: Appliquer toutes les étapes en une
+    desc:  La fonction construit le tableau agrégé et
+    applique la CKM sur le tableau fourni.
+    contents:
+      - tabuler_et_appliquer_ckm
+  - title: Construire la matrice de transition et préparer la table de
+  perturbation
+    desc:  Les fonctions permettent de récupérer la matrice de transition.
+    contents:
+      - creer_matrice_transition
+      - creer_table_perturbation
+  - title: Données exemples
+    desc: Jeu de données fictives pour tester les fonctions du package
+    contents:
+      - dtest
