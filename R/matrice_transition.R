@@ -19,16 +19,16 @@ creer_matrice_transition <- function(D, V, js = 0, ...){
   tryCatch(
     expr = {
       p_table <- ptable::create_cnt_ptable(D = D, V = V, js = js, ...)
+      return(p_table)
     },
     error = function(e){
+      message("Modifier les paramètres de la matrice de transition. Il est
+              probable que l'algorithme n'ait pas pu converger.\n")
       print(e)
       return(NULL)
     },
     warning = function(w){
       print(w)
-    },
-    finally = {
-      return(p_table)
     }
   )
 
