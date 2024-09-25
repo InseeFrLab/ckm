@@ -1,0 +1,130 @@
+---
+title: "Appliquer la méthode des clés aléatoires"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{utiliser-ckm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ckm)
+```
+
+Le package contient un jeu de données pour s'exercer:
+```{r data}
+data("dtest", package = "ckm")
+```
+
+## Une étape préalable: poser les clés individuelles
+
+La fonction `construire_cles_indiv()` ajoute à votre jeu de données 
+une colonne `rkey` contenant les clés individuelles qui sont des nombres 
+aléatoires tirés selon une loi uniforme entre 0 et 1.
+
+```{r cles}
+dtest_avec_cles <- construire_cles_indiv(dtest, seed = 40889)
+```
+
+On peut vérifier que la distribution des clés individuelles est bien uniforme.
+
+```{r unif}
+hist(dtest_avec_cles$rkey)
+```
+
+## Appliquer la méthode des clés aléatoires en une étape
+
+Après avoir généré la clé individuelle sur votre jeu de données, il est possible
+de construire directement le tableau perturbé.
+
+Le code ci-dessous va réaliser les étapes suivantes:
+
+- construire le tableau agrégé croisant les variables 
+`"REG", "DEP","DIPLOME", "SEXE", "AGE"`, y compris les marges du tableau.
+- calculer la table de pertubation en fonction des paramètres `D` (déviation 
+maximale) et `V` (la variance de la distribution)
+- appliquer la perturbation sur le tableau agrégé.
+
+```{r ckm_direct}
+res_ckm <- tabuler_et_appliquer_ckm(
+ df = dtest_avec_cles,
+ cat_vars = c("REG", "DEP","DIPLOME", "SEXE", "AGE"),
+ D = 5, V = 2
+)
+```
+
+Le résultat renvoyé est une liste de deux éléments:
+
+```{r}
+str(res_ckm, max.level = 2)
+```
+
+
+## Appliquer la méthode des clés aléatoires étape par étape
+
+### 1-Générer le tableau de comptages avec la clé des cellules
+
+La deuxième étape consiste à construire votre tableau de comptage. Il faut 
+pour cela renseigner le jeu de données contenant la colonne avec les clés 
+individuelles et les variables catégorielles que vous souhaitez croiser 
+ensemble.
+
+La fonction `tabulate_cnt_micro_data` s'occupe de construire l'ensemble 
+des croisements possibles - y compris les marges - et de fournir à la fois 
+le comptage (le nombre d'individus contenu dans chaque croisement) et la clé de la 
+cellule obtenue en récupérant la partie décimale de la somme des clés individuelles.
+
+
+```{r tabul}
+tab_avant <- tabulate_cnt_micro_data(
+ df = dtest_avec_cles,
+ cat_vars = c("REG", "DEP","DIPLOME", "SEXE", "AGE")
+)
+```
+
+L'argument `marge_label` permet de renseigner la modalité des marges (par défaut `"Total"`) et 
+l'argument `hrc_vars` permet de renseigner une éventuelle hiérarchie entre des 
+variables - dans le cas où vous souhaitez que cette hiérarchie apparaisse dans 
+une unique colonne.
+
+### 2-Appliquer la perturbation
+
+La troisième étape consiste à appliquer la perturbation à la table précédente. 
+Il suffit de renseigner, a minima :
+
+- le tableau sur lequel appliqué la perturbation
+- et les deux paramètres principaux de la CKM:
+  - la déviation maximale `D`. Par exemple,  `D=5` conduit à dévier les données 
+  d'un entier compris entre `-5` et `+5`.
+  - la variance `V` de la distribution de probabilités. Plus la variance sera 
+  importante, plus la perturbation globale (mesurée par exemple par la moyenne 
+  des écarts absolus) le sera.
+
+```{r appliquer}
+res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
+```
+
+```{r structure-res}
+str(res_ckm)
+```
+
+
+### 3-Mesurer la perte d'information
+
+En cours de dev
+
+### 4- Mesure le risque
+
+EN cours de dev
+
+
+
+
+

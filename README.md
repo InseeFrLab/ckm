@@ -84,7 +84,7 @@ res_ckm <- tabuler_et_appliquer_ckm(
  marge_label = "Total",
  D = 5, V = 2
 )
-str(rs_ckm$tab)                   
+str(res_ckm$tab)                   
 ```
 
 

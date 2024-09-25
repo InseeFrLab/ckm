@@ -12,21 +12,18 @@
 #' @export
 #' @import data.table
 #' @examples
+#' data("dtest", package = "ckm")
 #' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
 #' hist(dtest_avec_cles$rkey)
 construire_cles_indiv <- function(microdata, seed, nb_decim = NULL){
 
   N <- nrow(microdata)
-  if(is.null(nb_decim)) nb_decim <- ceiling(5+log(N)/log(10))
+  if(is.null(nb_decim)) nb_decim <- min(ceiling(5+log(N)/log(10)), 20)
 
   mdata <- data.table::as.data.table(microdata)
 
-  mdata$rkey <- cellKey::ck_generate_rkeys(
-    dat = mdata,
-    nr_digits = nb_decim,
-    seed = seed
-  )
+  set.seed(seed)
+  mdata[ , rkey := round(runif(N, 0, 1), digits = nb_decim)]
 
   return(mdata)
-
 }

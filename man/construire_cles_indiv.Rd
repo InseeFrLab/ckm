@@ -23,6 +23,7 @@ jeu de données de départ transformé en data.table avec la variable
 Ajoute les clés aléatoires individuelles sur le jeu de microdonnées
 }
 \examples{
+data("dtest", package = "ckm")
 dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
 hist(dtest_avec_cles$rkey)
 }
