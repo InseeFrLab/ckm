@@ -50,8 +50,78 @@ calculer_frequences_empiriques <- function(tableau, cat_vars){
   )
 }
 
+#' Calcule l'ensemble de déviation d'une valeur originale i étant donnés les paramètres D et js
+#' de la matrice de transition
+#'
+#' @param i valeur originale dont on souhaite calculer l'ensemble de déviation
+#' @param D la déviation de la CKM
+#' @param js Maximum des valeurs interdites après perturbation
+#'
+#' @return vecteur des valeurs perturbées possibles si la valeur originale est i,
+#' calculé en fonction de D et js.
+#' @export
+#'
+#' @examples
+#'
+#' calculer_ensemble_deviation(1, 5) #attendu 0:6
+#' calculer_ensemble_deviation(1, 5, 2) #attendu c(0,3:6)
+#' calculer_ensemble_deviation(0, 5, 2) #attendu 0
+#' calculer_ensemble_deviation(5, 5, 2) #attendu c(0,3:10)
+calculer_ensemble_deviation <- function(i, D, js = 0){
 
-#' Mesure du risque en estimant les probas de transition inverse
+  if(D <= 0) stop("D doit être strictement positif")
+  if(js < 0) stop("js doit être positif ou nul")
+  if(i < 0) stop("i doit être positif ou nul")
+
+  if(i == 0){
+    dev <- 0
+  }else{
+    dev <- (i-D):(i+D)
+    # Exclusion des valeurs négatives et interdites
+    dev <- if(js > 0) dev[dev == 0 | dev > js] else dev[dev >= 0]
+  }
+
+  return(dev)
+}
+
+#' Calcule l'ensemble des possibles de j étant donnés les paramètres D et js
+#' de la matrice de transition
+#'
+#' @param j valeur perturbée dont on souhaite calculer l'intervalle des possibles
+#' @param D la déviation de la CKM
+#' @param js Maximum des valeurs interdites après perturbation
+#'
+#' @return vecteur des valeurs originales possibles si la valeur perturbée est j,
+#' calculé en fonction de D et js. `NULL` si j > 0 et j <= js
+#' @export
+#'
+#' @examples
+#'
+#' calculer_ensemble_possibles(1, 5) #attendu 1:6
+#' calculer_ensemble_possibles(1, 5, 2) #attendu NULL
+#' calculer_ensemble_possibles(0, 5, 2) #attendu 0:5
+#' calculer_ensemble_possibles(5, 5, 2) #attendu 1:10
+calculer_ensemble_possibles <- function(j, D, js = 0){
+
+  if(D <= 0) stop("D doit être strictement positif")
+  if(js < 0) stop("js doit être positif ou nul")
+  if(j < 0) stop("j doit être positif ou nul")
+
+  if(j > 0 & j < js){
+    # Si j est dans l'ens des valeurs interdites alors ensemble vide
+    poss <- NULL
+  }else{
+    poss <- (j-D):(j+D)
+    # l'ensemble des possibles est nécessairement dans N
+    # si j > 0, l'ensemble ne peut contenir 0 (car les 0 ne sont pas déviés)
+    poss <- if(j == 0) poss[poss >= 0] else poss[poss > 0]
+  }
+
+  return(poss)
+}
+
+
+#' Mesure du risque en estimant les probabilités de transition inverses
 #'
 #' @param matrice_transition
 #' @param tableau
@@ -180,7 +250,7 @@ mesurer_risque <- function(matrice_transition, tableau, cat_vars, orig, pert){
 
 
 
-#' Title
+#' Calcule des probas de transition empiriques
 #'
 #' @param res_ckm objet retourné par la fonction `appliquer_ckm`
 #' @param cat_vars
@@ -191,6 +261,7 @@ mesurer_risque <- function(matrice_transition, tableau, cat_vars, orig, pert){
 #' @export
 #'
 #' @examples
+#' library(dplyr)
 #' data("dtest")
 #' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
 #'
@@ -201,7 +272,7 @@ mesurer_risque <- function(matrice_transition, tableau, cat_vars, orig, pert){
 #'   marge_label = "Total",
 #'   D = 5, V = 2
 #' )
-#' mesurer_risque_empirique(res_ckm, cat_vars, 1:3, 1:3)
+#' mesurer_risque_empirique(res_ckm, cat_vars, 1:4, 1:4)
 mesurer_risque_empirique <- function(res_ckm, cat_vars, orig, pert){
 
   tableau <- res_ckm$tab
@@ -214,9 +285,30 @@ mesurer_risque_empirique <- function(res_ckm, cat_vars, orig, pert){
     return(NULL)
   }
 
-  top_i <- p_transition |> tail(1) |> pull(i) #ifelse(js==0, D, D+js+1)
+  # top_i <- p_transition |> tail(1) |> pull(i) #ifelse(js==0, D, D+js+1)
+
+  all_origs = paste0(orig, collapse = ", ")
+  all_perts = paste0(pert, collapse = ", ")
 
   tableau_complet <- ajouter_zeros_tableau(tableau, cat_vars)
+
+  freq_i <- tableau_complet |> count(nb_obs) |> rename(freq_i = n, i = nb_obs) |> filter(i %in% orig)
+  freq_j <- tableau_complet |> count(nb_obs_ckm) |> rename(freq_j = n, j = nb_obs_ckm) |> filter(j %in% pert)
+
+  freq_i <- bind_rows(
+    freq_i |> mutate(i = as.character(i)),
+    freq_i |>
+      summarise(freq_i = sum(freq_i)) |>
+      mutate(i = all_origs)
+  )
+  freq_j <- bind_rows(
+    freq_j |> mutate(j = as.character(j)),
+    freq_j |>
+      summarise(freq_j = sum(freq_j)) |>
+      mutate(j = all_origs)
+  )
+
+
 
   croisements_o_p <- expand.grid(
     i = c(orig, all_origs),
@@ -246,6 +338,13 @@ mesurer_risque_empirique <- function(res_ckm, cat_vars, orig, pert){
     ) |>
     purrr::list_c()
 
-  return(croisements_o_p)
+  if(any(freq_i$freq_i < 100) | any(freq_j$freq_j < 100))
+    message("Les probas empiriques ne doivent pas être interpétées
+            si les fréquences empiriques des comptages sont faibles.")
+  return(
+    croisements_o_p |>
+    full_join(freq_i, by = "i") |>
+    full_join(freq_j, by = "j")
+  )
 }
 
