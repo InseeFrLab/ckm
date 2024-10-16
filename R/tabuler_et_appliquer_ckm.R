@@ -15,7 +15,8 @@
 #'   cat_vars = c("DIPLOME", "SEXE", "AGE"),
 #'   hrc_vars = list(GEO = c("REG", "DEP")),
 #'   marge_label = "Total",
-#'   D = 5, V = 2
+#'   D = 10, V = 15, js = 4,
+#'   j_risk = 0
 #' )
 tabuler_et_appliquer_ckm <- function(
     df,
@@ -26,6 +27,8 @@ tabuler_et_appliquer_ckm <- function(
     D,
     V,
     js = 0,
+    i_risk = 1:4,
+    j_risk = 1:4,
     ...){
 
   assertthat::assert_that(
@@ -38,7 +41,9 @@ tabuler_et_appliquer_ckm <- function(
     rk_var = rk_var,
     cat_vars = cat_vars,
     hrc_vars = hrc_vars,
-    marge_label = marge_label
+    marge_label = marge_label,
+    freq_empiriq = TRUE
+
   )
 
   args_add <- c(...)
@@ -48,6 +53,8 @@ tabuler_et_appliquer_ckm <- function(
     as.list(c(D = D, V = V, js = js, args_add))
   }
   args_trans[["tab_data"]] <- tab_avant
+  args_trans[["i_risk"]] <- i_risk
+  args_trans[["j_risk"]] <- j_risk
 
   res_ckm <- do.call("appliquer_ckm", args_trans)
 

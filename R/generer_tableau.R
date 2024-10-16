@@ -33,9 +33,14 @@ compute_margins <- function(
 #' @param cat_vars vector of categorical variables but not hierarchical
 #' @param hrc_vars named list (name = VAR final name, value = VAR current names)
 #' @param marge_label label of margins (applied to all cat and hrc variables)
+#' @param freq_empiriq booléen. Si `TRUE`, génère également le tableau
+#' des fréquences empiriques des comptages (utile pour la mesure du risque).
+#' `FALSE` par défaut.
 #'
-#' @return a tibble. La variable de comptage est nommée `nb_obs`, la clé de la cellule
-#' est dénommée `ckey`.
+#' @return Si `freq_empiriq=FALSE`: un tibble. La variable de comptage est nommée
+#' `nb_obs`, la clé de la cellule est dénommée `ckey`. Si `freq_empiriq=TRUE`,
+#' une liste comprenant le tibble ci-dessus et un tiblle des fréquences empiriques.
+#'
 #' @export
 #' @import data.table
 #'
@@ -57,12 +62,13 @@ tabulate_cnt_micro_data <- function(
     rk_var = "rkey",
     cat_vars = NULL,
     hrc_vars = NULL,
-    marge_label = "Total"
+    marge_label = "Total",
+    freq_empiriq = FALSE
 ){
 
   assertthat::assert_that(
-    (is.null(rk_var) || rk_var %in% names(df)),
-    msg = "La clé individuelle est absente de vos données"
+    (is.null(rk_var) || (rk_var %in% names(df))),
+    msg = "La clé individuelle mentionnée est absente de vos données."
   )
 
   all_cat_vars = c(cat_vars, unlist(unname(hrc_vars)))
@@ -71,8 +77,8 @@ tabulate_cnt_micro_data <- function(
     dplyr::mutate( dplyr::across(dplyr::all_of(all_cat_vars), as.character))
 
   if(is.null(rk_var)){
-    message("En l'absence de clés individuelles dans df, aucune clé ne pourra
-    être fournie pour les cellules du tableau agrégé.")
+    message("Avertissement: En l'absence d'une variable de clés individuelles mentionnée dans df,
+    aucune clé ne pourra être fournie pour les cellules du tableau agrégé.")
     inner_cells <- data_dt[, .(nb_obs = .N), by = c(all_cat_vars)]
     resp_var <- NULL
   }else{
@@ -103,6 +109,18 @@ tabulate_cnt_micro_data <- function(
     res[, rkey_tot := NULL]
   }
 
-  return(tibble::as_tibble(res))
+  tab <- tibble::as_tibble(res)
+
+  if(freq_empiriq){
+    return(
+      list(
+        tab = tab,
+        freq = calculer_frequences_empiriques(tab)
+      )
+    )
+  }else{
+    return(tab)
+  }
+
 }
 

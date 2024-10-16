@@ -1,14 +1,18 @@
 #' Appliquer une CKM sur un tableau
 #'
-#' @param tab_data tableau agrégé
+#' @param tab_data objet retourné par `tabulate_cnt_micro_data`  (data.frame ou liste)
 #' @param cnt_var (character) nom de la variable de comptage (fréquences, effectifs)
 #' @param ck_var (character) nom de la variable contenant la clé aléatoire de la cellule
 #' Il s'agit nécessairement d'un nombre décimal compris entre 0 et 1. La clé
 #' d'une cellule doit correspondre à la partie décimale de la somme des
 #' clés des individus qui composent la cellule.
 #' @inheritParams creer_matrice_transition
+#' @inheritParams mesurer_risque
 #'
-#' @return liste comprenant la table perturbée et la matrice de transition
+#' @return liste comprenant la table perturbée, la matrice de transition, la mesure du
+#' risque (NULL si les fréquences empiriques ne sont pas fournies) et la mesure
+#' de l'utilité.
+#'
 #' @export
 #' @import data.table
 #' @examples
@@ -19,11 +23,12 @@
 #'   df = dtest_avec_cles,
 #'   cat_vars = c("DIPLOME", "SEXE", "AGE"),
 #'   hrc_vars = list(GEO = c("REG", "DEP")),
-#'   marge_label = "Total"
+#'   marge_label = "Total",
+#'   freq_empiriq = TRUE #pour pouvoir mesurer le risque
 #' )
 #'
 #' res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
-#' str(res_ckm$tab)
+#' str(res_ckm)
 appliquer_ckm <- function(
     tab_data,
     cnt_var = "nb_obs",
@@ -31,10 +36,24 @@ appliquer_ckm <- function(
     D,
     V,
     js = 0,
+    i_risk = 1:4,
+    j_risk = 1:4,
     ...) {
 
+  if(!is.data.frame(tab_data)){
+    if(is.list(tab_data) & length(tab_data) == 2 & all(names(tab_data) %in% c("tab","freq"))){
+      dt_data <- as.data.table(tab_data$tab)
+      p_hat <- tab_data$freq
+    }else{
+      stop("l'argument tab_data doit être un data.frame/tibble ou une liste de deux data.frames/tibbles")
+    }
+  }else{
+    dt_data <- as.data.table(tab_data)
+    p_hat <- NULL
+  }
+
   assertthat::assert_that(
-    min(tab_data[[ck_var]]) >= 0 | max(tab_data[[ck_var]]) <= 1,
+    min(dt_data[[ck_var]]) >= 0 | max(dt_data[[ck_var]]) <= 1,
     msg = "La clé des cellules doit nécessairement être une valeur entre 0 et 1"
   )
 
@@ -46,9 +65,6 @@ appliquer_ckm <- function(
   tab_pert <- creer_table_perturbation(mat_trans)
   max_i <- max(tab_pert$i)
 
-  # Préparation du tableau
-  dt_data <- as.data.table(tab_data)
-
   dt_data[,`:=`(i = ifelse(nb_obs <= max_i, nb_obs, max_i))]
   # cell_key = rkeys_tot %% 1, # on récupère la partie décimale de la somme des clés
   #par commodité pour la fusion
@@ -59,6 +75,20 @@ appliquer_ckm <- function(
 
   # fusion par intervalle
   res <- data.table::foverlaps(dt_data, tab_pert, mult = "all")
+
+  # Mesures de risque si les fréquences empiriques sont fournies dans tab_data
+  if(!is.null(p_hat)){
+    risque <- mesurer_risque(mat_trans, p_hat, i_risk, j_risk)
+  }else{
+    risque <- NULL
+  }
+
+  # Mesures d'utilité
+  utilite <- tibble::tibble(
+    ecarts_absolus_moyens = ecarts_absolus_moyens(res$nb_obs, res$nb_obs_ckm),
+    ecarts_absolus_moyens_relatifs = ecarts_absolus_moyens_relatifs(res$nb_obs, res$nb_obs_ckm),
+    hellinger = distance_hellinger(res$nb_obs, res$nb_obs_ckm)
+  )
 
   # Test
   if (
@@ -72,6 +102,7 @@ appliquer_ckm <- function(
           tibble::as_tibble() |>
           dplyr::mutate(nb_obs_ckm = nb_obs + v) |>
           dplyr::select(-ck_end, -i, -v, -p_int_lb, -p_int_ub, - {{ ck_var }}),
+        risque = risque,
         ptab = mat_trans
       )
     )
@@ -81,6 +112,7 @@ appliquer_ckm <- function(
     return(
       list(
         tab = res,
+        risque = risque,
         ptab = mat_trans
       )
     )

@@ -16,7 +16,8 @@ ajouter_zeros_tableau <- function(tableau, cat_vars){
       \(colvar) unique(colvar)
     ) |>
     expand.grid(
-      stringsAsFactors = FALSE
+      stringsAsFactors = FALSE,
+      KEEP.OUT.ATTRS = FALSE
     ) |>
     full_join(
       tableau |>
@@ -32,14 +33,41 @@ ajouter_zeros_tableau <- function(tableau, cat_vars){
 #' construit avec les fonctions `tabulate_cnt_micro_data` ou `appliquer_ckm` ou
 #' `tabuler_et_appliquer_ckm`.
 #'
-#' @param tableau
+#' @param tableau tableau généré avec les fonctions `tabulate_cnt_micro_data` ou
+#' `appliquer_ckm` ou `tabuler_et_appliquer_ckm`
+#' @param hierarchies liste de vecteurs - description des emboîtements éventuelles
+#' des variables catégorielles de tableau entre elles
 #'
 #' @return
 #' @export data.frame avec 3 colonnes
 #' (i = comptage, N = nb d'apparitions du comptage, p_hat = fréquence empirique du comptage)
 #'
 #' @examples
-calculer_frequences_empiriques <- function(tableau, cat_vars){
+#' library(ptable)
+#' library(dplyr)
+#'
+#' data("dtest")
+#'
+#' tab_comptage1 <- tabulate_cnt_micro_data(
+#'   df = dtest, rk = NULL,
+#'   cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE"),
+#'   marge_label = "Total"
+#' )
+#' p_hat1 <- calculer_frequences_empiriques(tab_comptage1)
+#'
+#' tab_comptage2 <- tabulate_cnt_micro_data(
+#'   df = dtest, rk = NULL,
+#'   cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE"),
+#'   marge_label = "Total"
+#' )
+#' p_hat <- calculer_frequences_empiriques(tab_comptage1)
+calculer_frequences_empiriques <- function(tableau, hierarchies = NULL){
+
+  cat_vars <- tableau |> select(where(is.character)) |> names()
+  if(!is.null(hierarchies)){
+    cat_a_supprimer <- sapply(hierarchies, \(h) h[-length(h)])
+    cat_vars <- cat_vars[!cat_vars %in% cat_a_supprimer]
+  }
 
   return(
     tableau |>
@@ -122,12 +150,12 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 
 
 #' Mesure du risque en estimant les probabilités de transition inverses
+#' Calcul les probabilités P(X=i|X'=j) où X désigne l'original et X' le perturbé
 #'
-#' @param matrice_transition
-#' @param tableau
-#' @param cat_vars
-#' @param orig
-#' @param pert
+#' @param matrice_transition objet retourné par `creer_matrice_transition`
+#' @param freq objet retourné par `calculer_frequences_empiriques`
+#' @param i_risk vecteur d'entiers (valeurs originales)
+#' @param j_risk vecteur d'entiers (valeurs perturbées)
 #'
 #' @return
 #' @export
@@ -136,7 +164,6 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 #' library(ptable)
 #' library(dplyr)
 #' mat_trans <- creer_matrice_transition(D = 5, V = 2)
-#' mat_trans2 <- creer_matrice_transition(D = 5, V = 2, js = 1)
 #' data("dtest")
 #'
 #' tab_comptage <- tabulate_cnt_micro_data(
@@ -144,34 +171,44 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 #'   cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE"),
 #'   marge_label = "Total"
 #' )
-#' mesurer_risque(mat_trans, tab_comptage, c("DEP", "DIPLOME", "SEXE", "AGE"), 1:4, 1:4)
-#' mesurer_risque(mat_trans2, tab_comptage, c("DEP", "DIPLOME", "SEXE", "AGE"), 1:4, 1:4)
-mesurer_risque <- function(matrice_transition, tableau, cat_vars, orig, pert){
+#' p_hat <- calculer_frequences_empiriques(tab_comptage, c("DEP", "DIPLOME", "SEXE", "AGE"))
+#'
+#' # Ci-dessous calcul des probabilités de transition inverses P(X=i|X'=1) avec
+#' #i qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble).
+#' mesurer_risque(mat_trans, p_hat, 1:4, 1)
+#'
+#' # Ci-dessous calcul des probabilités de transition inverses P(X=i|X'=j) avec
+#' # i qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble)
+#' # et j qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble).
+#' mesurer_risque(mat_trans, p_hat, 1:4, 1:4)
+mesurer_risque <- function(matrice_transition, freq, i_risk, j_risk){
 
   p_transition <- matrice_transition@pTable[, .(i,j,p)]
   D <- matrice_transition@pParams@D
   js <- matrice_transition@pParams@js
 
-  pert <- pert[pert > js | pert == 0]
-  if(length(pert) == 0){
+  j_risk <- j_risk[j_risk > js | j_risk == 0]
+  if(length(j_risk) == 0){
     message(
-      "Les valeurs perturbées renseignées ne peuvent pas exister dans les données finales.
-      Veuillez modifier l'argument `pert`"
+      "Avertissement: Les valeurs perturbées renseignées ne peuvent pas exister dans les données finales, au regard des paramètres de la matrice de transition.
+    Pour obtenir une mesure de risque, modifier l'argument `j_risk`."
     )
     return(NULL)
   }
 
   top_i <- p_transition |> tail(1) |> pull(i) #ifelse(js==0, D, D+js+1)
 
-  p_hat <- calculer_frequences_empiriques(tableau, cat_vars) |> as.data.table()
+  p_hat <- freq |> as.data.table()
 
-  if(p_hat[ i %in% orig, sum(p_hat)] == 0)
+  if(p_hat[ i %in% i_risk, sum(p_hat)] == 0){
     message(
-      paste0("Dans votre tableau agrégé original, aucune case prend les valeurs ",
-             paste0(orig, collapse = ", "),
+      paste0("Avertissement: Dans votre tableau agrégé original, aucune case ne prend les valeurs ",
+             paste0(i_risk, collapse = ", "),
              "\n Le risque n'est donc pas mesurable."
       )
     )
+    return(NULL)
+  }
 
   nb_compt_sup_D <- nrow(p_hat |> filter(i > top_i))
 
@@ -192,7 +229,7 @@ mesurer_risque <- function(matrice_transition, tableau, cat_vars, orig, pert){
   # p = pij
   # p_hat = P(X=i)
   # p_hat_star = sum_{k in N}{pkj P(X=k)}
-  # p_hat_star_all_pert = sum_{i in N}{ P(X=i) sum{j in pert}{pij}}
+  # p_hat_star_all_pert = sum_{i in N}{ P(X=i) sum{j in j_risk}{pij}}
   p_transition_augmentee <- p_transition_augmentee[
     #p_hat_star = sum_{k in N}{pkj P(X=k)} (denominateur de la proba de trans inverse)
     , p_hat_star := sum(p * p_hat)
@@ -204,27 +241,28 @@ mesurer_risque <- function(matrice_transition, tableau, cat_vars, orig, pert){
     )
   ]
 
-  p_hat_star_pert <- unique(p_transition_augmentee[ j %in% pert, .(j,p_hat_star)])[, sum(p_hat_star)]
+  p_hat_star_pert <- unique(p_transition_augmentee[ j %in% j_risk, .(j,p_hat_star)])[, sum(p_hat_star)]
 
   p_transition_augmentee[
     ,
-    p_star_all_pert := ifelse(j %in% pert, p * p_hat / p_hat_star_pert, NA)#prob de X = i sachant X' in pert]
+    p_star_all_pert := ifelse(j %in% j_risk, p * p_hat / p_hat_star_pert, NA)#prob de X = i sachant X' in j_risk]
   ]
 
-  all_origs = paste0(orig, collapse = ", ")
-  all_perts = paste0(pert, collapse = ", ")
+  all_origs = paste0(i_risk, collapse = ", ")
+  all_perts = paste0(j_risk, collapse = ", ")
 
   croisements_o_p <- expand.grid(
-    i = c(orig, all_origs),
-    j = c(pert, all_perts),
-    stringsAsFactors = FALSE
+    i = c(i_risk, all_origs),
+    j = c(j_risk, all_perts),
+    stringsAsFactors = FALSE,
+    KEEP.OUT.ATTRS = FALSE
   )
 
   croisements_o_p$frequence_empirique_i =
     sapply(
       croisements_o_p$i,
       \(val_i){
-        if(val_i == all_origs) unique(p_transition_augmentee[i %in% orig, .(i, p_hat)])[,sum(p_hat)] else p_transition_augmentee[i == val_i, p_hat][1]
+        if(val_i == all_origs) unique(p_transition_augmentee[i %in% i_risk, .(i, p_hat)])[,sum(p_hat)] else p_transition_augmentee[i == val_i, p_hat][1]
       }
     )
 
@@ -233,11 +271,11 @@ mesurer_risque <- function(matrice_transition, tableau, cat_vars, orig, pert){
       croisements_o_p$i, croisements_o_p$j,
       \(val_i, val_j){
         if(val_i == all_origs & val_j == all_perts){
-          p_transition_augmentee[i %in% orig & j %in% pert, sum(p_star_all_pert)]
+          p_transition_augmentee[i %in% i_risk & j %in% j_risk, sum(p_star_all_pert)]
         }else if(val_i == all_origs){
-          p_transition_augmentee[i %in% orig & j == val_j, sum(p_star)]
+          p_transition_augmentee[i %in% i_risk & j == val_j, sum(p_star)]
         }else if(val_j == all_perts){
-          p_transition_augmentee[i == val_i & j %in% pert, sum(p_star_all_pert)]
+          p_transition_augmentee[i == val_i & j %in% j_risk, sum(p_star_all_pert)]
         }else{
           p_transition_augmentee[i == val_i & j == val_j, p_star]
         }
@@ -245,17 +283,17 @@ mesurer_risque <- function(matrice_transition, tableau, cat_vars, orig, pert){
     ) |>
     purrr::list_c()
 
-  return(croisements_o_p)
+  return(tibble::as_tibble(croisements_o_p))
 }
 
 
 
-#' Calcule des probas de transition empiriques
+#' Calcule des probas de transition empiriques - NE PAS UTILISER
 #'
 #' @param res_ckm objet retourné par la fonction `appliquer_ckm`
 #' @param cat_vars
-#' @param orig
-#' @param pert
+#' @param i_risk
+#' @param j_risk
 #'
 #' @return
 #' @export
@@ -273,27 +311,27 @@ mesurer_risque <- function(matrice_transition, tableau, cat_vars, orig, pert){
 #'   D = 5, V = 2
 #' )
 #' mesurer_risque_empirique(res_ckm, cat_vars, 1:4, 1:4)
-mesurer_risque_empirique <- function(res_ckm, cat_vars, orig, pert){
+mesurer_risque_empirique <- function(res_ckm, cat_vars, i_risk, j_risk){
 
   tableau <- res_ckm$tab
-  pert <- pert[pert %in% tableau$nb_obs_ckm | pert == 0]
-  if(length(pert) == 0){
+  j_risk <- j_risk[j_risk %in% tableau$nb_obs_ckm | j_risk == 0]
+  if(length(j_risk) == 0){
     message(
       "Les valeurs perturbées renseignées ne peuvent pas exister dans les données finales.
-      Veuillez modifier l'argument `pert`"
+      Veuillez modifier l'argument `j_risk`"
     )
     return(NULL)
   }
 
   # top_i <- p_transition |> tail(1) |> pull(i) #ifelse(js==0, D, D+js+1)
 
-  all_origs = paste0(orig, collapse = ", ")
-  all_perts = paste0(pert, collapse = ", ")
+  all_origs = paste0(i_risk, collapse = ", ")
+  all_perts = paste0(j_risk, collapse = ", ")
 
   tableau_complet <- ajouter_zeros_tableau(tableau, cat_vars)
 
-  freq_i <- tableau_complet |> count(nb_obs) |> rename(freq_i = n, i = nb_obs) |> filter(i %in% orig)
-  freq_j <- tableau_complet |> count(nb_obs_ckm) |> rename(freq_j = n, j = nb_obs_ckm) |> filter(j %in% pert)
+  freq_i <- tableau_complet |> count(nb_obs) |> rename(freq_i = n, i = nb_obs) |> filter(i %in% i_risk)
+  freq_j <- tableau_complet |> count(nb_obs_ckm) |> rename(freq_j = n, j = nb_obs_ckm) |> filter(j %in% j_risk)
 
   freq_i <- bind_rows(
     freq_i |> mutate(i = as.character(i)),
@@ -311,9 +349,10 @@ mesurer_risque_empirique <- function(res_ckm, cat_vars, orig, pert){
 
 
   croisements_o_p <- expand.grid(
-    i = c(orig, all_origs),
-    j = c(pert, all_perts),
-    stringsAsFactors = FALSE
+    i = c(i_risk, all_origs),
+    j = c(j_risk, all_perts),
+    stringsAsFactors = FALSE,
+    KEEP.OUT.ATTRS = FALSE
   )
 
   croisements_o_p$prob_i_sachant_j <-
@@ -321,8 +360,8 @@ mesurer_risque_empirique <- function(res_ckm, cat_vars, orig, pert){
       croisements_o_p$i, croisements_o_p$j,
       \(val_i, val_j){
 
-        if(val_i == all_origs) val_i <- orig
-        if(val_j == all_perts) val_j <- pert
+        if(val_i == all_origs) val_i <- i_risk
+        if(val_j == all_perts) val_j <- j_risk
 
         numerateur = tableau_complet |>
           filter(nb_obs_ckm %in% val_j & nb_obs %in% val_i) |>
