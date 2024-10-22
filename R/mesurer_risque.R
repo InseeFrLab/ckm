@@ -169,18 +169,18 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 #' tab_comptage <- tabulate_cnt_micro_data(
 #'   df = dtest, rk = NULL,
 #'   cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE"),
-#'   marge_label = "Total"
+#'   marge_label = "Total",
+#'   freq_empiriq = TRUE
 #' )
-#' p_hat <- calculer_frequences_empiriques(tab_comptage, c("DEP", "DIPLOME", "SEXE", "AGE"))
 #'
 #' # Ci-dessous calcul des probabilités de transition inverses P(X=i|X'=1) avec
 #' #i qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble).
-#' mesurer_risque(mat_trans, p_hat, 1:4, 1)
+#' mesurer_risque(mat_trans, tab_comptage$freq, 1:4, 1)
 #'
 #' # Ci-dessous calcul des probabilités de transition inverses P(X=i|X'=j) avec
 #' # i qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble)
 #' # et j qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble).
-#' mesurer_risque(mat_trans, p_hat, 1:4, 1:4)
+#' mesurer_risque(mat_trans, tab_comptage$freq, 1:4, 1:4)
 mesurer_risque <- function(matrice_transition, freq, i_risk, j_risk){
 
   p_transition <- matrice_transition@pTable[, .(i,j,p)]
@@ -212,6 +212,9 @@ mesurer_risque <- function(matrice_transition, freq, i_risk, j_risk){
 
   nb_compt_sup_D <- nrow(p_hat |> filter(i > top_i))
 
+  #p_transition_augmentee = table de perturbation augmentee des valeurs
+  #de l'intervalle des possibles qui sont supérieures à la dernière
+  #valeur i de la mat de transition
   p_transition_augmentee <- rbind(
     p_transition,
     p_transition[i == top_i,][
@@ -226,23 +229,34 @@ mesurer_risque <- function(matrice_transition, freq, i_risk, j_risk){
     )
   p_transition_augmentee[is.na(p_hat), p_hat := 0]
 
+
+
+
+
+
+
+
+
+
   # p = pij
   # p_hat = P(X=i)
-  # p_hat_star = sum_{k in N}{pkj P(X=k)}
-  # p_hat_star_all_pert = sum_{i in N}{ P(X=i) sum{j in j_risk}{pij}}
+  # p_hat_star = sum_{k in N}{pkj P(X=k)} = sum_{k in D_poss}{pkj P(X=k)}
+  # où D_poss est l'intervalle des possibles de j
   p_transition_augmentee <- p_transition_augmentee[
     #p_hat_star = sum_{k in N}{pkj P(X=k)} (denominateur de la proba de trans inverse)
     , p_hat_star := sum(p * p_hat)
     , by = .(j)
   ][
     , `:=`(
-      #prob de X = i sachant X' = j
+      #prob de X = i sachant X' = j (transition inverse terme à terme)
       p_star = p * p_hat / p_hat_star
     )
   ]
 
+  # p_hat_star_all_pert = sum_{i in N}{ P(X=i) sum{j in j_risk}{pij}}
   p_hat_star_pert <- unique(p_transition_augmentee[ j %in% j_risk, .(j,p_hat_star)])[, sum(p_hat_star)]
 
+  #transition inverse ensemble (j) à terme (i)
   p_transition_augmentee[
     ,
     p_star_all_pert := ifelse(j %in% j_risk, p * p_hat / p_hat_star_pert, NA)#prob de X = i sachant X' in j_risk]

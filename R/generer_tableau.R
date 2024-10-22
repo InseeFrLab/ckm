@@ -71,7 +71,11 @@ tabulate_cnt_micro_data <- function(
     msg = "La clé individuelle mentionnée est absente de vos données."
   )
 
-  all_cat_vars = c(cat_vars, unlist(unname(hrc_vars)))
+  if(is.null(cat_vars) & is.null(hrc_vars)){
+    all_cat_vars <- df %>% dplyr::select(where(is.character)) %>% names()
+  }else{
+    all_cat_vars <- c(cat_vars, unlist(unname(hrc_vars)))
+  }
 
   data_dt <- data.table::as.data.table(df) |>
     dplyr::mutate( dplyr::across(dplyr::all_of(all_cat_vars), as.character))
