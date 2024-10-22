@@ -73,7 +73,7 @@ calculer_frequences_empiriques <- function(tableau, hierarchies = NULL){
     tableau |>
       ajouter_zeros_tableau(cat_vars = cat_vars) |>
       count(nb_obs) |>
-      mutate(p_hat = n/n()) |>
+      mutate(p_hat = n/sum(n)) |>
       rename(i = nb_obs, N = n)
   )
 }

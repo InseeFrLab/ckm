@@ -103,7 +103,7 @@ appliquer_ckm <- function(
           dplyr::mutate(nb_obs_ckm = nb_obs + v) |>
           dplyr::select(-ck_end, -i, -v, -p_int_lb, -p_int_ub, - {{ ck_var }}),
         risque = risque,
-        ptab = mat_trans
+        ptab = mat_trans, # + utilité
       )
     )
 
