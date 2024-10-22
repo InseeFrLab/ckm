@@ -36,8 +36,8 @@ appliquer_ckm <- function(
     D,
     V,
     js = 0,
-    i_risk = 1:4,
-    j_risk = 1:4,
+    i_risk = 1,
+    j_risk = 1,
     ...) {
 
   if(!is.data.frame(tab_data)){
@@ -103,7 +103,8 @@ appliquer_ckm <- function(
           dplyr::mutate(nb_obs_ckm = nb_obs + v) |>
           dplyr::select(-ck_end, -i, -v, -p_int_lb, -p_int_ub, - {{ ck_var }}),
         risque = risque,
-        ptab = mat_trans, # + utilité
+        utilite = utilite,
+        ptab = mat_trans
       )
     )
 
@@ -113,6 +114,7 @@ appliquer_ckm <- function(
       list(
         tab = res,
         risque = risque,
+        utilite = utilite,
         ptab = mat_trans
       )
     )
