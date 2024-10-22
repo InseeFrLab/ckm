@@ -283,7 +283,7 @@ mesurer_risque <- function(matrice_transition, freq, i_risk, j_risk){
     ) |>
     purrr::list_c()
 
-  return(tibble::as_tibble(croisements_o_p))
+  return(unique(tibble::as_tibble(croisements_o_p)))
 }
 
 

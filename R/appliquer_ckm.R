@@ -16,6 +16,7 @@
 #' @export
 #' @import data.table
 #' @examples
+#' library(dplyr)
 #' data("dtest")
 #' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
 #'
@@ -28,7 +29,7 @@
 #' )
 #'
 #' res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
-#' str(res_ckm)
+#' str(res_ckm, max.level = 2)
 appliquer_ckm <- function(
     tab_data,
     cnt_var = "nb_obs",
@@ -56,6 +57,10 @@ appliquer_ckm <- function(
     min(dt_data[[ck_var]]) >= 0 | max(dt_data[[ck_var]]) <= 1,
     msg = "La clé des cellules doit nécessairement être une valeur entre 0 et 1"
   )
+  assertthat::assert_that(
+    cnt_var %in% names(dt_data),
+    msg = "La variable de comptage renseignée dans l'argument `cnt_var` n'existe pas dans le jeu de données fourni."
+  )
 
   # Construction de la table de perturbation
   args_add <- c(...)
@@ -65,7 +70,7 @@ appliquer_ckm <- function(
   tab_pert <- creer_table_perturbation(mat_trans)
   max_i <- max(tab_pert$i)
 
-  dt_data[,`:=`(i = ifelse(nb_obs <= max_i, nb_obs, max_i))]
+  dt_data[,`:=`(i = ifelse(get(cnt_var) <= max_i, get(cnt_var), max_i))]
   # cell_key = rkeys_tot %% 1, # on récupère la partie décimale de la somme des clés
   #par commodité pour la fusion
   #les probas de transition pour les valeurs > Dmax_i sont identiques à i = max_i
@@ -74,9 +79,12 @@ appliquer_ckm <- function(
   data.table::setkeyv(dt_data, cols = c("i", ck_var, "ck_end"))
 
   # fusion par intervalle
-  res <- data.table::foverlaps(dt_data, tab_pert, mult = "all")
+  cnt_var_ckm <- paste0(cnt_var, "_ckm")
+  res <- data.table::foverlaps(dt_data, tab_pert, mult = "all") |>
+    dplyr::mutate(res_ckm = get(cnt_var) + v) |>
+    dplyr::rename_with(~cnt_var_ckm, res_ckm)
 
-  # Mesures de risque si les fréquences empiriques sont fournies dans tab_data
+   # Mesures de risque si les fréquences empiriques sont fournies dans tab_data
   if(!is.null(p_hat)){
     risque <- mesurer_risque(mat_trans, p_hat, i_risk, j_risk)
   }else{
@@ -85,9 +93,9 @@ appliquer_ckm <- function(
 
   # Mesures d'utilité
   utilite <- tibble::tibble(
-    ecarts_absolus_moyens = ecarts_absolus_moyens(res$nb_obs, res$nb_obs_ckm),
-    ecarts_absolus_moyens_relatifs = ecarts_absolus_moyens_relatifs(res$nb_obs, res$nb_obs_ckm),
-    hellinger = distance_hellinger(res$nb_obs, res$nb_obs_ckm)
+    ecarts_absolus_moyens = ecarts_absolus_moyens(res[[cnt_var]], res[[cnt_var_ckm]]),
+    ecarts_absolus_moyens_relatifs = ecarts_absolus_moyens_relatifs(res[[cnt_var]], res[[cnt_var_ckm]]),
+    hellinger = distance_hellinger(res[[cnt_var]], res[[cnt_var_ckm]])
   )
 
   # Test
@@ -100,7 +108,6 @@ appliquer_ckm <- function(
         tab = res |>
           as.data.frame() |>
           tibble::as_tibble() |>
-          dplyr::mutate(nb_obs_ckm = nb_obs + v) |>
           dplyr::select(-ck_end, -i, -v, -p_int_lb, -p_int_ub, - {{ ck_var }}),
         risque = risque,
         utilite = utilite,
@@ -113,8 +120,6 @@ appliquer_ckm <- function(
     return(
       list(
         tab = res,
-        risque = risque,
-        utilite = utilite,
         ptab = mat_trans
       )
     )
