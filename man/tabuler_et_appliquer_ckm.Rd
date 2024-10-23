@@ -13,6 +13,8 @@ tabuler_et_appliquer_ckm(
   D,
   V,
   js = 0,
+  i_risk = 1:4,
+  j_risk = 1:4,
   ...
 )
 }
@@ -51,6 +53,7 @@ res_ckm <- tabuler_et_appliquer_ckm(
   cat_vars = c("DIPLOME", "SEXE", "AGE"),
   hrc_vars = list(GEO = c("REG", "DEP")),
   marge_label = "Total",
-  D = 5, V = 2
+  D = 10, V = 15, js = 4,
+  j_risk = 0
 )
 }

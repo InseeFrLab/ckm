@@ -72,7 +72,7 @@ tabulate_cnt_micro_data <- function(
   )
 
   if(is.null(cat_vars) & is.null(hrc_vars)){
-    all_cat_vars <- df %>% dplyr::select(where(is.character)) %>% names()
+    all_cat_vars <- df |> dplyr::select(dplyr::where(is.character)) |> names()
   }else{
     all_cat_vars <- c(cat_vars, unlist(unname(hrc_vars)))
   }

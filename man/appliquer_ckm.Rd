@@ -4,10 +4,20 @@
 \alias{appliquer_ckm}
 \title{Appliquer une CKM sur un tableau}
 \usage{
-appliquer_ckm(tab_data, cnt_var = "nb_obs", ck_var = "ckey", D, V, js = 0, ...)
+appliquer_ckm(
+  tab_data,
+  cnt_var = "nb_obs",
+  ck_var = "ckey",
+  D,
+  V,
+  js = 0,
+  i_risk = 1,
+  j_risk = 1,
+  ...
+)
 }
 \arguments{
-\item{tab_data}{tableau agrégé}
+\item{tab_data}{objet retourné par `tabulate_cnt_micro_data`  (data.frame ou liste)}
 
 \item{cnt_var}{(character) nom de la variable de comptage (fréquences, effectifs)}
 
@@ -26,12 +36,15 @@ valeur 0 sera interdite.}
 \item{...}{Paramètres additionnels de la fonction `ptable::create_cnt_ptable`}
 }
 \value{
-liste comprenant la table perturbée et la matrice de transition
+liste comprenant la table perturbée, la matrice de transition, la mesure du
+risque (NULL si les fréquences empiriques ne sont pas fournies) et la mesure
+de l'utilité.
 }
 \description{
 Appliquer une CKM sur un tableau
 }
 \examples{
+library(dplyr)
 data("dtest")
 dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
 
@@ -39,9 +52,10 @@ tab_avant <- tabulate_cnt_micro_data(
   df = dtest_avec_cles,
   cat_vars = c("DIPLOME", "SEXE", "AGE"),
   hrc_vars = list(GEO = c("REG", "DEP")),
-  marge_label = "Total"
+  marge_label = "Total",
+  freq_empiriq = TRUE #pour pouvoir mesurer le risque
 )
 
 res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
-str(res_ckm$tab)
+str(res_ckm, max.level = 2)
 }

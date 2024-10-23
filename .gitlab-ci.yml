@@ -17,12 +17,8 @@ pkg_check:
   tags:
     - docker
   script:
-    - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable', 'cellKey'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
-    - R -e 'devtools::check(check_dir = ".",
-                            error_on  = "error",
-                            cran      = FALSE,
-                            document  = FALSE,
-                            manual    = FALSE)'
+    - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - R -e 'devtools::check(check_dir = ".",error_on  = "error",cran = FALSE, document  = FALSE, manual = FALSE)'
   artifacts:
     paths:
       - "${PKG_NAME}_*.tar.gz"
@@ -34,7 +30,7 @@ testing:
   allow_failure: true
   when: on_success
   script:
-    - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable', 'cellKey'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
     - R -e 'devtools::test()'
   only:
     - main

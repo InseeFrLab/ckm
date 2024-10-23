@@ -1,17 +1,34 @@
 #' Ajoute les croisements nuls à un tableau de données
 #'
-#' @param tableau
-#' @param cat_vars
+#' @param tableau data.frame
+#' @param cat_vars vecteur de chaines de caractères: variables de `tableau` qui sont croisées
+#' @param cnt_var chaine de caractères: nom de la variable de comptage
 #'
-#' @return
+#' @return data.frame avec le croisement de toutes les modalités (y compris nuls)
 #' @export
 #'
 #' @examples
-ajouter_zeros_tableau <- function(tableau, cat_vars){
+#' library(dplyr)
+#'
+#' data("dtest")
+#' cat_vars <- c("DEP", "DIPLOME", "SEXE", "AGE")
+#' tab_comptage <- tabulate_cnt_micro_data(
+#'   df = dtest, rk = NULL,
+#'   cat_vars = cat_vars,
+#'   marge_label = "Total"
+#' )
+#'
+#' avec_zeros <- ajouter_zeros_tableau(tab_comptage, cat_vars)
+ajouter_zeros_tableau <- function(tableau, cat_vars = NULL, cnt_var = "nb_obs"){
 
+  if(is.null(cat_vars)){
+    cat_vars <- tableau |>
+      dplyr::select(where(is.character(cat_vars))) |>
+      names()
+  }
   cols <- names(tableau)
   all_mods_vals <- tableau |>
-    dplyr::select(all_of(cat_vars)) |>
+    dplyr::select(dplyr::all_of(cat_vars)) |>
     purrr::map(
       \(colvar) unique(colvar)
     ) |>
@@ -19,12 +36,12 @@ ajouter_zeros_tableau <- function(tableau, cat_vars){
       stringsAsFactors = FALSE,
       KEEP.OUT.ATTRS = FALSE
     ) |>
-    full_join(
+    dplyr::full_join(
       tableau |>
-        dplyr::select(all_of(c(cat_vars)), starts_with("nb_obs")),
+        dplyr::select(dplyr::all_of(c(cat_vars)), dplyr::starts_with(cnt_var)),
       by = cat_vars
     ) |>
-    mutate(across(starts_with("nb_obs"), ~ifelse(is.na(.), 0, .)))
+    dplyr::mutate(dplyr::across(dplyr::starts_with(cnt_var), ~ifelse(is.na(.), 0, .)))
 
   return(all_mods_vals)
 }
@@ -38,9 +55,12 @@ ajouter_zeros_tableau <- function(tableau, cat_vars){
 #' @param hierarchies liste de vecteurs - description des emboîtements éventuelles
 #' des variables catégorielles de tableau entre elles
 #'
-#' @return
-#' @export data.frame avec 3 colonnes
-#' (i = comptage, N = nb d'apparitions du comptage, p_hat = fréquence empirique du comptage)
+#' @return data.frame avec 3 colonnes:
+#' - i = comptage
+#' - N = nb d'apparitions du comptage
+#' - p_hat = fréquence empirique du comptage
+#'
+#' @export
 #'
 #' @examples
 #' library(ptable)
@@ -63,7 +83,7 @@ ajouter_zeros_tableau <- function(tableau, cat_vars){
 #' p_hat <- calculer_frequences_empiriques(tab_comptage1)
 calculer_frequences_empiriques <- function(tableau, hierarchies = NULL){
 
-  cat_vars <- tableau |> select(where(is.character)) |> names()
+  cat_vars <- tableau |> dplyr::select(dplyr::where(is.character)) |> names()
   if(!is.null(hierarchies)){
     cat_a_supprimer <- sapply(hierarchies, \(h) h[-length(h)])
     cat_vars <- cat_vars[!cat_vars %in% cat_a_supprimer]
@@ -72,9 +92,9 @@ calculer_frequences_empiriques <- function(tableau, hierarchies = NULL){
   return(
     tableau |>
       ajouter_zeros_tableau(cat_vars = cat_vars) |>
-      count(nb_obs) |>
-      mutate(p_hat = n/sum(n)) |>
-      rename(i = nb_obs, N = n)
+      dplyr::count(nb_obs) |>
+      dplyr::mutate(p_hat = n/sum(n)) |>
+      dplyr::rename(i = nb_obs, N = n)
   )
 }
 
@@ -154,11 +174,20 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 #'
 #' @param matrice_transition objet retourné par `creer_matrice_transition`
 #' @param freq objet retourné par `calculer_frequences_empiriques`
-#' @param i_risk vecteur d'entiers (valeurs originales)
-#' @param j_risk vecteur d'entiers (valeurs perturbées)
+#' @param I vecteur d'entiers (valeurs originales)
+#' @param J vecteur d'entiers (valeurs perturbées)
 #'
-#' @return
+#' @return `data.frame` de 5 colonnes:
+#' - `i`: valeur(s) prise(s) par X
+#' - `j`: valeur(s) prise(s) par X'
+#' - `pi_hat`: Estimation de `P( X = i )`
+#' - `pij`: Probabilité de transition `P(X' = j | X = i )`
+#' - `qij`: Probabilité de transition inverse `P( X = i | X' = j )`
+#'
 #' @export
+#'
+#' @details
+#' Pour le code, voir les formules et algorithmes ici (ajouter lien vers document pdf).
 #'
 #' @examples
 #' library(ptable)
@@ -181,223 +210,260 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 #' # i qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble)
 #' # et j qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble).
 #' mesurer_risque(mat_trans, tab_comptage$freq, 1:4, 1:4)
-mesurer_risque <- function(matrice_transition, freq, i_risk, j_risk){
+mesurer_risque <- function(matrice_transition, freq, I, J){
 
   p_transition <- matrice_transition@pTable[, .(i,j,p)]
+  data.table::setnames(p_transition, c("i","j"), c("X","Xp"))
+
   D <- matrice_transition@pParams@D
   js <- matrice_transition@pParams@js
 
-  j_risk <- j_risk[j_risk > js | j_risk == 0]
-  if(length(j_risk) == 0){
+  J <- J[J > js | J == 0]
+  if(length(J) == 0){
     message(
       "Avertissement: Les valeurs perturbées renseignées ne peuvent pas exister dans les données finales, au regard des paramètres de la matrice de transition.
-    Pour obtenir une mesure de risque, modifier l'argument `j_risk`."
+    Pour obtenir une mesure de risque, modifier l'argument `J`."
     )
     return(NULL)
   }
 
-  top_i <- p_transition |> tail(1) |> pull(i) #ifelse(js==0, D, D+js+1)
+  top_i <- p_transition[.N, X] #ifelse(js==0, D, D+js+1)
 
   p_hat <- freq |> as.data.table()
+  data.table::setnames(p_hat, c("i"), c("X"))
 
-  if(p_hat[ i %in% i_risk, sum(p_hat)] == 0){
+  if(p_hat[ X %in% I, sum(p_hat)] == 0){
     message(
       paste0("Avertissement: Dans votre tableau agrégé original, aucune case ne prend les valeurs ",
-             paste0(i_risk, collapse = ", "),
+             paste0(I, collapse = ", "),
              "\n Le risque n'est donc pas mesurable."
       )
     )
     return(NULL)
   }
 
-  nb_compt_sup_D <- nrow(p_hat |> filter(i > top_i))
+  nb_compt_sup_D <- nrow(p_hat |> dplyr::filter(X > top_i))
 
   #p_transition_augmentee = table de perturbation augmentee des valeurs
   #de l'intervalle des possibles qui sont supérieures à la dernière
   #valeur i de la mat de transition
   p_transition_augmentee <- rbind(
     p_transition,
-    p_transition[i == top_i,][
+    p_transition[X == top_i,][
       rep(1:.N, nb_compt_sup_D)][
-        , i := sort(rep(p_hat[i>top_i,i], 2*D+1))][
-          , j := i - (top_i-j)
+        , X := sort(rep(p_hat[X > top_i, X], 2*D+1))][
+          , Xp := Xp - (top_i-X)
         ][]
   ) |>
     merge(
-      p_hat[, .(i,p_hat)],
-      by = "i", all = TRUE
+      p_hat[, .(X, p_hat)],
+      by = "X", all = TRUE
     )
   p_transition_augmentee[is.na(p_hat), p_hat := 0]
 
+  # Calcul des qj
+  calculer_qj <- function(tab, j, Dposs_j){
 
-
-
-
-
-
-
-
-
-  # p = pij
-  # p_hat = P(X=i)
-  # p_hat_star = sum_{k in N}{pkj P(X=k)} = sum_{k in D_poss}{pkj P(X=k)}
-  # où D_poss est l'intervalle des possibles de j
-  p_transition_augmentee <- p_transition_augmentee[
-    #p_hat_star = sum_{k in N}{pkj P(X=k)} (denominateur de la proba de trans inverse)
-    , p_hat_star := sum(p * p_hat)
-    , by = .(j)
-  ][
-    , `:=`(
-      #prob de X = i sachant X' = j (transition inverse terme à terme)
-      p_star = p * p_hat / p_hat_star
-    )
-  ]
-
-  # p_hat_star_all_pert = sum_{i in N}{ P(X=i) sum{j in j_risk}{pij}}
-  p_hat_star_pert <- unique(p_transition_augmentee[ j %in% j_risk, .(j,p_hat_star)])[, sum(p_hat_star)]
-
-  #transition inverse ensemble (j) à terme (i)
-  p_transition_augmentee[
-    ,
-    p_star_all_pert := ifelse(j %in% j_risk, p * p_hat / p_hat_star_pert, NA)#prob de X = i sachant X' in j_risk]
-  ]
-
-  all_origs = paste0(i_risk, collapse = ", ")
-  all_perts = paste0(j_risk, collapse = ", ")
-
-  croisements_o_p <- expand.grid(
-    i = c(i_risk, all_origs),
-    j = c(j_risk, all_perts),
-    stringsAsFactors = FALSE,
-    KEEP.OUT.ATTRS = FALSE
-  )
-
-  croisements_o_p$frequence_empirique_i =
-    sapply(
-      croisements_o_p$i,
-      \(val_i){
-        if(val_i == all_origs) unique(p_transition_augmentee[i %in% i_risk, .(i, p_hat)])[,sum(p_hat)] else p_transition_augmentee[i == val_i, p_hat][1]
-      }
-    )
-
-  croisements_o_p$prob_i_sachant_j =
-    purrr::map2(
-      croisements_o_p$i, croisements_o_p$j,
-      \(val_i, val_j){
-        if(val_i == all_origs & val_j == all_perts){
-          p_transition_augmentee[i %in% i_risk & j %in% j_risk, sum(p_star_all_pert)]
-        }else if(val_i == all_origs){
-          p_transition_augmentee[i %in% i_risk & j == val_j, sum(p_star)]
-        }else if(val_j == all_perts){
-          p_transition_augmentee[i == val_i & j %in% j_risk, sum(p_star_all_pert)]
-        }else{
-          p_transition_augmentee[i == val_i & j == val_j, p_star]
-        }
-      }
-    ) |>
-    purrr::list_c()
-
-  return(unique(tibble::as_tibble(croisements_o_p)))
-}
-
-
-
-#' Calcule des probas de transition empiriques - NE PAS UTILISER
-#'
-#' @param res_ckm objet retourné par la fonction `appliquer_ckm`
-#' @param cat_vars
-#' @param i_risk
-#' @param j_risk
-#'
-#' @return
-#' @export
-#'
-#' @examples
-#' library(dplyr)
-#' data("dtest")
-#' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
-#'
-#' cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE")
-#' res_ckm <- tabuler_et_appliquer_ckm(
-#'   df = dtest_avec_cles,
-#'   cat_vars = cat_vars,
-#'   marge_label = "Total",
-#'   D = 5, V = 2
-#' )
-#' mesurer_risque_empirique(res_ckm, cat_vars, 1:4, 1:4)
-mesurer_risque_empirique <- function(res_ckm, cat_vars, i_risk, j_risk){
-
-  tableau <- res_ckm$tab
-  j_risk <- j_risk[j_risk %in% tableau$nb_obs_ckm | j_risk == 0]
-  if(length(j_risk) == 0){
-    message(
-      "Les valeurs perturbées renseignées ne peuvent pas exister dans les données finales.
-      Veuillez modifier l'argument `j_risk`"
-    )
-    return(NULL)
+    qj <- 0
+    for(k in Dposs_j){
+      pk <- tab[X == k, p_hat][1]
+      pkj <- tab[X == k & Xp == j, p][1]
+      qj <- qj + pk*pkj
+    }
+    return(qj)
   }
 
-  # top_i <- p_transition |> tail(1) |> pull(i) #ifelse(js==0, D, D+js+1)
+  # Calcul des q_ij
 
-  all_origs = paste0(i_risk, collapse = ", ")
-  all_perts = paste0(j_risk, collapse = ", ")
+  calculer_qij <- function(tab,i,j){
 
-  tableau_complet <- ajouter_zeros_tableau(tableau, cat_vars)
+    Dposs_j <- calculer_ensemble_possibles(j,D,js)
 
-  freq_i <- tableau_complet |> count(nb_obs) |> rename(freq_i = n, i = nb_obs) |> filter(i %in% i_risk)
-  freq_j <- tableau_complet |> count(nb_obs_ckm) |> rename(freq_j = n, j = nb_obs_ckm) |> filter(j %in% j_risk)
+    pi <- tab[X == i, p_hat][1]
+    pij <- tab[X == i & Xp == j, p][1]
 
-  freq_i <- bind_rows(
-    freq_i |> mutate(i = as.character(i)),
-    freq_i |>
-      summarise(freq_i = sum(freq_i)) |>
-      mutate(i = all_origs)
+    qj <- calculer_qj(tab, j, Dposs_j)
+
+    return(pi*pij/qj)
+  }
+
+
+  # Calcul des piJ
+  calculer_piJ <- function(tab, i, J){
+    piJ <- 0
+    for(j in J){
+      pij <- tab[X == i & Xp == j, p][1]
+      piJ <- piJ + pij
+    }
+    return(piJ)
+  }
+
+  # Calcul des qJ
+  calculer_qJ <- function(tab, J){
+    qJ <- 0
+    for(j in J){
+      Dposs_j <- calculer_ensemble_possibles(j,D,js)
+      qJ <- qJ + calculer_qj(tab, j, Dposs_j)
+    }
+    return(qJ)
+  }
+
+  # Calcul des q_iJ
+
+  calculer_qiJ <- function(tab, i, J){
+
+    pi <- tab[X == i, p_hat][1]
+
+    piJ <- calculer_piJ(tab, i, J)
+
+    qJ <- calculer_qJ(tab, J)
+
+    return(piJ * pi/qJ)
+  }
+
+  # Calcul des q_IJ
+
+  calculer_qIJ <- function(tab, I, J){
+
+    sum(sapply(I, \(i) calculer_qiJ(tab,i,J)))
+
+  }
+
+  # Calcul des q_Ij
+  calculer_qIj <- function(tab, I, j){
+
+    sum(sapply(I, \(i) calculer_qij(tab,i,j)))
+
+  }
+
+  # Résultats:
+  all_origs = paste0(I, collapse = ", ")
+  all_perts = paste0(J, collapse = ", ")
+
+  res_q <- data.frame(
+    i = vector("character"),
+    j = vector("character"),
+    pi_hat =  vector("numeric"),
+    pij =  vector("numeric"),
+    qij = vector("numeric")
   )
-  freq_j <- bind_rows(
-    freq_j |> mutate(j = as.character(j)),
-    freq_j |>
-      summarise(freq_j = sum(freq_j)) |>
-      mutate(j = all_origs)
-  )
 
+  for(i in I){
+    for(j in J){
+      res1 <- data.frame(
+        i = as.character(i),
+        j = as.character(j),
+        pi_hat = p_transition_augmentee[X==i, p_hat][1],
+        pij =  p_transition_augmentee[X==i & Xp==j, p],
+        qij = calculer_qij(p_transition_augmentee, i, j)
+      )
 
+      res_q <- dplyr::bind_rows(res_q,res1)
+    }
+    if(length(J) > 1){
+      res2 <- data.frame(
+        i = as.character(i),
+        j = all_perts,
+        pi_hat = p_transition_augmentee[X == i, p_hat][1],
+        pij =  calculer_piJ(p_transition_augmentee, i, J),
+        qij = calculer_qiJ(p_transition_augmentee, i, J)
+      )
+      res_q <- dplyr::bind_rows(res_q, res2)
+    }
+  }
 
-  croisements_o_p <- expand.grid(
-    i = c(i_risk, all_origs),
-    j = c(j_risk, all_perts),
-    stringsAsFactors = FALSE,
-    KEEP.OUT.ATTRS = FALSE
-  )
+  if(length(I) > 1){
+    for(j in J){
 
-  croisements_o_p$prob_i_sachant_j <-
-    purrr::map2(
-      croisements_o_p$i, croisements_o_p$j,
-      \(val_i, val_j){
+      res3 <- data.frame(
+        i = all_origs,
+        j = as.character(j),
+        pi_hat = unique(p_transition_augmentee[X %in% I, .(X,p_hat)])[, sum(p_hat)],
+        pij =  unique(p_transition_augmentee[X %in% I & Xp == j, .(X,p)])[, sum(p)],
+        qij = calculer_qIj(p_transition_augmentee, I, j)
+      )
 
-        if(val_i == all_origs) val_i <- i_risk
-        if(val_j == all_perts) val_j <- j_risk
+      res_q <- dplyr::bind_rows(res_q, res3)
+    }
+  }
 
-        numerateur = tableau_complet |>
-          filter(nb_obs_ckm %in% val_j & nb_obs %in% val_i) |>
-          count() |>
-          pull(n)
-        denominateur = tableau_complet |>
-          filter(nb_obs_ckm %in% val_j) |>
-          count() |>
-          pull(n)
+  if(length(I) > 1 & length(J) > 1){
 
-        return(numerateur/denominateur)
-      }
-    ) |>
-    purrr::list_c()
+    res_q <- dplyr::bind_rows(
+      res_q,
+      data.frame(
+        i = all_origs,
+        j = all_origs,
+        pi_hat = unique(p_transition_augmentee[X %in% I, .(X,p_hat)])[, sum(p_hat)],
+        pij =  sum(sapply(I, \(i) calculer_piJ(p_transition_augmentee, i, J))),
+        qij = calculer_qIJ(p_transition_augmentee, I, J)
+      )
+    )
+  }
 
-  if(any(freq_i$freq_i < 100) | any(freq_j$freq_j < 100))
-    message("Les probas empiriques ne doivent pas être interpétées
-            si les fréquences empiriques des comptages sont faibles.")
-  return(
-    croisements_o_p |>
-    full_join(freq_i, by = "i") |>
-    full_join(freq_j, by = "j")
-  )
+  return(res_q)
+
+#
+#   # p = pij
+#   # p_hat = P(X=i)
+#   # p_hat_star = sum_{k in N}{pkj P(X=k)} = sum_{k in D_poss}{pkj P(X=k)}
+#   # où D_poss est l'intervalle des possibles de j
+#   p_transition_augmentee <- p_transition_augmentee[
+#     #p_hat_star = sum_{k in N}{pkj P(X=k)} (denominateur de la proba de trans inverse)
+#     , p_hat_star := sum(p * p_hat)
+#     , by = .(j)
+#   ][
+#     , `:=`(
+#       #prob de X = i sachant X' = j (transition inverse terme à terme)
+#       p_star = p * p_hat / p_hat_star
+#     )
+#   ]
+#
+#   # p_hat_star_all_pert = sum_{i in N}{ P(X=i) sum{j in J}{pij}}
+#   p_hat_star_pert <- unique(p_transition_augmentee[ j %in% J, .(j,p_hat_star)])[, sum(p_hat_star)]
+#
+#   #transition inverse ensemble (j) à terme (i)
+#   p_transition_augmentee[
+#     ,
+#     p_star_all_pert := ifelse(j %in% J, p * p_hat / p_hat_star_pert, NA)#prob de X = i sachant X' in J]
+#   ]
+#
+#   all_origs = paste0(I, collapse = ", ")
+#   all_perts = paste0(J, collapse = ", ")
+#
+#   croisements_o_p <- expand.grid(
+#     i = c(I, all_origs),
+#     j = c(J, all_perts),
+#     stringsAsFactors = FALSE,
+#     KEEP.OUT.ATTRS = FALSE
+#   )
+#
+#   croisements_o_p$frequence_empirique_i =
+#     sapply(
+#       croisements_o_p$i,
+#       \(val_i){
+#         if(val_i == all_origs) unique(p_transition_augmentee[i %in% I, .(i, p_hat)])[,sum(p_hat)] else p_transition_augmentee[i == val_i, p_hat][1]
+#       }
+#     )
+#
+#   croisements_o_p$prob_i_sachant_j =
+#     purrr::map2(
+#       croisements_o_p$i, croisements_o_p$j,
+#       \(val_i, val_j){
+#         if(val_i == all_origs & val_j == all_perts){
+#           p_transition_augmentee[i %in% I & j %in% J, sum(p_star_all_pert)]
+#         }else if(val_i == all_origs){
+#           p_transition_augmentee[i %in% I & j == val_j, sum(p_star)]
+#         }else if(val_j == all_perts){
+#           p_transition_augmentee[i == val_i & j %in% J, sum(p_star_all_pert)]
+#         }else{
+#           p_transition_augmentee[i == val_i & j == val_j, p_star]
+#         }
+#       }
+#     ) |>
+#     purrr::list_c()
+#
+#   return(unique(tibble::as_tibble(croisements_o_p)))
 }
+
 

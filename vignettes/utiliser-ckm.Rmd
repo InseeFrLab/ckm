@@ -55,7 +55,7 @@ maximale) et `V` (la variance de la distribution)
 ```{r ckm_direct}
 res_ckm <- tabuler_et_appliquer_ckm(
  df = dtest_avec_cles,
- cat_vars = c("REG", "DEP","DIPLOME", "SEXE", "AGE"),
+ cat_vars = c("DEP","DIPLOME", "SEXE", "AGE"),
  D = 5, V = 2
 )
 ```
@@ -85,7 +85,7 @@ cellule obtenue en récupérant la partie décimale de la somme des clés indivi
 ```{r tabul}
 tab_avant <- tabulate_cnt_micro_data(
  df = dtest_avec_cles,
- cat_vars = c("REG", "DEP","DIPLOME", "SEXE", "AGE")
+ cat_vars = c("DEP","DIPLOME", "SEXE", "AGE")
 )
 ```
 
@@ -112,19 +112,6 @@ res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
 ```
 
 ```{r structure-res}
-str(res_ckm)
+str(res_ckm, max.level = 2)
 ```
-
-
-### 3-Mesurer la perte d'information
-
-En cours de dev
-
-### 4- Mesure le risque
-
-EN cours de dev
-
-
-
-
 

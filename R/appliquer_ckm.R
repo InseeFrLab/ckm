@@ -37,8 +37,8 @@ appliquer_ckm <- function(
     D,
     V,
     js = 0,
-    i_risk = 1,
-    j_risk = 1,
+    I = 1,
+    J = 1,
     ...) {
 
   if(!is.data.frame(tab_data)){
@@ -86,16 +86,16 @@ appliquer_ckm <- function(
 
    # Mesures de risque si les fréquences empiriques sont fournies dans tab_data
   if(!is.null(p_hat)){
-    risque <- mesurer_risque(mat_trans, p_hat, i_risk, j_risk)
+    risque <- mesurer_risque(mat_trans, p_hat, I, J)
   }else{
     risque <- NULL
   }
 
   # Mesures d'utilité
   utilite <- tibble::tibble(
-    ecarts_absolus_moyens = ecarts_absolus_moyens(res[[cnt_var]], res[[cnt_var_ckm]]),
-    ecarts_absolus_moyens_relatifs = ecarts_absolus_moyens_relatifs(res[[cnt_var]], res[[cnt_var_ckm]]),
-    hellinger = distance_hellinger(res[[cnt_var]], res[[cnt_var_ckm]])
+    MAD = ecarts_absolus_moyens(res[[cnt_var]], res[[cnt_var_ckm]]),
+    RMAD = ecarts_absolus_moyens_relatifs(res[[cnt_var]], res[[cnt_var_ckm]]),
+    HD = distance_hellinger(res[[cnt_var]], res[[cnt_var_ckm]])
   )
 
   # Test

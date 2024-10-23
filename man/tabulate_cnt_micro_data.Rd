@@ -11,7 +11,8 @@ tabulate_cnt_micro_data(
   rk_var = "rkey",
   cat_vars = NULL,
   hrc_vars = NULL,
-  marge_label = "Total"
+  marge_label = "Total",
+  freq_empiriq = FALSE
 )
 }
 \arguments{
@@ -24,10 +25,15 @@ tabulate_cnt_micro_data(
 \item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
 
 \item{marge_label}{label of margins (applied to all cat and hrc variables)}
+
+\item{freq_empiriq}{booléen. Si `TRUE`, génère également le tableau
+des fréquences empiriques des comptages (utile pour la mesure du risque).
+`FALSE` par défaut.}
 }
 \value{
-a tibble. La variable de comptage est nommée `nb_obs`, la clé de la cellule
-est dénommée `ckey`.
+Si `freq_empiriq=FALSE`: un tibble. La variable de comptage est nommée
+`nb_obs`, la clé de la cellule est dénommée `ckey`. Si `freq_empiriq=TRUE`,
+une liste comprenant le tibble ci-dessus et un tiblle des fréquences empiriques.
 }
 \description{
 Construit la table des effectifs en croisant l'ensemble des variables catégorielles

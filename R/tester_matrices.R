@@ -1,13 +1,13 @@
 #' Teste la construction des matrices de
 #' transition pour différentes valeurs de variance à D et js fixés
 #'
-#' @param D
-#' @param js
-#' @param Vmin
-#' @param Vmax
-#' @param Vseq
+#' @param D integer déviation
+#' @param js integer seuil des valeurs sensibles
+#' @param Vmin numeric Variaince minimum à tester
+#' @param Vmax numeric Variance maximum à tester
+#' @param Vseq integer pas d'avancement
 #'
-#' @return
+#' @return data.frame précisant si chaque matrice a pu être construite ou non
 #' @export
 #'
 #' @examples
