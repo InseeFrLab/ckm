@@ -38,12 +38,12 @@ ecarts_absolus_moyens <- function(o, p){
 
 }
 
-#' Ecarts absolus relatifs moyens en %
+#' Ecarts absolus relatifs moyens en \%
 #'
 #' @param o vecteur des valeurs originales
 #' @param p vecteur des valeurs perturbées
 #'
-#' @return numeric (en %)
+#' @return numeric (en \%)
 #' @export
 #'
 #' @examples

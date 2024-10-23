@@ -11,6 +11,7 @@
 #'
 #' @export
 #' @import data.table
+#' @importFrom stats runif
 #' @examples
 #' data("dtest", package = "ckm")
 #' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
@@ -23,7 +24,7 @@ construire_cles_indiv <- function(microdata, seed, nb_decim = NULL){
   mdata <- data.table::as.data.table(microdata)
 
   set.seed(seed)
-  mdata[ , rkey := round(runif(N, 0, 1), digits = nb_decim)]
+  mdata[ , rkey := round(stats::runif(N, 0, 1), digits = nb_decim)]
 
   return(mdata)
 }

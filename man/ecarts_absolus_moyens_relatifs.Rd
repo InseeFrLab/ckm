@@ -2,7 +2,7 @@
 % Please edit documentation in R/mesurer_utilite.R
 \name{ecarts_absolus_moyens_relatifs}
 \alias{ecarts_absolus_moyens_relatifs}
-\title{Ecarts absolus relatifs moyens en %}
+\title{Ecarts absolus relatifs moyens en \%}
 \usage{
 ecarts_absolus_moyens_relatifs(o, p)
 }
@@ -12,10 +12,10 @@ ecarts_absolus_moyens_relatifs(o, p)
 \item{p}{vecteur des valeurs perturbées}
 }
 \value{
-numeric (en %)
+numeric (en \%)
 }
 \description{
-Ecarts absolus relatifs moyens en %
+Ecarts absolus relatifs moyens en \%
 }
 \examples{
 ecarts_absolus_moyens_relatifs(1:100, 11:110)

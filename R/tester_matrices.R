@@ -9,7 +9,8 @@
 #'
 #' @return data.frame précisant si chaque matrice a pu être construite ou non
 #' @export
-#'
+#' @importFrom purrr map
+#' @importFrom purrr list_rbind
 #' @examples
 #' tester_matrices(5, 1)
 #' tester_matrices(10, js = 9)

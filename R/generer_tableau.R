@@ -43,7 +43,7 @@ compute_margins <- function(
 #'
 #' @export
 #' @import data.table
-#'
+#' @importFrom rlang .data
 #' @examples
 #' library(data.table)
 #'

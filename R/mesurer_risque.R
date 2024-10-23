@@ -6,7 +6,17 @@
 #'
 #' @return data.frame avec le croisement de toutes les modalités (y compris nuls)
 #' @export
-#'
+#' @import data.table
+#' @importFrom dplyr all_of
+#' @importFrom dplyr across
+#' @importFrom dplyr mutate
+#' @importFrom dplyr full_join
+#' @importFrom dplyr starts_with
+#' @importFrom dplyr where
+#' @importFrom dplyr select
+#' @importFrom dplyr rename
+#' @importFrom dplyr count
+#' @importFrom purrr map
 #' @examples
 #' library(dplyr)
 #'
@@ -185,6 +195,7 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 #' - `qij`: Probabilité de transition inverse `P( X = i | X' = j )`
 #'
 #' @export
+#' @importFrom dplyr bind_rows
 #'
 #' @details
 #' Pour le code, voir les formules et algorithmes ici (ajouter lien vers document pdf).
@@ -403,67 +414,6 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
 
   return(res_q)
 
-#
-#   # p = pij
-#   # p_hat = P(X=i)
-#   # p_hat_star = sum_{k in N}{pkj P(X=k)} = sum_{k in D_poss}{pkj P(X=k)}
-#   # où D_poss est l'intervalle des possibles de j
-#   p_transition_augmentee <- p_transition_augmentee[
-#     #p_hat_star = sum_{k in N}{pkj P(X=k)} (denominateur de la proba de trans inverse)
-#     , p_hat_star := sum(p * p_hat)
-#     , by = .(j)
-#   ][
-#     , `:=`(
-#       #prob de X = i sachant X' = j (transition inverse terme à terme)
-#       p_star = p * p_hat / p_hat_star
-#     )
-#   ]
-#
-#   # p_hat_star_all_pert = sum_{i in N}{ P(X=i) sum{j in J}{pij}}
-#   p_hat_star_pert <- unique(p_transition_augmentee[ j %in% J, .(j,p_hat_star)])[, sum(p_hat_star)]
-#
-#   #transition inverse ensemble (j) à terme (i)
-#   p_transition_augmentee[
-#     ,
-#     p_star_all_pert := ifelse(j %in% J, p * p_hat / p_hat_star_pert, NA)#prob de X = i sachant X' in J]
-#   ]
-#
-#   all_origs = paste0(I, collapse = ", ")
-#   all_perts = paste0(J, collapse = ", ")
-#
-#   croisements_o_p <- expand.grid(
-#     i = c(I, all_origs),
-#     j = c(J, all_perts),
-#     stringsAsFactors = FALSE,
-#     KEEP.OUT.ATTRS = FALSE
-#   )
-#
-#   croisements_o_p$frequence_empirique_i =
-#     sapply(
-#       croisements_o_p$i,
-#       \(val_i){
-#         if(val_i == all_origs) unique(p_transition_augmentee[i %in% I, .(i, p_hat)])[,sum(p_hat)] else p_transition_augmentee[i == val_i, p_hat][1]
-#       }
-#     )
-#
-#   croisements_o_p$prob_i_sachant_j =
-#     purrr::map2(
-#       croisements_o_p$i, croisements_o_p$j,
-#       \(val_i, val_j){
-#         if(val_i == all_origs & val_j == all_perts){
-#           p_transition_augmentee[i %in% I & j %in% J, sum(p_star_all_pert)]
-#         }else if(val_i == all_origs){
-#           p_transition_augmentee[i %in% I & j == val_j, sum(p_star)]
-#         }else if(val_j == all_perts){
-#           p_transition_augmentee[i == val_i & j %in% J, sum(p_star_all_pert)]
-#         }else{
-#           p_transition_augmentee[i == val_i & j == val_j, p_star]
-#         }
-#       }
-#     ) |>
-#     purrr::list_c()
-#
-#   return(unique(tibble::as_tibble(croisements_o_p)))
 }
 
 

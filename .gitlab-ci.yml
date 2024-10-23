@@ -42,7 +42,7 @@ pages:
   tags:
     - docker
   script:
-    - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable', 'cellKey'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
     - R -e 'devtools::install(dependencies = FALSE)'
     - R -e 'options(pkgdown.internet = FALSE) ; pkgdown::build_site()'
     - R -e 'covr::gitlab(file = "public/coverage.html", quiet = FALSE)'

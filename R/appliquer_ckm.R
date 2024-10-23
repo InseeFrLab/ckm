@@ -15,6 +15,10 @@
 #'
 #' @export
 #' @import data.table
+#' @importFrom tibble tibble
+#' @importFrom tibble as_tibble
+#' @importFrom dplyr rename_with
+#' @importFrom rlang .data
 #' @examples
 #' library(dplyr)
 #' data("dtest")

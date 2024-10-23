@@ -20,7 +20,11 @@ Imports:
     data.table,
     dplyr,
     ptable,
-    tibble
+    tibble,
+    lifecycle,
+    purrr,
+    rlang,
+    utils
 RoxygenNote: 7.3.2
 Suggests: 
     knitr,

@@ -11,8 +11,8 @@ appliquer_ckm(
   D,
   V,
   js = 0,
-  i_risk = 1,
-  j_risk = 1,
+  I = 1,
+  J = 1,
   ...
 )
 }
@@ -32,6 +32,10 @@ clés des individus qui composent la cellule.}
 
 \item{js}{Seuil des valeurs interdites (integer). Si `js=0` (défaut), seule la
 valeur 0 sera interdite.}
+
+\item{I}{vecteur d'entiers (valeurs originales)}
+
+\item{J}{vecteur d'entiers (valeurs perturbées)}
 
 \item{...}{Paramètres additionnels de la fonction `ptable::create_cnt_ptable`}
 }

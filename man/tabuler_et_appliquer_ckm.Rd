@@ -13,8 +13,8 @@ tabuler_et_appliquer_ckm(
   D,
   V,
   js = 0,
-  i_risk = 1:4,
-  j_risk = 1:4,
+  I = 1:4,
+  J = 1:4,
   ...
 )
 }
@@ -36,6 +36,10 @@ tabuler_et_appliquer_ckm(
 \item{js}{Seuil des valeurs interdites (integer). Si `js=0` (défaut), seule la
 valeur 0 sera interdite.}
 
+\item{I}{vecteur d'entiers (valeurs originales)}
+
+\item{J}{vecteur d'entiers (valeurs perturbées)}
+
 \item{...}{Paramètres additionnels de la fonction `ptable::create_cnt_ptable`}
 }
 \value{
@@ -54,6 +58,6 @@ res_ckm <- tabuler_et_appliquer_ckm(
   hrc_vars = list(GEO = c("REG", "DEP")),
   marge_label = "Total",
   D = 10, V = 15, js = 4,
-  j_risk = 0
+  J = 0
 )
 }
