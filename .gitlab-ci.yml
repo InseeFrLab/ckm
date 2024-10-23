@@ -1,5 +1,6 @@
 variables:
   GIT_SSL_NO_VERIFY: "1"
+  _R_CHECK_SYSTEM_CLOCK_: 0
   HTTP_PROXY: http://proxy-app.insee.fr:3128
   HTTPS_PROXY: http://proxy-app.insee.fr:3128
   NO_PROXY: insee.test,insee.intra,insee.fr,localhost

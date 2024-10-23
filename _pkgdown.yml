@@ -5,10 +5,17 @@ navbar:
     left:
       - home
       - reference
+      - articles
+      - news
+
   components:
     reference:
       text: Contenu du package
       href: reference/index.html
+    news:
+      text: Nouveautés
+      href: news/index.html
+
   right:
     - text: Code source
       href: https://gitlab.insee.fr/outilsconfidentialite/ckm
