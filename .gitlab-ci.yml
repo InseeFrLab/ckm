@@ -42,6 +42,10 @@ pages:
     - testing
   tags:
     - docker
+  when: on_success
+  retry:
+    max: 2
+    when: runner_system_failure
   script:
     - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
     - R -e 'devtools::install(dependencies = FALSE)'
@@ -51,6 +55,5 @@ pages:
   artifacts:
     paths:
       - public
-  when: manual
   only:
     - main
