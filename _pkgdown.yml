@@ -2,14 +2,12 @@ destination: public
 
 template:
   bootstrap: 5
-  light-switch: true
-  bootswatch: cosmo
 lang: fr
 
 navbar:
   structure:
     left:  [home, reference, articles, news]
-    right: [search, github, lightswitch]
+    right: [search, gitlab, lightswitch]
 
   components:
     reference:
@@ -18,11 +16,11 @@ navbar:
     news:
       text: Nouveautés
       href: news/index.html
-
-  right:
-    - text: Code source
-      href: https://gitlab.insee.fr/outilsconfidentialite/ckm
+    gitlab:
       icon: fa-gitlab
+      aria-label: Gitlab
+      text: Code source
+      href: https://gitlab.insee.fr/outilsconfidentialite/ckm
 
 home:
   title: Package R pour appliquer la méthode des clés aléatoires
