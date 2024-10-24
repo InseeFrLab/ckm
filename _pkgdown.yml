@@ -1,12 +1,15 @@
 destination: public
 
+template:
+  bootstrap: 5
+  light-switch: true
+  bootswatch: cosmo
+lang: fr
+
 navbar:
   structure:
-    left:
-      - home
-      - reference
-      - articles
-      - news
+    left:  [home, reference, articles, news]
+    right: [search, github, lightswitch]
 
   components:
     reference:
