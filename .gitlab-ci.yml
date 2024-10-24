@@ -6,7 +6,7 @@ variables:
   NO_PROXY: insee.test,insee.intra,insee.fr,localhost
   PKG_NAME: "ckm"
 
-image: inseefrlab/onyxia-rstudio:latest
+image: gitlab-registry.insee.fr:443/kubernetes/images/build/r-toolbox/onyxia-rstudio-insee:r4.3.2
 
 stages:
   - check
@@ -50,8 +50,6 @@ pages:
     - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','evaluate'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
     - R -e 'devtools::install(dependencies = FALSE)'
     - R -e 'options(pkgdown.internet = FALSE) ; pkgdown::build_site()'
-    - R -e 'covr::gitlab(file = "public/coverage.html", quiet = FALSE)'
-  coverage: '/Coverage: \d+\.\d+/'
   artifacts:
     paths:
       - public
