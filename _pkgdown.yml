@@ -1,8 +1,6 @@
 url: ~
 template:
   bootstrap: 5
-  assets:
-    - assets/headroom.min.js
 
 destination: public
 
@@ -10,8 +8,8 @@ lang: fr
 
 navbar:
   structure:
-  left:  [home, reference, articles, news]
-  right: [search, gitlab, lightswitch]
+    left:  [home, reference, articles, news]
+    right: [search, gitlab]
 
   components:
     reference:
