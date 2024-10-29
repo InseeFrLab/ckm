@@ -8,7 +8,8 @@
 #'
 #' @examples
 #' data("dtest")
-#' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
+#' set.seed(123)
+#' dtest_avec_cles <- construire_cles_indiv(dtest)
 #'
 #' res_ckm <- tabuler_et_appliquer_ckm(
 #'   df = dtest_avec_cles,

@@ -22,7 +22,8 @@
 #' @examples
 #' library(dplyr)
 #' data("dtest")
-#' dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
+#' set.seed(8245)
+#' dtest_avec_cles <- construire_cles_indiv(dtest)
 #'
 #' tab_avant <- tabulate_cnt_micro_data(
 #'   df = dtest_avec_cles,
