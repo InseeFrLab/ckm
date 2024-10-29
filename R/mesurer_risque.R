@@ -290,6 +290,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
 
     Dposs_j <- calculer_ensemble_possibles(j,D,js)
 
+    if(! i %in% Dposs_j) return(0)
     pi <- tab[X == i, p_hat][1]
     pij <- tab[X == i & Xp == j, p][1]
 
@@ -301,13 +302,39 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
 
   # Calcul des piJ
   calculer_piJ <- function(tab, i, J){
+
     piJ <- 0
     for(j in J){
       pij <- tab[X == i & Xp == j, p][1]
-      piJ <- piJ + pij
+      piJ <- piJ + ifelse(is.na(pij), 0, pij)
     }
     return(piJ)
   }
+
+  # Calcul des pIj
+  calculer_pIj <- function(tab, I, j){
+
+    num <- 0
+    denom <- 0
+    for(i in I){
+      pi <- tab[X == i, p_hat][1]
+      pij <- tab[X == i & Xp == j, p][1]
+      num <- num + ifelse(is.na(pi) | is.na(pij), 0, pi * pij)
+      denom <- denom + ifelse(is.na(pi), 0, pi)
+    }
+    return(num/denom)
+  }
+
+  # Calcul des pIJ
+  calculer_pIJ <- function(tab, I, J){
+
+    pIJ <- 0
+    for(j in J){
+      pIJ <- pIJ + calculer_pIj(tab, I, j)
+    }
+    return(pIJ)
+  }
+
 
   # Calcul des qJ
   calculer_qJ <- function(tab, J){
@@ -365,7 +392,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
         i = as.character(i),
         j = as.character(j),
         pi_hat = p_transition_augmentee[X==i, p_hat][1],
-        pij =  p_transition_augmentee[X==i & Xp==j, p],
+        pij = if(abs(j-i) > D) 0 else p_transition_augmentee[X==i & Xp==j, p],
         qij = calculer_qij(p_transition_augmentee, i, j)
       )
 
@@ -390,7 +417,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
         i = all_origs,
         j = as.character(j),
         pi_hat = unique(p_transition_augmentee[X %in% I, .(X,p_hat)])[, sum(p_hat)],
-        pij =  unique(p_transition_augmentee[X %in% I & Xp == j, .(X,p)])[, sum(p)],
+        pij =  calculer_pIj(p_transition_augmentee, I, j),
         qij = calculer_qIj(p_transition_augmentee, I, j)
       )
 
@@ -404,9 +431,9 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
       res_q,
       data.frame(
         i = all_origs,
-        j = all_origs,
+        j = all_perts,
         pi_hat = unique(p_transition_augmentee[X %in% I, .(X,p_hat)])[, sum(p_hat)],
-        pij =  sum(sapply(I, \(i) calculer_piJ(p_transition_augmentee, i, J))),
+        pij =  calculer_pIJ(p_transition_augmentee, I, J),
         qij = calculer_qIJ(p_transition_augmentee, I, J)
       )
     )

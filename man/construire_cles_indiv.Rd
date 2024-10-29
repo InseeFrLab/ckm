@@ -4,13 +4,11 @@
 \alias{construire_cles_indiv}
 \title{Ajoute les clés aléatoires individuelles sur le jeu de microdonnées}
 \usage{
-construire_cles_indiv(microdata, seed, nb_decim = NULL)
+construire_cles_indiv(microdata, nb_decim = NULL)
 }
 \arguments{
 \item{microdata}{jeu de données (data.frame, data.table ou tibble)
 représentant une table individuelle}
-
-\item{seed}{graine aléatoire (numeric) pour reproduire le résultat à l'identique}
 
 \item{nb_decim}{nb de décimales (integer) de la clé générée. Si `NULL` (défaut)
 le programme calcule un nombre idéal de décimales pour la clé aléatoire.}
@@ -24,6 +22,7 @@ Ajoute les clés aléatoires individuelles sur le jeu de microdonnées
 }
 \examples{
 data("dtest", package = "ckm")
-dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
+set.seed(12345)
+dtest_avec_cles <- construire_cles_indiv(dtest)
 hist(dtest_avec_cles$rkey)
 }
