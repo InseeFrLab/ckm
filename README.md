@@ -35,12 +35,17 @@ remotes::install_git("https://gitlab.insee.fr/outilsconfidentialite/ckm.git",
 
 ### 1-Poser une clé aléatoire sur le jeu de données individuelles
 
+La commande `set.seed()` permet de fixer une graine aléatoire et d'assurer 
+la reproductibilité du code, en l'occurrence ici du tirage des clés 
+individuelles.
+
 ```r
 library(ckm)
 
 data("dtest", package = "ckm")
 
-dtest_avec_cles <- construire_cles_indiv(dtest, 40889)
+set.seed(4081789)
+dtest_avec_cles <- construire_cles_indiv(dtest)
 hist(dtest_avec_cles$rkey)
                      
 ```

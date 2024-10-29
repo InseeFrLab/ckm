@@ -30,7 +30,8 @@ une colonne `rkey` contenant les clés individuelles qui sont des nombres
 aléatoires tirés selon une loi uniforme entre 0 et 1.
 
 ```{r cles}
-dtest_avec_cles <- construire_cles_indiv(dtest, seed = 40889)
+set.seed(451919)
+dtest_avec_cles <- construire_cles_indiv(dtest)
 ```
 
 On peut vérifier que la distribution des clés individuelles est bien uniforme.
