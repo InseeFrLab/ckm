@@ -50,6 +50,7 @@ pages:
     - main
     - master
   script:
+    - sudo apt install cmake
     - Rscript -e 'install.packages("https://packagemanager.posit.co/cran/latest/src/contrib/Archive/pkgdown/pkgdown_2.0.9.tar.gz", repos = NULL, type = "source")'
     - Rscript -e "install.packages(c('htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
     - Rscript -e 'devtools::install(dependencies = FALSE)'
