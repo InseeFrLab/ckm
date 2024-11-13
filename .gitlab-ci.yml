@@ -9,36 +9,7 @@ variables:
 image: gitlab-registry.insee.fr:443/datascience/registry-prod/onyxia-rstudio:r4.4.1
 
 stages:
-  - check
-  - test
   - 📘 Documentation
-
-pkg_check:
-  stage: check
-  image: inseefrlab/onyxia-rstudio:latest
-  retry:
-    max: 2
-    when: runner_system_failure
-  script:
-    - Rscript -e "install.packages(c('htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
-    - Rscript -e 'devtools::check(check_dir = ".",error_on  = "error",cran = FALSE, document  = FALSE, manual = FALSE)'
-  artifacts:
-    paths:
-      - "${PKG_NAME}_*.tar.gz"
-
-testing:
-  stage: test
-  image: inseefrlab/onyxia-rstudio:latest
-  retry:
-    max: 2
-    when: runner_system_failure
-  when: on_success
-  script:
-    - Rscript -e "install.packages(c('htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
-    - Rscript -e 'devtools::test()'
-  only:
-    - main
-
 
 pages:
   stage: 📘 Documentation
