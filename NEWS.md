@@ -10,7 +10,7 @@ output: rmarkdown::html_vignette
 
 Modification:
 
-- `tester_matrices`: la fonction recherche désormais une variance minimale dans un intervalle défini par l'utilsateur et par dichotomie
+- `tester_matrices`: la fonction recherche désormais une variance minimale dans un intervalle défini par l'utilisateur et par dichotomie
 
 ## ckm 0.2.0
 
