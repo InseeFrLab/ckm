@@ -17,7 +17,7 @@ pkg_check:
   stage: check
   image: inseefrlab/onyxia-rstudio:latest
   retry:
-    max: 3
+    max: 2
     when: runner_system_failure
   script:
     - Rscript -e "install.packages(c('htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
