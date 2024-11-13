@@ -5,21 +5,22 @@
 \title{Teste la construction des matrices de
 transition pour différentes valeurs de variance à D et js fixés}
 \usage{
-tester_matrices(D, js = 0, Vmin = 0, Vmax = 30, Vseq = 5)
+tester_matrices(D, js = 0, Vmin = 0, Vmax = 30, precision = 1)
 }
 \arguments{
-\item{D}{integer déviation}
+\item{D}{\code{integer} déviation}
 
-\item{js}{integer seuil des valeurs sensibles}
+\item{js}{\code{integer} seuil des valeurs sensibles}
 
-\item{Vmin}{numeric Variaince minimum à tester}
+\item{Vmin}{\code{numeric} Variance minimum à tester}
 
-\item{Vmax}{numeric Variance maximum à tester}
+\item{Vmax}{\code{numeric} Variance maximum à tester}
 
-\item{Vseq}{integer pas d'avancement}
+\item{precision}{\code{numeric} Précision}
 }
 \value{
-data.frame précisant si chaque matrice a pu être construite ou non
+\code{NULL} si aucune solution n'existe dans l'intervalle demandé
+\code{numeric} Valeur de la variance qui rend la matrice constructible
 }
 \description{
 Teste la construction des matrices de
@@ -28,5 +29,5 @@ transition pour différentes valeurs de variance à D et js fixés
 \examples{
 tester_matrices(5, 1)
 tester_matrices(10, js = 9)
-tester_matrices(10, js = 9, Vmin=25, Vmax=30, Vseq=1)
+tester_matrices(10, js = 9, Vmin=25, Vmax=30, precision=0.5)
 }
