@@ -6,6 +6,7 @@
 #'
 #' @return data.frame avec le croisement de toutes les modalités (y compris nuls)
 #' @export
+#' @keywords internal
 #' @import data.table
 #' @importFrom dplyr all_of
 #' @importFrom dplyr across
@@ -71,6 +72,7 @@ ajouter_zeros_tableau <- function(tableau, cat_vars = NULL, cnt_var = "nb_obs"){
 #' - p_hat = fréquence empirique du comptage
 #'
 #' @export
+#' @keywords internal
 #'
 #' @examples
 #' library(ptable)

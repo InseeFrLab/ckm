@@ -10,3 +10,5 @@
 ^data-raw$
 
 ^docs$
+^doc$
+^Meta$

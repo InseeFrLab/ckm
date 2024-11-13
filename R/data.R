@@ -1,6 +1,6 @@
 #' Données de test#'
 #'
-#' @format data.table, données individuelles contenant 9 variables et 600 000
+#' @format data.table, données individuelles contenant 9 variables et 6 000
 #' lignes:
 #' \describe{
 #'    \item{SEXE}{sexe : "G" = garçon, "F" = fille}

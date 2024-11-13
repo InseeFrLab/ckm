@@ -21,3 +21,4 @@ data.table
 \description{
 Fonction construisant les marges pour un croisement donné
 }
+\keyword{internal}

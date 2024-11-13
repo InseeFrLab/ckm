@@ -32,3 +32,4 @@ tab_comptage <- tabulate_cnt_micro_data(
 
 avec_zeros <- ajouter_zeros_tableau(tab_comptage, cat_vars)
 }
+\keyword{internal}

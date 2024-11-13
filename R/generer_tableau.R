@@ -6,6 +6,8 @@
 #' @param marge_label character
 #'
 #' @return data.table
+#' @keywords internal
+#' @export
 compute_margins <- function(
     inner_cells,
     margins,

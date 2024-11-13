@@ -53,6 +53,17 @@ reference:
     contents:
       - creer_matrice_transition
       - creer_table_perturbation
+      - tester_matrices
+  - title: Arbitrage Risque - Utilité
+    desc: Réaliser l'arbitrage risque - utilité
+    contents:
+      - mesurer_risque
+      - calculer_ensemble_deviation
+      - calculer_ensemble_possibles
+      - calculer_frequences_empiriques
+      - distance_hellinger
+      - ecarts_absolus_moyens
+      - ecarts_absolus_moyens_relatifs
   - title: Données exemples
     desc: Jeu de données fictives pour tester les fonctions du package
     contents:

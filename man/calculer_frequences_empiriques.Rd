@@ -46,3 +46,4 @@ tab_comptage2 <- tabulate_cnt_micro_data(
 )
 p_hat <- calculer_frequences_empiriques(tab_comptage1)
 }
+\keyword{internal}
