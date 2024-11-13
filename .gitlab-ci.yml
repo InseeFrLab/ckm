@@ -6,53 +6,52 @@ variables:
   NO_PROXY: insee.test,insee.intra,insee.fr,localhost
   PKG_NAME: "ckm"
 
-image: inseefrlab/onyxia-rstudio:latest
+image: gitlab-registry.insee.fr:443/datascience/registry-prod/onyxia-rstudio:r4.4.1
 
 stages:
   - check
   - test
-  - deploy
+  - 📘 Documentation
 
 pkg_check:
   stage: check
-  tags:
-    - docker
+  image: inseefrlab/onyxia-rstudio:latest
   script:
-    - R -e "install.packages(c('htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
-    - R -e 'devtools::check(check_dir = ".",error_on  = "error",cran = FALSE, document  = FALSE, manual = FALSE)'
+    - Rscript -e "install.packages(c('htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - Rscript -e 'devtools::check(check_dir = ".",error_on  = "error",cran = FALSE, document  = FALSE, manual = FALSE)'
   artifacts:
     paths:
       - "${PKG_NAME}_*.tar.gz"
 
 testing:
   stage: test
-  tags:
-    - docker
-  allow_failure: true
-  when: on_success
-  script:
-    - R -e "install.packages(c('htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
-    - R -e 'devtools::test()'
-  only:
-    - main
-
-pages:
-  stage: deploy
-  dependencies:
-    - testing
-  tags:
-    - docker
-  when: on_success
+  image: inseefrlab/onyxia-rstudio:latest
   retry:
     max: 2
     when: runner_system_failure
+  when: on_success
   script:
-    - R -e "install.packages(c('pkgdown','htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
-    - R -e 'devtools::install(dependencies = FALSE)'
-    - R -e 'options(pkgdown.internet = FALSE) ; pkgdown::build_site()'
+    - Rscript -e "install.packages(c('htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - Rscript -e 'devtools::test()'
+  only:
+    - main
+
+
+pages:
+  stage: 📘 Documentation
+  retry:
+    max: 2
+    when: runner_system_failure
+  when: manual
+  only:
+    - main
+    - master
+  script:
+    - Rscript -e 'install.packages("https://packagemanager.posit.co/cran/latest/src/contrib/Archive/pkgdown/pkgdown_2.0.9.tar.gz", repos = NULL, type = "source")'
+    - Rscript -e "install.packages(c('htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
+    - Rscript -e 'devtools::install(dependencies = TRUE)'
+    - Rscript -e "options(pkgdown.internet = FALSE) ; pkgdown::build_site()"
   artifacts:
     paths:
       - public
-  only:
-    - main
-  when: manual
+
