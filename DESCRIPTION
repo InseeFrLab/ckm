@@ -24,7 +24,9 @@ Imports:
     lifecycle,
     purrr,
     rlang,
-    utils
+    utils,
+    furrr,
+    future
 RoxygenNote: 7.3.2
 Suggests: 
     knitr,
