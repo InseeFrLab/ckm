@@ -4,7 +4,7 @@
 #' @param Vs \code{numeric} vecteur de variance
 #' @param jss \code{integer} vecteur de seuil de sensibilité
 #'
-#' @return
+#' @return \code{data.frame}
 #' @export
 #'
 #' @examples
