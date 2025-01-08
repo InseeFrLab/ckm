@@ -4,6 +4,15 @@ subtitle: Historique des modifications
 output: rmarkdown::html_vignette
 ---
 
+## ckm 0.2.3
+
+[07/01/2025]
+
+Modification:
+
+- `tester_matrices`: la fonction recherche désormais une variance minimale dans un intervalle défini par l'utilisateur et par dichotomie
+
+
 ## ckm 0.2.2
 
 [13/11/2024]

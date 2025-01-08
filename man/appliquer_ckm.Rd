@@ -11,8 +11,8 @@ appliquer_ckm(
   D,
   V,
   js = 0,
-  I = 1,
-  J = 1,
+  I = NULL,
+  J = NULL,
   ...
 )
 }
