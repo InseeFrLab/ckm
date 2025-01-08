@@ -42,8 +42,8 @@ appliquer_ckm <- function(
     D,
     V,
     js = 0,
-    I = 1,
-    J = 1,
+    I = NULL,
+    J = NULL,
     ...) {
 
   if(!is.data.frame(tab_data)){
@@ -90,7 +90,7 @@ appliquer_ckm <- function(
     dplyr::rename_with(~cnt_var_ckm, res_ckm)
 
    # Mesures de risque si les fréquences empiriques sont fournies dans tab_data
-  if(!is.null(p_hat)){
+  if(!is.null(p_hat) & !is.null(I) & !is.null(J)){
     risque <- mesurer_risque(mat_trans, p_hat, I, J)
   }else{
     risque <- NULL
