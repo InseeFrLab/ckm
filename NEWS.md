@@ -4,13 +4,22 @@ subtitle: Historique des modifications
 output: rmarkdown::html_vignette
 ---
 
-## ckm 0.2.3
+## ckm 0.3.0
 
-[07/01/2025]
+[XX/XX/2025]
 
 Modification:
 
-- `tester_matrices`: la fonction recherche désormais une variance minimale dans un intervalle défini par l'utilisateur et par dichotomie
+- Possibilité de mesurer le risque et l'utilité d'un ou plusieurs scénarios:
+  - `mesurer_RU`: Permet de mesurer le risque et l'utilité d'un scénario donné
+  - `mesurer_RUs`: Compare le risque et l'utilité de plusieurs scénarios
+  - `simuler_RUs`: Compare le risque et l'utilité de plusieurs scénarios en se basant
+  sur plusieurs simulations
+- Appliquer la méthode sur plusieurs tableaux à la fois:
+  - `tabuler_et_appliquer_ckm_liste`
+- Par défaut, les arguments `I` et `J` sont par défaut renseignés à `NULL`, 
+désactivant la mesure du risque par défaut en utilisant `appliquer_ckm` ou 
+`tabuler_et_appliquer_ckm`.
 
 
 ## ckm 0.2.2
