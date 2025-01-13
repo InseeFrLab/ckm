@@ -1,11 +1,7 @@
 Package: ckm
 Type: Package
 Title: Appliquer la méthode des clés aléatoires (Cell Key Method) pour protéger des données tabulées
-<<<<<<< HEAD
 Version: 0.3.0.9000
-=======
-Version: 0.2.2.99
->>>>>>> 3b4374e2de306fb5267ec486fe11b3eb03cad916
 Authors@R: c(
     person("Julien", "Jamme", , "julien.jamme@insee.fr", role = c("aut", "cre")),
     person(, "Institut National de la Statistique et des Études Économiques", role = "cph")
