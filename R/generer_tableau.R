@@ -44,7 +44,6 @@ compute_margins <- function(
 #' une liste comprenant le tibble ci-dessus et un tiblle des fréquences empiriques.
 #'
 #' @export
-#' @import data.table
 #' @importFrom rlang .data
 #' @examples
 #' library(data.table)

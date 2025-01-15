@@ -14,7 +14,7 @@
 #' de l'utilité.
 #'
 #' @export
-#' @import data.table
+#' @rawNamespace import(data.table, except = c(transpose, first, last, between))
 #' @importFrom tibble tibble
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr rename_with

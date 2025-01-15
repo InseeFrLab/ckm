@@ -7,7 +7,6 @@
 #' @return data.frame avec le croisement de toutes les modalités (y compris nuls)
 #' @export
 #' @keywords internal
-#' @import data.table
 #' @importFrom dplyr all_of
 #' @importFrom dplyr across
 #' @importFrom dplyr mutate
