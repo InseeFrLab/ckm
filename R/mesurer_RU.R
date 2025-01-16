@@ -257,15 +257,21 @@ simuler_RUs <- function(
     parametres,
     \(D, V, js){
 
+      min_size_workers <- as.numeric(object.size(df)) + 0.2*1024^3
+      min_size_workers <- if(is.null(size_workers)) min_size_workers else if(size_workers <= min_size_workers) min_size_workers else size_workers*1024^3
+      # print(min_size_workers/(1024^3))
+      options(future.globals.maxSize = min_size_workers)
+
+      oplan <- future::plan(future::sequential)
+      on.exit(future::plan(oplan))
+      oopts <- options(future.globals.maxSize = NULL)
+      on.exit(options(oopts))
+
       if(parallel){
 
         n_cores <- as.numeric(future::availableCores())
         util_cores <- if(is.null(max_cores)) n_cores - 1 else if(max_cores >= n_cores) n_cores - 1 else max_cores
         # print(util_cores)
-        min_size_workers <- as.numeric(object.size(df)) + 0.2*1024^3
-        min_size_workers <- if(is.null(size_workers)) min_size_workers else if(size_workers <= min_size_workers) min_size_workers else size_workers*1024^3
-        # print(min_size_workers/(1024^3))
-        options(future.globals.maxSize = min_size_workers)
 
         future::plan(future::multisession, workers = util_cores)
 
