@@ -7,7 +7,7 @@
 tabuler_et_appliquer_ckm(
   df,
   rk_var = "rkey",
-  cat_vars,
+  cat_vars = NULL,
   hrc_vars = NULL,
   marge_label = "Total",
   D,

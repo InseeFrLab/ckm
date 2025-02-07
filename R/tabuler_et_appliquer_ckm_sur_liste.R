@@ -6,31 +6,43 @@ convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
   df_cat_vars <- desc_tab |>
     filter(is.na(HRC))
 
-  noms_tab1 <- sort(unique(df_cat_vars$TAB))
-  noms_tab1 <- setNames(noms_tab1, paste0(prefix, "_", noms_tab1))
+  if(nrow(df_cat_vars) == 0){
+    list_cat_vars <- list()
+    noms_tab1 <- NULL
+  }else{
+    noms_tab1 <- sort(unique(df_cat_vars$TAB))
+    noms_tab1 <- setNames(noms_tab1, paste0(prefix, "_", noms_tab1))
 
-  list_cat_vars <- purrr::map(
-    noms_tab1,
-    \(i){
-      df_cat_vars |> filter(TAB==i) |> pull(VAR)
-    }
-  )
+    list_cat_vars <- purrr::map(
+      noms_tab1,
+      \(i){
+        df_cat_vars |> filter(TAB==i) |> pull(VAR)
+      }
+    )
+  }
 
   df_hrc_vars <- desc_tab |>
     filter(!is.na(HRC))
 
-  noms_tab2 <- sort(unique(df_hrc_vars$TAB))
-  noms_tab2 <- setNames(noms_tab2, paste0(prefix, "_", noms_tab2))
+  if(nrow(df_hrc_vars) == 0){
+    list_hrc_vars <- list()
+    noms_tab2 <- NULL
+  }else{
 
-  list_hrc_vars <- purrr::map(
-    noms_tab2,
-    \(i){
-      t <- df_hrc_vars |> filter(TAB==i)
-      l <- t |> pull(VAR) |> list()
-      names(l) <- unique(t$HRC)
-      l
-    }
-  )
+    noms_tab2 <- sort(unique(df_hrc_vars$TAB))
+    noms_tab2 <- setNames(noms_tab2, paste0(prefix, "_", noms_tab2))
+
+    list_hrc_vars <- purrr::map(
+      noms_tab2,
+      \(i){
+        t <- df_hrc_vars |> filter(TAB==i)
+        l <- t |> pull(VAR) |> list()
+        names(l) <- unique(t$HRC)
+        l
+      }
+    )
+
+  }
 
   tableaux <- sort(unique(c(names(noms_tab1), names(noms_tab2))))
   return(
@@ -65,8 +77,10 @@ convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
 #'
 #' 2) Une ligne correspond à une variable d'une table donnée
 #'
-#' 3) Deux variables d'une même table ayant une relation hiérarchique
-#'  doivent recevoir la même valeur dans la colonne \code{HRC}
+#' 3) Deux variables (ex: REGION et DEPARTEMENT) d'une même table ayant une relation hiérarchique
+#'  doivent recevoir la même valeur dans la colonne \code{HRC}. Ces variables
+#'  doivent être renseignées dans l'ordre décroissant de la hiérarchie,
+#'  cad du niveau le plus large (ex: REGION) au niveau le plus fin (ex: DEPARTEMENT).
 #'
 #' Voir la partie exemple pour une illustration.
 #' @md
@@ -123,6 +137,7 @@ tabuler_et_appliquer_ckm_liste <- function(
     as.list(c(D = D, V = V, js = js, args_add))
   }
   args_trans[["df"]] <- df
+  args_trans[["rk_var"]] <- rk_var
   args_trans[["I"]] <- I
   args_trans[["J"]] <- J
 
@@ -146,7 +161,7 @@ tabuler_et_appliquer_ckm_liste <- function(
   risque <- purrr::imap(
     res,
     \(ll,n) if(is.null(ll$risque)) tibble(tab = n, qij = NA) else ll$risque |> mutate(tab = n) |> as_tibble()
-    ) |>
+  ) |>
     purrr::list_rbind()
   utilite <- purrr::imap(res, \(ll,n) ll$utilite |> mutate(tab = n)) |>
     purrr::list_rbind()

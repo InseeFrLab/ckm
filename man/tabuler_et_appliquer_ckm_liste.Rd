@@ -67,8 +67,10 @@ mentionner un nom pour cette hiérarchie. Sinon, \code{NA}
 }
 \enumerate{
 \item Une ligne correspond à une variable d'une table donnée
-\item Deux variables d'une même table ayant une relation hiérarchique
-doivent recevoir la même valeur dans la colonne \code{HRC}
+\item Deux variables (ex: REGION et DEPARTEMENT) d'une même table ayant une relation hiérarchique
+doivent recevoir la même valeur dans la colonne \code{HRC}. Ces variables
+doivent être renseignées dans l'ordre décroissant de la hiérarchie,
+cad du niveau le plus large (ex: REGION) au niveau le plus fin (ex: DEPARTEMENT).
 }
 
 Voir la partie exemple pour une illustration.
