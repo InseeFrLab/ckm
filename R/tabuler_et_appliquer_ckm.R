@@ -36,13 +36,15 @@ tabuler_et_appliquer_ckm <- function(
     msg = "La clé individuelle est absente de vos données."
   )
 
+  freq_empiriq <- ! (is.null(I) | is.null(J))
+
   tab_avant <- tabulate_cnt_micro_data(
     df = df,
     rk_var = rk_var,
     cat_vars = cat_vars,
     hrc_vars = hrc_vars,
     marge_label = marge_label,
-    freq_empiriq = TRUE
+    freq_empiriq = freq_empiriq
   )
 
   args_add <- c(...)
