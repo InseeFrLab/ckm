@@ -1,10 +1,15 @@
-#' Ajoute les croisements nuls à un tableau de données
+#' Calcule les fréquences empiriques des comptages à partir d'un tableau agrégé
+#' construit avec les fonctions `tabulate_cnt_micro_data` ou `appliquer_ckm` ou
+#' `tabuler_et_appliquer_ckm`.
 #'
-#' @param tableau data.frame
-#' @param cat_vars vecteur de chaines de caractères: variables de `tableau` qui sont croisées
-#' @param cnt_var chaine de caractères: nom de la variable de comptage
+#' @param tableau tableau généré avec les fonctions `tabulate_cnt_micro_data` ou
+#' `appliquer_ckm` ou `tabuler_et_appliquer_ckm`
+#' @inheritParams tabulate_cnt_micro_data
+#' @return data.frame avec 3 colonnes:
+#' - i = comptage
+#' - N = nb d'apparitions du comptage
+#' - p_hat = fréquence empirique du comptage
 #'
-#' @return data.frame avec le croisement de toutes les modalités (y compris nuls)
 #' @export
 #' @keywords internal
 #' @importFrom dplyr all_of
@@ -18,27 +23,57 @@
 #' @importFrom dplyr count
 #' @importFrom purrr map
 #' @examples
+#' library(ptable)
 #' library(dplyr)
 #'
 #' data("dtest")
-#' cat_vars <- c("DEP", "DIPLOME", "SEXE", "AGE")
-#' tab_comptage <- tabulate_cnt_micro_data(
+#'
+#' cat_vars1 = c("DEP", "DIPLOME", "SEXE", "AGE")
+#' hrc_vars1 = NULL
+#' tab_comptage1 <- tabulate_cnt_micro_data(
 #'   df = dtest, rk = NULL,
-#'   cat_vars = cat_vars,
+#'   cat_vars = cat_vars1,
 #'   marge_label = "Total"
 #' )
+#' p_hat1 <- calculer_frequences_empiriques(tab_comptage1, cat_vars1, hrc_vars1)
 #'
-#' avec_zeros <- ajouter_zeros_tableau(tab_comptage, cat_vars)
-ajouter_zeros_tableau <- function(tableau, cat_vars = NULL, cnt_var = "nb_obs"){
+#' cat_vars2 = c("DIPLOME", "SEXE", "AGE")
+#' hrc_vars2 = list(GEO = c("REG","DEP"), TYPES = c("TYPE","TYPE2"))
+#' tab_comptage2 <- tabulate_cnt_micro_data(
+#'   df = dtest, rk = NULL,
+#'   cat_vars = cat_vars2,
+#'   hrc_vars = hrc_vars2,
+#'   marge_label = "Total"
+#' )
+#' p_hat2 <- calculer_frequences_empiriques(tab_comptage2, cat_vars2, hrc_vars2)
+calculer_frequences_empiriques <- function(tableau, cat_vars, hrc_vars){
 
-  if(is.null(cat_vars)){
-    cat_vars <- tableau |>
-      dplyr::select(where(is.character(cat_vars))) |>
-      names()
+  cnt_var <- "nb_obs"
+
+  tableau_long <- tableau
+  if(!is.null(hrc_vars)){
+
+    l <- length(hrc_vars)
+    for(hrc in names(hrc_vars)){
+      for(vn in hrc_vars[[hrc]]){
+        tableau_long <- tableau_long |>
+          dplyr::mutate(
+            dplyr::across(all_of(vn), ~paste0({{vn}}, "_", .)))
+      }
+      tableau_long <- tidyr::pivot_longer(
+        tableau_long,
+        cols = hrc_vars[[hrc]],
+        names_to = "XYZXYZ",
+        values_to = hrc
+      ) |>
+        dplyr::select(-XYZXYZ)
+    }
   }
-  cols <- names(tableau)
-  all_mods_vals <- tableau |>
-    dplyr::select(dplyr::all_of(cat_vars)) |>
+
+  all_cat_vars <- c(cat_vars, names(hrc_vars))
+
+  all_mods_vals <- tableau_long |>
+    dplyr::select(dplyr::all_of(all_cat_vars)) |>
     purrr::map(
       \(colvar) unique(colvar)
     ) |>
@@ -47,66 +82,15 @@ ajouter_zeros_tableau <- function(tableau, cat_vars = NULL, cnt_var = "nb_obs"){
       KEEP.OUT.ATTRS = FALSE
     ) |>
     dplyr::full_join(
-      tableau |>
-        dplyr::select(dplyr::all_of(c(cat_vars)), dplyr::starts_with(cnt_var)),
-      by = cat_vars
+      tableau_long |>
+        dplyr::select(dplyr::all_of(c(all_cat_vars)), dplyr::starts_with(cnt_var)),
+      by = all_cat_vars
     ) |>
-    dplyr::mutate(dplyr::across(dplyr::starts_with(cnt_var), ~ifelse(is.na(.), 0, .)))
+    dplyr::mutate(dplyr::across(dplyr::starts_with(cnt_var), ~ifelse(is.na(.), 0, .)))|>
+    dplyr::count(nb_obs) |>
+    dplyr::mutate(p_hat = n/sum(n)) |>
+    dplyr::rename(i = nb_obs, N = n)
 
-  return(all_mods_vals)
-}
-
-#' Calcule les fréquences empiriques des comptages à partir d'un tableau agrégé
-#' construit avec les fonctions `tabulate_cnt_micro_data` ou `appliquer_ckm` ou
-#' `tabuler_et_appliquer_ckm`.
-#'
-#' @param tableau tableau généré avec les fonctions `tabulate_cnt_micro_data` ou
-#' `appliquer_ckm` ou `tabuler_et_appliquer_ckm`
-#' @param hierarchies liste de vecteurs - description des emboîtements éventuelles
-#' des variables catégorielles de tableau entre elles
-#'
-#' @return data.frame avec 3 colonnes:
-#' - i = comptage
-#' - N = nb d'apparitions du comptage
-#' - p_hat = fréquence empirique du comptage
-#'
-#' @export
-#' @keywords internal
-#'
-#' @examples
-#' library(ptable)
-#' library(dplyr)
-#'
-#' data("dtest")
-#'
-#' tab_comptage1 <- tabulate_cnt_micro_data(
-#'   df = dtest, rk = NULL,
-#'   cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE"),
-#'   marge_label = "Total"
-#' )
-#' p_hat1 <- calculer_frequences_empiriques(tab_comptage1)
-#'
-#' tab_comptage2 <- tabulate_cnt_micro_data(
-#'   df = dtest, rk = NULL,
-#'   cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE"),
-#'   marge_label = "Total"
-#' )
-#' p_hat <- calculer_frequences_empiriques(tab_comptage1)
-calculer_frequences_empiriques <- function(tableau, hierarchies = NULL){
-
-  cat_vars <- tableau |> dplyr::select(dplyr::where(is.character)) |> names()
-  if(!is.null(hierarchies)){
-    cat_a_supprimer <- sapply(hierarchies, \(h) h[-length(h)])
-    cat_vars <- cat_vars[!cat_vars %in% cat_a_supprimer]
-  }
-
-  return(
-    tableau |>
-      ajouter_zeros_tableau(cat_vars = cat_vars) |>
-      dplyr::count(nb_obs) |>
-      dplyr::mutate(p_hat = n/sum(n)) |>
-      dplyr::rename(i = nb_obs, N = n)
-  )
 }
 
 #' Calcule l'ensemble de déviation d'une valeur originale i étant donnés les paramètres D et js

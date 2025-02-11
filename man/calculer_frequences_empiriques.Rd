@@ -6,14 +6,15 @@
 construit avec les fonctions `tabulate_cnt_micro_data` ou `appliquer_ckm` ou
 `tabuler_et_appliquer_ckm`.}
 \usage{
-calculer_frequences_empiriques(tableau, hierarchies = NULL)
+calculer_frequences_empiriques(tableau, cat_vars, hrc_vars)
 }
 \arguments{
 \item{tableau}{tableau généré avec les fonctions `tabulate_cnt_micro_data` ou
 `appliquer_ckm` ou `tabuler_et_appliquer_ckm`}
 
-\item{hierarchies}{liste de vecteurs - description des emboîtements éventuelles
-des variables catégorielles de tableau entre elles}
+\item{cat_vars}{vector of categorical variables but not hierarchical}
+
+\item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
 }
 \value{
 data.frame avec 3 colonnes:
@@ -32,18 +33,23 @@ library(dplyr)
 
 data("dtest")
 
+cat_vars1 = c("DEP", "DIPLOME", "SEXE", "AGE")
+hrc_vars1 = NULL
 tab_comptage1 <- tabulate_cnt_micro_data(
   df = dtest, rk = NULL,
-  cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE"),
+  cat_vars = cat_vars1,
   marge_label = "Total"
 )
-p_hat1 <- calculer_frequences_empiriques(tab_comptage1)
+p_hat1 <- calculer_frequences_empiriques(tab_comptage1, cat_vars1, hrc_vars1)
 
+cat_vars2 = c("DIPLOME", "SEXE", "AGE")
+hrc_vars2 = list(GEO = c("REG","DEP"), TYPES = c("TYPE","TYPE2"))
 tab_comptage2 <- tabulate_cnt_micro_data(
   df = dtest, rk = NULL,
-  cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE"),
+  cat_vars = cat_vars2,
+  hrc_vars = hrc_vars2,
   marge_label = "Total"
 )
-p_hat <- calculer_frequences_empiriques(tab_comptage1)
+p_hat2 <- calculer_frequences_empiriques(tab_comptage2, cat_vars2, hrc_vars2)
 }
 \keyword{internal}
