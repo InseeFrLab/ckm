@@ -9,6 +9,7 @@ tabuler_et_appliquer_ckm(
   rk_var = "rkey",
   cat_vars = NULL,
   hrc_vars = NULL,
+  num_var = NULL,
   marge_label = "Total",
   D,
   V,
@@ -26,6 +27,8 @@ tabuler_et_appliquer_ckm(
 \item{cat_vars}{vector of categorical variables but not hierarchical}
 
 \item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
+
+\item{num_var}{nom d'une variable numérique à aggréger en même temps}
 
 \item{marge_label}{label of margins (applied to all cat and hrc variables)}
 

@@ -35,6 +35,18 @@
 #'
 #' res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
 #' str(res_ckm, max.level = 2)
+#'
+#' tab_avant2 <- tabulate_cnt_micro_data(
+#'   df = dtest_avec_cles |> mutate(NUM = 12),
+#'   cat_vars = c("DIPLOME", "SEXE", "AGE"),
+#'   hrc_vars = list(GEO = c("REG", "DEP")),
+#'   num_var = "NUM",
+#'   marge_label = "Total",
+#'   freq_empiriq = TRUE #pour pouvoir mesurer le risque
+#' )
+#'
+#' res_ckm2 <- appliquer_ckm(tab_avant2, cnt_var = "num_tot", D = 5, V = 2)
+#' head(res_ckm2$tab)
 appliquer_ckm <- function(
     tab_data,
     cnt_var = "nb_obs",

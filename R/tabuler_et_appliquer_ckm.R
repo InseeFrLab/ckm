@@ -23,6 +23,7 @@ tabuler_et_appliquer_ckm <- function(
     rk_var = "rkey",
     cat_vars = NULL,
     hrc_vars = NULL,
+    num_var = NULL,
     marge_label = "Total",
     D,
     V,
@@ -43,6 +44,7 @@ tabuler_et_appliquer_ckm <- function(
     rk_var = rk_var,
     cat_vars = cat_vars,
     hrc_vars = hrc_vars,
+    num_var = num_var,
     marge_label = marge_label,
     freq_empiriq = freq_empiriq
   )

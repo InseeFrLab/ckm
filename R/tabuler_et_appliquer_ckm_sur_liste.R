@@ -1,6 +1,22 @@
+#' Convertit un tableau de description en listes de variables
+#'
+#' @inheritParams tabuler_et_appliquer_ckm_liste
+#'
+#' @return listes
 #' @importFrom dplyr pull
 #' @importFrom dplyr filter
 #' @importFrom stats setNames
+#' @export
+#'
+#' @examples
+#' # example code
+#'
+#' desc_tableaux <- data.frame(
+#'   TAB = c(rep(1,3), rep(2,4)),
+#'   VAR = c("DIPLOME", "SEXE", "AGE", "DIPLOME", "TYPE", "REG", "DEP"),
+#'   HRC = c(rep(NA, 5), rep("GEO",2))
+#' )
+#' convertir_desc_table_en_liste(desc_tableaux)
 convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
 
   df_cat_vars <- desc_tab |>
