@@ -2,11 +2,15 @@
 % Please edit documentation in R/estimer_intervalle_confiance_ratio.R
 \name{calculer_proba_ecart_ratio}
 \alias{calculer_proba_ecart_ratio}
-\title{Calcule P(|R-R'|>beta) pour R= A/B et beta fixés.}
+\title{Calcule P(|R-R'|>beta) pour R=une statistique fonction de A et B, et
+pour beta fixé.}
 \usage{
 calculer_proba_ecart_ratio(
   A,
   B,
+  fun = function(a, b) {
+     a/b * 100
+ },
   D,
   V,
   js = 0,
@@ -19,6 +23,9 @@ calculer_proba_ecart_ratio(
 \item{A}{numérateur}
 
 \item{B}{dénominateur}
+
+\item{fun}{function, sert à calculer la statistique souhaitée
+à partir de A et B}
 
 \item{D}{Déviation max de la CKM}
 
@@ -36,7 +43,8 @@ calculer_proba_ecart_ratio(
 dataframe de deux colonnes (beta, proba)
 }
 \description{
-Calcule P(|R-R'|>beta) pour R= A/B et beta fixés.
+Calcule P(|R-R'|>beta) pour R=une statistique fonction de A et B, et
+pour beta fixé.
 }
 \details{
 La fonction prend un seul ratio en entrée.
@@ -47,9 +55,24 @@ c'est-à-dire que le ratio fourni (A/B) est le ratio issu de la perturbation
 par CKM.
 }
 \examples{
-ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |> as.data.frame()
+ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
+  as.data.frame()
 # Calcul de alpha pour la stat originale = 10/15 pour différents beta
 calculer_proba_ecart_ratio(A=10,B=15,D = 15, V = 30.1, js = 0, ptab = ptab)
-# Calcul de alpha pour la stat perturbée = 10/15 pour différentes valeurs de beta'
-calculer_proba_ecart_ratio(A=10,B=15,D = 15, V = 30.1, js = 0, ptab = ptab, posterior = TRUE)
+# Calcul de alpha pour la stat perturbée = 10/15 pour différentes valeurs
+# de beta'
+calculer_proba_ecart_ratio(
+  A=10,B=15,
+  D = 15, V = 30.1, js = 0,
+  ptab = ptab,
+  posterior = TRUE
+)
+#Calcul pour une évolution
+calculer_proba_ecart_ratio(
+  A=10,B=15,
+  fun = \(a,b){(b/a - 1)*100},
+  D = 15, V = 30.1, js = 0,
+  ptab = ptab,
+  posterior = TRUE
+)
 }

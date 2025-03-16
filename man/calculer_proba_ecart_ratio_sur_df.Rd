@@ -2,10 +2,14 @@
 % Please edit documentation in R/estimer_intervalle_confiance_ratio.R
 \name{calculer_proba_ecart_ratio_sur_df}
 \alias{calculer_proba_ecart_ratio_sur_df}
-\title{Calcule P(|R-R'|>beta) pour chaque R=A/B d'un dataframe donné et pour chaque beta fixé.}
+\title{Calcule P(|R-R'|>beta) pour chaque R=A/B d'un dataframe donné et pour
+chaque beta fixé.}
 \usage{
 calculer_proba_ecart_ratio_sur_df(
   data,
+  fun = function(a, b) {
+     a/b * 100
+ },
   D,
   V,
   js = 0,
@@ -18,6 +22,9 @@ calculer_proba_ecart_ratio_sur_df(
 \arguments{
 \item{data}{data.frame à 2 colonnes, le numérateur et le dénominateur
 de chaque ratio}
+
+\item{fun}{function, sert à calculer la statistique souhaitée
+à partir de A et B}
 
 \item{D}{Déviation max de la CKM}
 
@@ -37,7 +44,8 @@ de chaque ratio}
 un dataframe
 }
 \description{
-Calcule P(|R-R'|>beta) pour chaque R=A/B d'un dataframe donné et pour chaque beta fixé.
+Calcule P(|R-R'|>beta) pour chaque R=A/B d'un dataframe donné et pour
+chaque beta fixé.
 }
 \details{
 Si \code{posterior=FALSE}, le calcul repose sur l'approche a priori,
@@ -52,13 +60,14 @@ test <- data.frame(
   B = sample(50:1000, 10, replace = TRUE)
 )
 
+fun = \(a,b){a/b * 100}
 D = 10
 V = 10
 js = 4
 
 # Approche a priori
-res <- calculer_proba_ecart_ratio_sur_df(test, D, V)
+res <- calculer_proba_ecart_ratio_sur_df(test, fun, D, V)
 
 # Approche a posteriori
-res_ap <- calculer_proba_ecart_ratio_sur_df(test, D, V, posterior = TRUE)
+res_ap <- calculer_proba_ecart_ratio_sur_df(test, fun, D, V, posterior = TRUE)
 }

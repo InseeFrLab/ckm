@@ -1,7 +1,10 @@
-#' Calcule P(|R-R'|>beta) pour R= A/B et beta fixés.
+#' Calcule P(|R-R'|>beta) pour R=une statistique fonction de A et B, et
+#' pour beta fixé.
 #'
 #' @param A numérateur
 #' @param B dénominateur
+#' @param fun function, sert à calculer la statistique souhaitée
+#' à partir de A et B
 #' @param D Déviation max de la CKM
 #' @param V Variance de la CKM
 #' @param js Seuil interdiction de la CKM
@@ -21,11 +24,26 @@
 #'
 #'
 #' @examples
-#' ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |> as.data.frame()
+#' ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
+#'   as.data.frame()
 #' # Calcul de alpha pour la stat originale = 10/15 pour différents beta
 #' calculer_proba_ecart_ratio(A=10,B=15,D = 15, V = 30.1, js = 0, ptab = ptab)
-#' # Calcul de alpha pour la stat perturbée = 10/15 pour différentes valeurs de beta'
-#' calculer_proba_ecart_ratio(A=10,B=15,D = 15, V = 30.1, js = 0, ptab = ptab, posterior = TRUE)
+#' # Calcul de alpha pour la stat perturbée = 10/15 pour différentes valeurs
+#' # de beta'
+#' calculer_proba_ecart_ratio(
+#'   A=10,B=15,
+#'   D = 15, V = 30.1, js = 0,
+#'   ptab = ptab,
+#'   posterior = TRUE
+#' )
+#' #Calcul pour une évolution
+#' calculer_proba_ecart_ratio(
+#'   A=10,B=15,
+#'   fun = \(a,b){(b/a - 1)*100},
+#'   D = 15, V = 30.1, js = 0,
+#'   ptab = ptab,
+#'   posterior = TRUE
+#' )
 #' @importFrom dplyr %>%
 #' @importFrom dplyr summarise
 #' @importFrom dplyr group_by
@@ -38,6 +56,7 @@
 calculer_proba_ecart_ratio <- function(
     A,
     B,
+    fun = function(a,b){a/b*100},
     D,
     V,
     js = 0,
@@ -49,7 +68,8 @@ calculer_proba_ecart_ratio <- function(
   if (posterior) {
     if ((A <= js & A > 0) | A < 0 | (B <= js & B > 0) | B < 0) {
       message(
-        "Les comptages A et B ne sont pas cohérents (négatifs ou inférieurs au seuil de sensibilité js)"
+        "Les comptages A et B ne sont pas cohérents (négatifs ou inférieurs
+        au seuil de sensibilité js)"
       )
       return(NULL)
     } else{
@@ -63,13 +83,15 @@ calculer_proba_ecart_ratio <- function(
       ) |>
         as.data.frame() |>
         mutate(
-          Rp = Ap / Bp * 100,
+          Rp = fun(Ap, Bp), #Ap / Bp * 100,
           Ao = Ap - zA,
           Bo = Bp - zB,
-          Ro = Ao / Bo * 100,
-          # Par convention l'écart relatif est passé à 1 si le dénominateur est nul
+          Ro = fun(Ao, Bo), #Ao / Bo * 100,
+          # Par convention l'écart relatif est passé à 1 si le dénominateur
+          # est nul
           # Delta_R = ifelse(is.nan(Rp) | is.infinite(Rp), 1, abs(R - Rp)/R),
-          # Choix pour l'écart absolu: passé à R si le ratio perturbé est infini ou indéterminé
+          # Choix pour l'écart absolu: passé à R si le ratio perturbé est
+          # infini ou indéterminé
           Delta_R = ifelse(
             is.nan(Ro) |
               is.infinite(Ro),
@@ -112,13 +134,15 @@ calculer_proba_ecart_ratio <- function(
       ) |>
         as.data.frame() |>
         mutate(
-          Ro = Ao / Bo * 100,
+          Ro = fun(Ao, Bo), #Ao / Bo * 100,
           Ap = Ao + zA,
           Bp = Bo + zB,
-          Rp = Ap / Bp * 100,
-          # Par convention l'écart relatif est passé à 1 si le dénominateur est nul
+          Rp = fun(Ap, Bp), #Ap / Bp * 100,
+          # Par convention l'écart relatif est passé à 1 si le dénominateur
+          # est nul
           # Delta_R = ifelse(is.nan(Rp) | is.infinite(Rp), 1, abs(R - Rp)/R),
-          # Choix pour l'écart absolu: passé à R si le ratio perturbé est infini ou indéterminé
+          # Choix pour l'écart absolu: passé à R si le ratio perturbé est
+          # infini ou indéterminé
           Delta_R = ifelse(is.nan(Rp) |
                              is.infinite(Rp), Ro, abs(Ro - Rp)),
           iA = ifelse(Ao > max(ptab$i), max(ptab$i), Ao),
@@ -160,7 +184,8 @@ calculer_proba_ecart_ratio <- function(
   }) |>
     purrr::list_rbind() |>
     full_join(tibble(beta = betas), by = "beta") |>
-    mutate(p_delta_sup_beta = ifelse(is.na(p_delta_sup_beta), 0, p_delta_sup_beta)) |>
+    mutate(p_delta_sup_beta =
+             ifelse(is.na(p_delta_sup_beta), 0, p_delta_sup_beta)) |>
     #normalisation
     mutate(p_delta_sup_beta = p_delta_sup_beta / p_delta_sup_beta[beta == 0]) |>
     arrange(beta)
@@ -170,7 +195,8 @@ calculer_proba_ecart_ratio <- function(
 }
 
 
-#' Calcule P(|R-R'|>beta) pour chaque R=A/B d'un dataframe donné et pour chaque beta fixé.
+#' Calcule P(|R-R'|>beta) pour chaque R=A/B d'un dataframe donné et pour
+#' chaque beta fixé.
 #'
 #' @param data data.frame à 2 colonnes, le numérateur et le dénominateur
 #' de chaque ratio
@@ -192,19 +218,21 @@ calculer_proba_ecart_ratio <- function(
 #'   B = sample(50:1000, 10, replace = TRUE)
 #' )
 #'
+#' fun = \(a,b){a/b * 100}
 #' D = 10
 #' V = 10
 #' js = 4
 #'
 #' # Approche a priori
-#' res <- calculer_proba_ecart_ratio_sur_df(test, D, V)
+#' res <- calculer_proba_ecart_ratio_sur_df(test, fun, D, V)
 #'
 #' # Approche a posteriori
-#' res_ap <- calculer_proba_ecart_ratio_sur_df(test, D, V, posterior = TRUE)
+#' res_ap <- calculer_proba_ecart_ratio_sur_df(test, fun, D, V, posterior = TRUE)
 #' @importFrom dplyr %>%
 #' @export
 calculer_proba_ecart_ratio_sur_df <- function(
     data,
+    fun = function(a,b){a/b*100},
     D,
     V,
     js = 0,
@@ -214,7 +242,8 @@ calculer_proba_ecart_ratio_sur_df <- function(
     max_cores = NULL
 ) {
 
-  ptab <- ptable::create_cnt_ptable(D = D, V = V, js = js)@pTable |> as.data.frame()
+  ptab <- ptable::create_cnt_ptable(D = D, V = V, js = js)@pTable |>
+    as.data.frame()
 
   data_f <- unique(data)
   print(paste0("Doublons supprimés: ", nrow(data) - nrow(data_f)))
@@ -237,8 +266,10 @@ calculer_proba_ecart_ratio_sur_df <- function(
     res <- furrr::future_map2(
       data_f$num,
       data_f$denom,
-      \(n, d) calculer_proba_ecart_ratio(n, d, D, V, js, ptab, betas, posterior) |>
-        mutate(A = n, B = d, R = n / d * 100),
+      \(n, d) calculer_proba_ecart_ratio(
+        n, d, fun, D, V, js, ptab, betas, posterior
+      ) |>
+        mutate(A = n, B = d, R = fun(n,d)), #n / d * 100),
       .progress = TRUE
     ) |>
       purrr::list_rbind()
@@ -249,8 +280,10 @@ calculer_proba_ecart_ratio_sur_df <- function(
     res <- purrr::map2(
       data_f$num,
       data_f$denom,
-      \(n, d) calculer_proba_ecart_ratio(n, d, D, V, js, ptab, betas, posterior) |>
-        mutate(A = n, B = d, R = n / d * 100),
+      \(n, d) calculer_proba_ecart_ratio(
+        n, d, fun, D, V, js, ptab, betas, posterior
+      ) |>
+        mutate(A = n, B = d, R = fun(n,d)), #n / d * 100),
       .progress = TRUE
     ) |>
       purrr::list_rbind()
@@ -282,13 +315,27 @@ calculer_proba_ecart_ratio_sur_df <- function(
 #'
 #' @examples
 #' library(dplyr)
-#' ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |> as.data.frame()
-#' r1 <- calculer_proba_ecart_ratio(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab, betas = seq(0,10,0.1))
+#' ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
+#'   as.data.frame()
+#' r1 <- calculer_proba_ecart_ratio(
+#'   A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab, betas = seq(0,10,0.1)
+#' )
 #' r1 |> filter(proba <= 0.05) |> head(1) |> pull(beta)
 #' calculer_beta_ratio(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab)
-#' r2 <- calculer_proba_ecart_ratio(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab, betas = seq(0,10,0.1), posterior = TRUE)
+#' r2 <- calculer_proba_ecart_ratio(
+#'   A=100,B=1500,
+#'   D = 15, V = 30.1, js = 0,
+#'   ptab = ptab,
+#'   betas = seq(0,10,0.1),
+#'   posterior = TRUE
+#' )
 #' r2 |> filter(proba <= 0.05) |> head(1) |> pull(beta)
-#' calculer_beta_ratio(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab, posterior = TRUE)
+#' calculer_beta_ratio(
+#'   A=100,B=1500,
+#'   D = 15, V = 30.1, js = 0,
+#'   ptab = ptab,
+#'   posterior = TRUE
+#'  )
 #' @importFrom dplyr pull
 #' @importFrom dplyr filter
 #' @importFrom dplyr %>%
@@ -296,6 +343,7 @@ calculer_proba_ecart_ratio_sur_df <- function(
 calculer_beta_ratio <- function(
     A,
     B,
+    fun = function(a,b){a/b*100},
     D,
     V,
     js = 0,
@@ -316,6 +364,7 @@ calculer_beta_ratio <- function(
   probas <- calculer_proba_ecart_ratio(
     A,
     B,
+    fun,
     D,
     V,
     js = js,
@@ -339,6 +388,7 @@ calculer_beta_ratio <- function(
       proba_mid <- calculer_proba_ecart_ratio(
         A,
         B,
+        fun,
         D,
         V,
         js = js,
@@ -353,6 +403,7 @@ calculer_beta_ratio <- function(
           calculer_beta_ratio(
             A,
             B,
+            fun,
             D,
             V,
             js,
@@ -369,6 +420,7 @@ calculer_beta_ratio <- function(
           calculer_beta_ratio(
             A,
             B,
+            fun,
             D,
             V,
             js,
@@ -403,7 +455,8 @@ calculer_beta_ratio <- function(
 #' Si posterior = FALSE: détermine beta0 pour alpha fixé
 #' Si posterior = TRUE: détermine beta0' pour alpha fixé
 #'
-#' @param data dataframe avec deux colonnes correspondant aux numérateurs et dénominateurs des ratios
+#' @param data dataframe avec deux colonnes correspondant aux numérateurs et
+#' dénominateurs des ratios
 #' @inheritParams calculer_beta_ratio
 #' @param parallel Booléen, si le calcul doit être parallélisé
 #' @param max_cores, integer, nombre maximal de travaux à réaliser en parallèle
@@ -431,13 +484,14 @@ calculer_beta_ratio <- function(
 #'   B = rep(c(100,200,300,500), 3)
 #' )
 #'
+#' fun = \(a,b){a/b * 100}
 #' D = 5
 #' V = 1
 #'
 #' # Approche a priori
-#' res <- calculer_beta_ratio_sur_df(test, D, V)
+#' res <- calculer_beta_ratio_sur_df(test, fun, D=5, V=1)
 #' # Approche a posteriori
-#' res_ap <- calculer_beta_ratio_sur_df(test, D, V, posterior = TRUE)
+#' res_ap <- calculer_beta_ratio_sur_df(test, fun, D, V, posterior = TRUE)
 #' @importFrom future plan
 #' @importFrom future sequential
 #' @importFrom future availableCores
@@ -448,6 +502,7 @@ calculer_beta_ratio <- function(
 #' @export
 calculer_beta_ratio_sur_df <- function(
     data,
+    fun = function(a,b){a/b*100},
     D,
     V,
     js = 0,
@@ -460,7 +515,8 @@ calculer_beta_ratio_sur_df <- function(
     max_cores = NULL
 ) {
 
-  ptab <- ptable::create_cnt_ptable(D = D, V = V, js = js)@pTable |> as.data.frame()
+  ptab <- ptable::create_cnt_ptable(D = D, V = V, js = js)@pTable |>
+    as.data.frame()
 
   data_f <- unique(data)
   print(paste0("Doublons supprimés: ", nrow(data) - nrow(data_f)))
@@ -486,11 +542,12 @@ calculer_beta_ratio_sur_df <- function(
       \(n, d) tibble(
         A = n,
         B = d,
-        R = n / d * 100,
+        R = fun(n,d), # n / d * 100,
         alpha = alpha,
         beta = calculer_beta_ratio(
           n,
           d,
+          fun,
           D,
           V,
           js,
@@ -514,11 +571,12 @@ calculer_beta_ratio_sur_df <- function(
       \(n, d) tibble(
         A = n,
         B = d,
-        R = n / d * 100,
+        R = fun(n,d), # n / d * 100,
         alpha = alpha,
         beta = calculer_beta_ratio(
           n,
           d,
+          fun,
           D,
           V,
           js,

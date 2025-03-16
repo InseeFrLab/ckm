@@ -8,6 +8,9 @@ pour un ratio R=A/B fourni en entrée.}
 calculer_beta_ratio(
   A,
   B,
+  fun = function(a, b) {
+     a/b * 100
+ },
   D,
   V,
   js = 0,
@@ -23,6 +26,9 @@ calculer_beta_ratio(
 \item{A}{numérateur}
 
 \item{B}{dénominateur}
+
+\item{fun}{function, sert à calculer la statistique souhaitée
+à partir de A et B}
 
 \item{D}{Déviation max de la CKM}
 
@@ -60,11 +66,25 @@ Le meilleur beta est recherché dans l'intervalle [beta_min; beta_max].
 }
 \examples{
 library(dplyr)
-ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |> as.data.frame()
-r1 <- calculer_proba_ecart_ratio(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab, betas = seq(0,10,0.1))
+ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
+  as.data.frame()
+r1 <- calculer_proba_ecart_ratio(
+  A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab, betas = seq(0,10,0.1)
+)
 r1 |> filter(proba <= 0.05) |> head(1) |> pull(beta)
 calculer_beta_ratio(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab)
-r2 <- calculer_proba_ecart_ratio(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab, betas = seq(0,10,0.1), posterior = TRUE)
+r2 <- calculer_proba_ecart_ratio(
+  A=100,B=1500,
+  D = 15, V = 30.1, js = 0,
+  ptab = ptab,
+  betas = seq(0,10,0.1),
+  posterior = TRUE
+)
 r2 |> filter(proba <= 0.05) |> head(1) |> pull(beta)
-calculer_beta_ratio(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab, posterior = TRUE)
+calculer_beta_ratio(
+  A=100,B=1500,
+  D = 15, V = 30.1, js = 0,
+  ptab = ptab,
+  posterior = TRUE
+ )
 }

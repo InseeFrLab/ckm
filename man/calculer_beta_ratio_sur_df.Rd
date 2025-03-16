@@ -7,6 +7,9 @@ pour chacun des ratio R=A/B fournis dans le dataframe en entrée.}
 \usage{
 calculer_beta_ratio_sur_df(
   data,
+  fun = function(a, b) {
+     a/b * 100
+ },
   D,
   V,
   js = 0,
@@ -20,7 +23,11 @@ calculer_beta_ratio_sur_df(
 )
 }
 \arguments{
-\item{data}{dataframe avec deux colonnes correspondant aux numérateurs et dénominateurs des ratios}
+\item{data}{dataframe avec deux colonnes correspondant aux numérateurs et
+dénominateurs des ratios}
+
+\item{fun}{function, sert à calculer la statistique souhaitée
+à partir de A et B}
 
 \item{D}{Déviation max de la CKM}
 
@@ -75,11 +82,12 @@ test <- data.frame(
   B = rep(c(100,200,300,500), 3)
 )
 
+fun = \(a,b){a/b * 100}
 D = 5
 V = 1
 
 # Approche a priori
-res <- calculer_beta_ratio_sur_df(test, D, V)
+res <- calculer_beta_ratio_sur_df(test, fun, D=5, V=1)
 # Approche a posteriori
-res_ap <- calculer_beta_ratio_sur_df(test, D, V, posterior = TRUE)
+res_ap <- calculer_beta_ratio_sur_df(test, fun, D, V, posterior = TRUE)
 }
