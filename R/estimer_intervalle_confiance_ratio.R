@@ -27,17 +27,17 @@
 #' ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
 #'   as.data.frame()
 #' # Calcul de alpha pour la stat originale = 10/15 pour différents beta
-#' calculer_proba_ecart_ratio(A=10,B=15,D = 15, V = 30.1, js = 0, ptab = ptab)
+#' estimer_proba_precision_statistique(A=10,B=15,D = 15, V = 30.1, js = 0, ptab = ptab)
 #' # Calcul de alpha pour la stat perturbée = 10/15 pour différentes valeurs
 #' # de beta'
-#' calculer_proba_ecart_ratio(
+#' estimer_proba_precision_statistique(
 #'   A=10,B=15,
 #'   D = 15, V = 30.1, js = 0,
 #'   ptab = ptab,
 #'   posterior = TRUE
 #' )
 #' #Calcul pour une évolution
-#' calculer_proba_ecart_ratio(
+#' estimer_proba_precision_statistique(
 #'   A=10,B=15,
 #'   fun = \(a,b){(b/a - 1)*100},
 #'   D = 15, V = 30.1, js = 0,
@@ -53,7 +53,7 @@
 #' @importFrom dplyr tibble
 #'
 #' @export
-calculer_proba_ecart_ratio <- function(
+estimer_proba_precision_statistique <- function(
     A,
     B,
     fun = function(a,b){a/b*100},
@@ -200,7 +200,7 @@ calculer_proba_ecart_ratio <- function(
 #'
 #' @param data data.frame à 2 colonnes, le numérateur et le dénominateur
 #' de chaque ratio
-#' @inheritParams calculer_proba_ecart_ratio
+#' @inheritParams estimer_proba_precision_statistique
 #' @param parallel Booléen, si le calcul doit être parallélisé
 #' @param max_cores, integer, nombre maximal de travaux à réaliser en parallèle
 #'
@@ -224,13 +224,13 @@ calculer_proba_ecart_ratio <- function(
 #' js = 4
 #'
 #' # Approche a priori
-#' res <- calculer_proba_ecart_ratio_sur_df(test, fun, D, V)
+#' res <- estimer_proba_precision_statistique_df(test, fun, D, V)
 #'
 #' # Approche a posteriori
-#' res_ap <- calculer_proba_ecart_ratio_sur_df(test, fun, D, V, posterior = TRUE)
+#' res_ap <- estimer_proba_precision_statistique_df(test, fun, D, V, posterior = TRUE)
 #' @importFrom dplyr %>%
 #' @export
-calculer_proba_ecart_ratio_sur_df <- function(
+estimer_proba_precision_statistique_df <- function(
     data,
     fun = function(a,b){a/b*100},
     D,
@@ -266,7 +266,7 @@ calculer_proba_ecart_ratio_sur_df <- function(
     res <- furrr::future_map2(
       data_f$num,
       data_f$denom,
-      \(n, d) calculer_proba_ecart_ratio(
+      \(n, d) estimer_proba_precision_statistique(
         n, d, fun, D, V, js, ptab, betas, posterior
       ) |>
         mutate(A = n, B = d, R = fun(n,d)), #n / d * 100),
@@ -280,7 +280,7 @@ calculer_proba_ecart_ratio_sur_df <- function(
     res <- purrr::map2(
       data_f$num,
       data_f$denom,
-      \(n, d) calculer_proba_ecart_ratio(
+      \(n, d) estimer_proba_precision_statistique(
         n, d, fun, D, V, js, ptab, betas, posterior
       ) |>
         mutate(A = n, B = d, R = fun(n,d)), #n / d * 100),
@@ -297,7 +297,7 @@ calculer_proba_ecart_ratio_sur_df <- function(
 #' Estime le beta minimal tel que P(|R-R'|>beta) < alpha, pour alpha fixé et
 #' pour un ratio R=A/B fourni en entrée.
 #'
-#' @inheritParams calculer_proba_ecart_ratio
+#' @inheritParams estimer_proba_precision_statistique
 #' @param beta_min integer, seuil de précision minimal
 #' @param beta_max integer, seuil de précision maximal
 #' @param precision double, niveau de précision de l'estimation de beta
@@ -317,12 +317,12 @@ calculer_proba_ecart_ratio_sur_df <- function(
 #' library(dplyr)
 #' ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
 #'   as.data.frame()
-#' r1 <- calculer_proba_ecart_ratio(
+#' r1 <- estimer_proba_precision_statistique(
 #'   A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab, betas = seq(0,10,0.1)
 #' )
 #' r1 |> filter(proba <= 0.05) |> head(1) |> pull(beta)
-#' calculer_beta_ratio(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab)
-#' r2 <- calculer_proba_ecart_ratio(
+#' estimer_beta(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab)
+#' r2 <- estimer_proba_precision_statistique(
 #'   A=100,B=1500,
 #'   D = 15, V = 30.1, js = 0,
 #'   ptab = ptab,
@@ -330,7 +330,7 @@ calculer_proba_ecart_ratio_sur_df <- function(
 #'   posterior = TRUE
 #' )
 #' r2 |> filter(proba <= 0.05) |> head(1) |> pull(beta)
-#' calculer_beta_ratio(
+#' estimer_beta(
 #'   A=100,B=1500,
 #'   D = 15, V = 30.1, js = 0,
 #'   ptab = ptab,
@@ -340,7 +340,7 @@ calculer_proba_ecart_ratio_sur_df <- function(
 #' @importFrom dplyr filter
 #' @importFrom dplyr %>%
 #' @export
-calculer_beta_ratio <- function(
+estimer_beta <- function(
     A,
     B,
     fun = function(a,b){a/b*100},
@@ -361,7 +361,7 @@ calculer_beta_ratio <- function(
   smax = betas[ns]
   smid = betas[ifelse(ns %% 2 == 0, ns / 2, (ns + 1) / 2)]
 
-  probas <- calculer_proba_ecart_ratio(
+  probas <- estimer_proba_precision_statistique(
     A,
     B,
     fun,
@@ -385,7 +385,7 @@ calculer_beta_ratio <- function(
       return(probas$beta[2])
     } else{
       #cas général où le beta est entre les deux
-      proba_mid <- calculer_proba_ecart_ratio(
+      proba_mid <- estimer_proba_precision_statistique(
         A,
         B,
         fun,
@@ -400,7 +400,7 @@ calculer_beta_ratio <- function(
         pull(proba)
       if (proba_mid > alpha) {
         return(
-          calculer_beta_ratio(
+          estimer_beta(
             A,
             B,
             fun,
@@ -417,7 +417,7 @@ calculer_beta_ratio <- function(
         )
       } else{
         return(
-          calculer_beta_ratio(
+          estimer_beta(
             A,
             B,
             fun,
@@ -457,7 +457,7 @@ calculer_beta_ratio <- function(
 #'
 #' @param data dataframe avec deux colonnes correspondant aux numérateurs et
 #' dénominateurs des ratios
-#' @inheritParams calculer_beta_ratio
+#' @inheritParams estimer_beta
 #' @param parallel Booléen, si le calcul doit être parallélisé
 #' @param max_cores, integer, nombre maximal de travaux à réaliser en parallèle
 #'
@@ -489,9 +489,9 @@ calculer_beta_ratio <- function(
 #' V = 1
 #'
 #' # Approche a priori
-#' res <- calculer_beta_ratio_sur_df(test, fun, D=5, V=1)
+#' res <- estimer_beta_df(test, fun, D=5, V=1)
 #' # Approche a posteriori
-#' res_ap <- calculer_beta_ratio_sur_df(test, fun, D, V, posterior = TRUE)
+#' res_ap <- estimer_beta_df(test, fun, D, V, posterior = TRUE)
 #' @importFrom future plan
 #' @importFrom future sequential
 #' @importFrom future availableCores
@@ -500,7 +500,7 @@ calculer_beta_ratio <- function(
 #' @importFrom purrr list_rbind
 #' @importFrom dplyr tibble
 #' @export
-calculer_beta_ratio_sur_df <- function(
+estimer_beta_df <- function(
     data,
     fun = function(a,b){a/b*100},
     D,
@@ -544,7 +544,7 @@ calculer_beta_ratio_sur_df <- function(
         B = d,
         R = fun(n,d), # n / d * 100,
         alpha = alpha,
-        beta = calculer_beta_ratio(
+        beta = estimer_beta(
           n,
           d,
           fun,
@@ -573,7 +573,7 @@ calculer_beta_ratio_sur_df <- function(
         B = d,
         R = fun(n,d), # n / d * 100,
         alpha = alpha,
-        beta = calculer_beta_ratio(
+        beta = estimer_beta(
           n,
           d,
           fun,
