@@ -48,6 +48,7 @@ compute_margins <- function(
 #' @importFrom rlang .data
 #' @examples
 #' library(data.table)
+#' library(dplyr)
 #'
 #' data("dtest")
 #'

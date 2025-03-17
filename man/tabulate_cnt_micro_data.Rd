@@ -45,6 +45,7 @@ et en construisant l'ensemble des marges possibles. La fonction construit
 }
 \examples{
 library(data.table)
+library(dplyr)
 
 data("dtest")
 
