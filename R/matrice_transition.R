@@ -9,7 +9,6 @@
 #'
 #' @return objet `ptable` contenant la matrice de transition
 #' @export
-#' @import data.table
 #' @examples
 #' library(ptable)
 #' mat_trans <- creer_matrice_transition(D = 5, V = 2)
@@ -40,7 +39,6 @@ creer_matrice_transition <- function(D, V, js = 0, ...){
 #'
 #' @return data.table  - la table de perturbation
 #' @export
-#' @import data.table
 #' @examples
 #' mat_trans <- creer_matrice_transition(D = 5, V = 2)
 #' tab_pert <- creer_table_perturbation(mat_trans)

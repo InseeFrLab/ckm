@@ -16,20 +16,20 @@
 #'   cat_vars = c("DIPLOME", "SEXE", "AGE"),
 #'   hrc_vars = list(GEO = c("REG", "DEP")),
 #'   marge_label = "Total",
-#'   D = 10, V = 15, js = 4,
-#'   J = 0
+#'   D = 10, V = 15, js = 4
 #' )
 tabuler_et_appliquer_ckm <- function(
     df,
     rk_var = "rkey",
-    cat_vars,
+    cat_vars = NULL,
     hrc_vars = NULL,
+    num_var = NULL,
     marge_label = "Total",
     D,
     V,
     js = 0,
-    I = 1:4,
-    J = 1:4,
+    I = NULL,
+    J = NULL,
     ...){
 
   assertthat::assert_that(
@@ -37,13 +37,16 @@ tabuler_et_appliquer_ckm <- function(
     msg = "La clé individuelle est absente de vos données."
   )
 
+  freq_empiriq <- ! (is.null(I) | is.null(J))
+
   tab_avant <- tabulate_cnt_micro_data(
     df = df,
     rk_var = rk_var,
     cat_vars = cat_vars,
     hrc_vars = hrc_vars,
+    num_var = num_var,
     marge_label = marge_label,
-    freq_empiriq = TRUE
+    freq_empiriq = freq_empiriq
   )
 
   args_add <- c(...)

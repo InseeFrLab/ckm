@@ -7,14 +7,15 @@
 tabuler_et_appliquer_ckm(
   df,
   rk_var = "rkey",
-  cat_vars,
+  cat_vars = NULL,
   hrc_vars = NULL,
+  num_var = NULL,
   marge_label = "Total",
   D,
   V,
   js = 0,
-  I = 1:4,
-  J = 1:4,
+  I = NULL,
+  J = NULL,
   ...
 )
 }
@@ -26,6 +27,8 @@ tabuler_et_appliquer_ckm(
 \item{cat_vars}{vector of categorical variables but not hierarchical}
 
 \item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
+
+\item{num_var}{nom d'une variable numérique à aggréger en même temps}
 
 \item{marge_label}{label of margins (applied to all cat and hrc variables)}
 
@@ -58,7 +61,6 @@ res_ckm <- tabuler_et_appliquer_ckm(
   cat_vars = c("DIPLOME", "SEXE", "AGE"),
   hrc_vars = list(GEO = c("REG", "DEP")),
   marge_label = "Total",
-  D = 10, V = 15, js = 4,
-  J = 0
+  D = 10, V = 15, js = 4
 )
 }

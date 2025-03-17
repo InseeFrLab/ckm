@@ -9,7 +9,6 @@
 #' `rkey` représentant la clé aléatoire individuelle en plus.
 #'
 #' @export
-#' @import data.table
 #' @importFrom stats runif
 #' @examples
 #' data("dtest", package = "ckm")

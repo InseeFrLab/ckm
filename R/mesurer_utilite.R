@@ -58,3 +58,42 @@ ecarts_absolus_moyens_relatifs <- function(o, p){
 }
 
 
+#' Distance Euclidienne
+#'
+#' @param o vecteur des valeurs originales
+#' @param p vecteur des valeurs perturbées
+#'
+#' @return numeric
+#' @export
+#'
+#' @examples
+#' distance_euclid(1:100, 11:110)
+distance_euclid <- function(o, p){
+
+  o <- o[o > 0]
+  p <- p[o > 0]
+
+  sqrt( sum( ( o - p )^2 ) )
+
+}
+
+
+#' Distance de Manhattan
+#'
+#' @param o vecteur des valeurs originales
+#' @param p vecteur des valeurs perturbées
+#'
+#' @return numeric
+#' @export
+#'
+#' @examples
+#' distance_manhattan(1:100, 11:110)
+distance_manhattan <- function(o, p){
+
+  o <- o[o > 0]
+  p <- p[o > 0]
+
+  sum( abs( o - p ) )
+
+}
+

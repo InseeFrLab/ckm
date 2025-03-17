@@ -34,6 +34,7 @@ compute_margins <- function(
 #' @param rk_var (character) nom de la variable des clés individuelles
 #' @param cat_vars vector of categorical variables but not hierarchical
 #' @param hrc_vars named list (name = VAR final name, value = VAR current names)
+#' @param num_var nom d'une variable numérique à aggréger en même temps
 #' @param marge_label label of margins (applied to all cat and hrc variables)
 #' @param freq_empiriq booléen. Si `TRUE`, génère également le tableau
 #' des fréquences empiriques des comptages (utile pour la mesure du risque).
@@ -44,7 +45,6 @@ compute_margins <- function(
 #' une liste comprenant le tibble ci-dessus et un tiblle des fréquences empiriques.
 #'
 #' @export
-#' @import data.table
 #' @importFrom rlang .data
 #' @examples
 #' library(data.table)
@@ -59,11 +59,21 @@ compute_margins <- function(
 #'   marge_label = "Total"
 #' )
 #' str(tab_comptage)
+#'
+#' tab_comptage_num <- tabulate_cnt_micro_data(
+#'   df = dtest |> mutate(NUM = 12),
+#'   rk_var = NULL,
+#'   cat_vars = c("DIPLOME", "SEXE", "AGE"),
+#'   hrc_vars = list(GEO = c("REG", "DEP")),
+#'   num_var = "NUM",
+#'   marge_label = "Total"
+#' )
 tabulate_cnt_micro_data <- function(
     df,
     rk_var = "rkey",
     cat_vars = NULL,
     hrc_vars = NULL,
+    num_var = NULL,
     marge_label = "Total",
     freq_empiriq = FALSE
 ){
@@ -85,11 +95,21 @@ tabulate_cnt_micro_data <- function(
   if(is.null(rk_var)){
     message("Avertissement: En l'absence d'une variable de clés individuelles mentionnée dans df,
     aucune clé ne pourra être fournie pour les cellules du tableau agrégé.")
-    inner_cells <- data_dt[, .(nb_obs = .N), by = c(all_cat_vars)]
-    resp_var <- NULL
+    if(is.null(num_var)){
+      inner_cells <- data_dt[, .(nb_obs = .N), by = c(all_cat_vars)]
+      resp_var <- NULL
+    }else{
+      inner_cells <- data_dt[, .(nb_obs = .N, num_tot = sum(get(num_var))), by = c(all_cat_vars)]
+      resp_var <- "num_tot"
+    }
   }else{
-    inner_cells <- data_dt[, .(nb_obs = .N, rkey_tot = sum(get(rk_var))), by = c(all_cat_vars)]
-    resp_var <- "rkey_tot"
+    if(is.null(num_var)){
+      inner_cells <- data_dt[, .(nb_obs = .N, rkey_tot = sum(get(rk_var))), by = c(all_cat_vars)]
+      resp_var <- "rkey_tot"
+    }else{
+      inner_cells <- data_dt[, .(nb_obs = .N, rkey_tot = sum(get(rk_var)), num_tot = sum(get(num_var))), by = c(all_cat_vars)]
+      resp_var <- c("rkey_tot","num_tot")
+    }
   }
 
   res <- compute_margins(
@@ -121,7 +141,7 @@ tabulate_cnt_micro_data <- function(
     return(
       list(
         tab = tab,
-        freq = calculer_frequences_empiriques(tab)
+        freq = calculer_frequences_empiriques(tab, cat_vars, hrc_vars)
       )
     )
   }else{

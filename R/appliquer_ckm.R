@@ -14,7 +14,7 @@
 #' de l'utilité.
 #'
 #' @export
-#' @import data.table
+#' @rawNamespace import(data.table, except = c(transpose, first, last, between))
 #' @importFrom tibble tibble
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr rename_with
@@ -35,6 +35,18 @@
 #'
 #' res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
 #' str(res_ckm, max.level = 2)
+#'
+#' tab_avant2 <- tabulate_cnt_micro_data(
+#'   df = dtest_avec_cles |> mutate(NUM = 12),
+#'   cat_vars = c("DIPLOME", "SEXE", "AGE"),
+#'   hrc_vars = list(GEO = c("REG", "DEP")),
+#'   num_var = "NUM",
+#'   marge_label = "Total",
+#'   freq_empiriq = TRUE #pour pouvoir mesurer le risque
+#' )
+#'
+#' res_ckm2 <- appliquer_ckm(tab_avant2, cnt_var = "num_tot", D = 5, V = 2)
+#' head(res_ckm2$tab)
 appliquer_ckm <- function(
     tab_data,
     cnt_var = "nb_obs",
@@ -42,8 +54,8 @@ appliquer_ckm <- function(
     D,
     V,
     js = 0,
-    I = 1,
-    J = 1,
+    I = NULL,
+    J = NULL,
     ...) {
 
   if(!is.data.frame(tab_data)){
@@ -90,7 +102,7 @@ appliquer_ckm <- function(
     dplyr::rename_with(~cnt_var_ckm, res_ckm)
 
    # Mesures de risque si les fréquences empiriques sont fournies dans tab_data
-  if(!is.null(p_hat)){
+  if(!is.null(p_hat) & !is.null(I) & !is.null(J)){
     risque <- mesurer_risque(mat_trans, p_hat, I, J)
   }else{
     risque <- NULL

@@ -11,6 +11,7 @@ tabulate_cnt_micro_data(
   rk_var = "rkey",
   cat_vars = NULL,
   hrc_vars = NULL,
+  num_var = NULL,
   marge_label = "Total",
   freq_empiriq = FALSE
 )
@@ -23,6 +24,8 @@ tabulate_cnt_micro_data(
 \item{cat_vars}{vector of categorical variables but not hierarchical}
 
 \item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
+
+\item{num_var}{nom d'une variable numérique à aggréger en même temps}
 
 \item{marge_label}{label of margins (applied to all cat and hrc variables)}
 
@@ -53,4 +56,13 @@ tab_comptage <- tabulate_cnt_micro_data(
   marge_label = "Total"
 )
 str(tab_comptage)
+
+tab_comptage_num <- tabulate_cnt_micro_data(
+  df = dtest |> mutate(NUM = 12),
+  rk_var = NULL,
+  cat_vars = c("DIPLOME", "SEXE", "AGE"),
+  hrc_vars = list(GEO = c("REG", "DEP")),
+  num_var = "NUM",
+  marge_label = "Total"
+)
 }
