@@ -66,6 +66,14 @@ reference:
       - creer_matrice_transition
       - creer_table_perturbation
       - tester_matrices
+  - title: Autres fonctions
+    contents:
+      - construire_table_parametres
+      - convertir_desc_table_en_liste
+      - distance_euclid
+      - distance_manhattan
+      - estimer_proba_precision_statistique
+      - estimer_proba_precision_statistique_df
   - title: Données exemples
     desc: Jeu de données fictives pour tester les fonctions du package
     contents:
