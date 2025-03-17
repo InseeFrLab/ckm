@@ -31,31 +31,35 @@ reference:
     desc:  Une fonction pour créer la clé associée à chaque individu
     contents:
       - construire_cles_indiv
-  - title: Construire un tableau de comptage
-    desc: |
-      La fonction agrège les données individuelles selon les
-      variables de croisements renseignées. Elle prend en compte les
-      hiérarchies éventuelles. Le tableau fournit contient également la clé
-      aléatoire de chaque cellule.
+  - title: Construire un tableau de comptage et appliquer la CKM
     contents:
       - tabulate_cnt_micro_data
-  - title: Appliquer la CKM à un tableau de données
-    desc:  La fonction applique la CKM sur un tableau agrégé fourni.
-    contents:
+        desc: |
+          La fonction agrège les données individuelles selon les
+          variables de croisements renseignées. Elle prend en compte les
+          hiérarchies éventuelles. Le tableau fournit contient également la clé
+          aléatoire de chaque cellule.
       - appliquer_ckm
-  - title: Appliquer toutes les étapes en une
-    desc:  La fonction construit le tableau agrégé et applique la CKM sur le tableau fourni.
-    contents:
+        desc:  La fonction applique la CKM sur un tableau agrégé fourni.
       - tabuler_et_appliquer_ckm
-  - title: Construire la matrice de transition et préparer la table de perturbation
-    desc:  Les fonctions permettent de récupérer la matrice de transition.
+        desc: |
+          La fonction construit le tableau agrégé et applique la CKM
+          sur le tableau fourni.
+      - tabuler_et_appliquer_ckm_liste
+        desc: |
+          La fonction construit une liste de tableaux et applique la CKM
+          sur chacun d'entre eux.
+  - title: Réaliser l'arbitrage risque - utilité
+    desc: Un ensemble de fonctions pour faciliter le choix des paramètres
     contents:
-      - creer_matrice_transition
-      - creer_table_perturbation
-      - tester_matrices
-  - title: Arbitrage Risque - Utilité
-    desc: Réaliser l'arbitrage risque - utilité
-    contents:
+      - mesurer_RU
+        desc: Fournit le risque et l'utilité pour un scénario donné
+      - mesurer_RUs
+        desc: Fournit le risque et l'utilité pour un ensemble de scénarios
+      - simuler_RUs
+        desc: |
+          Fournit le risque et l'utilité pour un ensemble de scénarios,
+          l'utilité étant mesurée à partir d'un ensemble de simulations.
       - mesurer_risque
       - calculer_ensemble_deviation
       - calculer_ensemble_possibles
@@ -63,6 +67,21 @@ reference:
       - distance_hellinger
       - ecarts_absolus_moyens
       - ecarts_absolus_moyens_relatifs
+  - title: Calculer des intervalles de confiance
+    desc: |
+      Fonctions fournissant les intervalles de confiance de statistiques
+      construites à partir de comptages perturbés
+    contents:
+      - estimer_beta
+        desc: Estime l'intervalle de confiance pour une statistique
+      - estimer_beta_df
+        desc: Estime l'intervalle de confiance à partir d'un dataframe
+  - title: Construire la matrice de transition et préparer la table de perturbation
+    desc:  Les fonctions permettent de récupérer la matrice de transition.
+    contents:
+      - creer_matrice_transition
+      - creer_table_perturbation
+      - tester_matrices
   - title: Données exemples
     desc: Jeu de données fictives pour tester les fonctions du package
     contents:
