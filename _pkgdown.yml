@@ -32,34 +32,20 @@ reference:
     contents:
       - construire_cles_indiv
   - title: Construire un tableau de comptage et appliquer la CKM
+    desc: |
+      Fonctions qui permettent de construire et appliquer la CKM, sur 
+      un seul tableau ou sur une liste de tableaux.
     contents:
       - tabulate_cnt_micro_data
-        desc: |
-          La fonction agrège les données individuelles selon les
-          variables de croisements renseignées. Elle prend en compte les
-          hiérarchies éventuelles. Le tableau fournit contient également la clé
-          aléatoire de chaque cellule.
       - appliquer_ckm
-        desc:  La fonction applique la CKM sur un tableau agrégé fourni.
       - tabuler_et_appliquer_ckm
-        desc: |
-          La fonction construit le tableau agrégé et applique la CKM
-          sur le tableau fourni.
       - tabuler_et_appliquer_ckm_liste
-        desc: |
-          La fonction construit une liste de tableaux et applique la CKM
-          sur chacun d'entre eux.
   - title: Réaliser l'arbitrage risque - utilité
     desc: Un ensemble de fonctions pour faciliter le choix des paramètres
     contents:
       - mesurer_RU
-        desc: Fournit le risque et l'utilité pour un scénario donné
       - mesurer_RUs
-        desc: Fournit le risque et l'utilité pour un ensemble de scénarios
       - simuler_RUs
-        desc: |
-          Fournit le risque et l'utilité pour un ensemble de scénarios,
-          l'utilité étant mesurée à partir d'un ensemble de simulations.
       - mesurer_risque
       - calculer_ensemble_deviation
       - calculer_ensemble_possibles
@@ -73,9 +59,7 @@ reference:
       construites à partir de comptages perturbés
     contents:
       - estimer_beta
-        desc: Estime l'intervalle de confiance pour une statistique
       - estimer_beta_df
-        desc: Estime l'intervalle de confiance à partir d'un dataframe
   - title: Construire la matrice de transition et préparer la table de perturbation
     desc:  Les fonctions permettent de récupérer la matrice de transition.
     contents:
