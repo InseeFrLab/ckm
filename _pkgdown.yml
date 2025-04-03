@@ -70,7 +70,7 @@ reference:
   - title: Calculer des intervalles de confiance
     desc: |
       Fonctions fournissant les intervalles de confiance de statistiques
-      construites à partir de comptages perturbés
+      construites à partir de comptages perturbés.
     contents:
       - estimer_beta
         desc: Estime l'intervalle de confiance pour une statistique
@@ -82,6 +82,10 @@ reference:
       - creer_matrice_transition
       - creer_table_perturbation
       - tester_matrices
+      - visualiser_distribution
+      desc: |
+        Permet de comparer des scénarios en visualisant
+        la distribution théorique du bruit.
   - title: Données exemples
     desc: Jeu de données fictives pour tester les fonctions du package
     contents:
