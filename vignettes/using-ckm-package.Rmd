@@ -1,0 +1,115 @@
+---
+title: "Applying the Cell Key Method with the `ckm` package"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{using-ckm-package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+This vignette demonstrates how to use the key functions of the package to apply the Cell Key Method for statistical disclosure control. The steps include:
+
+1. Adding keys to microdata using `build_individual_keys`.
+2. Comparing different transition matrices with `visualiser_distribution` for various parameter choices.
+3. Simulating risk and utility measures with `simulate_RUs`.
+4. Applying the Cell Key Method with `tabulate_and_apply_ckm` and interpreting the results.
+
+# Step 1: Adding Keys to Microdata
+
+First, load the package and example data, then generate individual keys.
+
+```{r setup-load-data}
+library(dplyr)
+library(ckm)
+
+# Load example microdata
+data("dtest", package = "ckm")
+
+# Set a seed for reproducibility
+set.seed(4081789)
+
+# Add individual keys to the microdata
+dtest_with_keys <- build_individual_keys(dtest)
+head(dtest_with_keys)
+```
+
+# Step 2: Comparing Transition Matrices
+
+## Step 2.1: Search Feasible Transition Matrices
+
+```{r}
+test_matrices(D = 10, js = 4)
+```
+
+```{r}
+test_matrices(D = 15, js = 4)
+```
+
+With D equals to 10 or 15 and js equals to 4, the minimal variance that let us 
+build a transition matrix is`V=6.5625`.
+
+
+## Step 2.2: Visualize the distributions
+
+We compare the transition matrices for different values of D and V using `visualiser_distribution`.
+
+```{r compare-transition-matrices}
+# Visualize transition matrices for different parameter sets
+visualize_distribution(D = c(10, 15), V = c(10, 20, 30))
+```
+
+With `V<=20`, the distributions ensures that more than `75%` of the absolute 
+deviations are equal to 5 at most.
+
+# Step 3: Estimating Risk and Simulating Utility Measures
+
+We use `simulate_RUs` to compare the risk and utility for the different parameter sets. 
+We set `n_sim = 5` for a quick demonstration and use the categorical variables REG, DIPLOME, AGE, and SEXE.
+
+```{r simulate-risk-utility}
+# Define the categorical variables
+cat_vars <- c("REG", "DIPLOME", "AGE", "SEXE")
+# Define the parameters D and V (and js if needed) to test:
+parameters <- build_parameters_table(Ds = c(10,15), Vs = c(10, 20), jss = 4)
+
+# Simulate risk and utility for different parameter sets
+sim_results <- simulate_RUs(
+  df = dtest,
+  cat_vars = cat_vars,
+  parametres = parameters,
+  confident = 5,
+  n_sim = 5
+)
+
+# Display the results
+sim_results |> 
+  group_by(D, V, js, i, j, risk_inference = qij) |>
+  summarise(MAD = mean(MAD), .groups = "drop")
+```
+
+As the risk inference of sensitive values is lower than `50%` for all sets of 
+parameters, one can choose the one that maximize the utility (`D=15, V=10`).
+
+# Step 4: Applying the Cell Key Method
+
+Based on the previous results, we select one set of parameters 
+(D = 15, V = 10) and apply the Cell Key Method using 
+`tabulate_and_apply_ckm`.
+
+```{r apply-ckm}
+# Apply the Cell Key Method with chosen parameters
+res_ckm <- tabulate_and_apply_ckm(
+  df = dtest_with_keys,
+  cat_vars = cat_vars,
+  D = 15,
+  V = 10,
+  js = 4
+)
+
+# Examine the perturbed table
+head(res_ckm$tab |> filter(DIPLOME == "D") |> arrange(REG, AGE, SEXE), n = 12)
+```
+

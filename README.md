@@ -1,98 +1,73 @@
-
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![minimum R version](https://img.shields.io/badge/R%3E%3D-3.5-blue.svg)](https://gitlab.insee.fr/outilsconfidentialite/ckm/-/blob/main/DESCRIPTION)
 [![pipeline status](https://gitlab.insee.fr/outilsconfidentialite/ckm/badges/main/pipeline.svg)](https://gitlab.insee.fr/outilsconfidentialite/ckm/-/pipelines)
 
-# Appliquer la méthode des clés aléatoires
+# Applying the Cell Key Method
 
+## Overview
 
-## Installation du package
+The Cell Key Method (CKM) is a statistical technique used to protect the confidentiality of tabular data by perturbating all cells in it. This package provides tools to apply the CKM in `R`, enabling users to select the best set of parameters and to generate perturbed counting tables from microdata.
 
-La procédure d'installation dépend de l'environnement dans lequel se trouve `R`
+For more information on the Cell Key Method, you can refer to the chapter 5.4 of the [Handbook on Statistical Disclsoure Control](https://sdctools.github.io/HandbookSDC/05-frequency-tables.html#sec-CKM_freq).
 
-<!--
- __Accès à internet: depuis `Github`__
+The package is designed to perturb only frequency tables only for the moment.
+
+## Documentation
+
+For detailed documentation, please refer to the [package vignette](https://inseefrlab.github.io/ckm/articles/quickstart-ckm.html).
+
+The transition matrices are built using the [`ptable`](https://cran.r-project.org/web/packages/ptable/index.html) package.
+
+For French readers, you can also refer to a [methdological document](https://www.insee.fr/fr/statistiques/fichier/2838097/12-fiche_methodologique_ckm.pdf) for more information on the Cell Key Method.
+
+## Package Installation
 
 ```r
 # install.packages("remotes")
-remotes::install_github("inseefrlab/ckm",
-                     dependencies = TRUE)
-                     
-```
--->
-
-__Pas d'accès à internet (AUS, LS3...): depuis un `Gitlab` interne :
-
-```r
-# install.packages("remotes")
-remotes::install_git("https://gitlab.insee.fr/outilsconfidentialite/ckm.git",
-                     dependencies = TRUE)
-                     
+remotes::install_github("inseefrlab/ckm", dependencies = TRUE)
 ```
 
+## Applying the Cell Key Method Step by Step
 
-## Appliquer la méthode des clés aléatoires étape par étape
-
-### 1-Poser une clé aléatoire sur le jeu de données individuelles
-
-La commande `set.seed()` permet de fixer une graine aléatoire et d'assurer 
-la reproductibilité du code, en l'occurrence ici du tirage des clés 
-individuelles.
+### Assigning a Random Key to the Microdata
 
 ```r
 library(ckm)
 
 data("dtest", package = "ckm")
 
-set.seed(4081789)
-dtest_avec_cles <- construire_cles_indiv(dtest)
-hist(dtest_avec_cles$rkey)
-                     
+set.seed(4081789) # Ensure reproducibility
+dtest_with_keys <- build_individual_keys(dtest)
+hist(dtest_with_keys$rkey)
 ```
 
-
-### 2-Générer le tableau de comptages avec la clé des cellules
-
+### Generating the Counting Table with Cell Keys
 
 ```r
-tab_avant <- tabulate_cnt_micro_data(
- df = dtest_avec_cles,
- cat_vars = c("DIPLOME", "SEXE", "AGE"),
- hrc_vars = list(GEO = c("REG", "DEP")),
- marge_label = "Total"
+tab_before <- tabulate_cnt_micro_data(
+  df = dtest_with_keys,
+  cat_vars = c("DIPLOME", "SEXE", "AGE"),
+  hrc_vars = list(GEO = c("REG", "DEP")),
+  marge_label = "Total"
 )
-                     
 ```
 
-### 3-Appliquer la perturbation
+### Applying the Perturbation
 
 ```r
-res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
-
+res_ckm <- apply_ckm(tab_before, D = 5, V = 2)
 ```
 
+## Applying the Cell Key Method in One Step
 
-### 4-Mesurer la perte d'information
-
-En cours de dev
-
-### 5- Mesure le risque
-
-EN cours de dev
-
-## Appliquer la méthode des clés aléatoires en une étape
-
-Après avoir généré la clé individuelle sur votre jeu de données, il est possible
-de construire directement le tableau perturbé
-
+After generating the individual key on your dataset, you can directly build the perturbed table:
 
 ```r
-res_ckm <- tabuler_et_appliquer_ckm(
- df = dtest_avec_cles,
- cat_vars = c("DIPLOME", "SEXE", "AGE"),
- hrc_vars = list(GEO = c("REG", "DEP")),
- marge_label = "Total",
- D = 5, V = 2
+res_ckm <- tabulate_and_apply_ckm(
+  df = dtest_with_keys,
+  cat_vars = c("DIPLOME", "SEXE", "AGE"),
+  hrc_vars = list(GEO = c("REG", "DEP")),
+  marge_label = "Total",
+  D = 5, V = 2
 )
-str(res_ckm$tab)                   
 ```

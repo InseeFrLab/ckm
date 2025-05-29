@@ -25,13 +25,13 @@ data("dtest", package = "ckm")
 
 ## Une étape préalable: poser les clés individuelles
 
-La fonction `construire_cles_indiv()` ajoute à votre jeu de données 
+La fonction `build_individual_keys()` ajoute à votre jeu de données 
 une colonne `rkey` contenant les clés individuelles qui sont des nombres 
 aléatoires tirés selon une loi uniforme entre 0 et 1.
 
 ```{r cles}
 set.seed(451919)
-dtest_avec_cles <- construire_cles_indiv(dtest)
+dtest_avec_cles <- build_individual_keys(dtest)
 ```
 
 On peut vérifier que la distribution des clés individuelles est bien uniforme.
@@ -54,7 +54,7 @@ maximale) et `V` (la variance de la distribution)
 - appliquer la perturbation sur le tableau agrégé.
 
 ```{r ckm_direct}
-res_ckm <- tabuler_et_appliquer_ckm(
+res_ckm <- tabulate_and_apply_ckm(
  df = dtest_avec_cles,
  cat_vars = c("DEP","DIPLOME", "SEXE", "AGE"),
  D = 5, V = 2
@@ -109,7 +109,7 @@ Il suffit de renseigner, a minima :
   des écarts absolus) le sera.
 
 ```{r appliquer}
-res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
+res_ckm <- apply_ckm(tab_avant, D = 5, V = 2)
 ```
 
 ```{r structure-res}
