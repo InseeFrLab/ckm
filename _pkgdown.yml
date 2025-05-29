@@ -1,84 +1,77 @@
+url: https://inseefrlab.github.io/ckm/
 template:
   bootstrap: 5
-
-destination: public
-
-lang: fr
 
 navbar:
   structure:
     left:  [home, reference, articles, news]
-    right: [search, gitlab]
+    right: [search, github]
 
   components:
     reference:
-      text: Contenu du package
+      text: Package Contents
       href: reference/index.html
     news:
-      text: Nouveautés
+      text: News
       href: news/index.html
-    gitlab:
-      icon: fa-gitlab
-      aria-label: Gitlab
-      text: Code source
-      href: https://gitlab.insee.fr/outilsconfidentialite/ckm
+    github:
+      icon: fa-github
+      aria-label: GitHub
+      text: Source Code
+      href: https://github.com/inseefrlab/ckm
 
 home:
-  title: Package R pour appliquer la méthode des clés aléatoires
+  title: R package for applying the Cell Key Method
 
 reference:
-  - title: Générer les clés individuelles dans un jeu de microdonnées
-    desc:  Une fonction pour créer la clé associée à chaque individu
+  - title: Generate individual keys in microdata
+    desc:  A function to create the key associated with each individual
     contents:
-      - construire_cles_indiv
-  - title: Construire un tableau de comptage et appliquer la CKM
+      - build_individual_keys
+  - title: Build a counting table and apply the CKM
     desc: |
-      Fonctions qui permettent de construire et appliquer la CKM, sur
-      un seul tableau ou sur une liste de tableaux.
+      Functions to build and apply the Cell Key Method, on a single table or a list of tables.
     contents:
       - tabulate_cnt_micro_data
-      - appliquer_ckm
-      - tabuler_et_appliquer_ckm
-      - tabuler_et_appliquer_ckm_liste
-  - title: Réaliser l'arbitrage risque - utilité
-    desc: Un ensemble de fonctions pour faciliter le choix des paramètres
+      - apply_ckm
+      - tabulate_and_apply_ckm
+      - tabulate_and_apply_ckm_list
+  - title: Risk-utility trade-off
+    desc: A set of functions to help choose the parameters
     contents:
-      - mesurer_RU
-      - mesurer_RUs
-      - simuler_RUs
-      - mesurer_risque
-      - calculer_ensemble_deviation
-      - calculer_ensemble_possibles
-      - calculer_frequences_empiriques
+      - assess_RU
+      - assess_RUs
+      - simulate_RUs
+      - assess_risk
+      - get_deviation_set
+      - get_possibles_set
+      - compute_frequencies
       - distance_hellinger
-      - ecarts_absolus_moyens
-      - ecarts_absolus_moyens_relatifs
-  - title: Calculer des intervalles de confiance
+      - mean_absolute_deviation
+      - mean_relative_absolute_deviation
+  - title: Compute confidence intervals
     desc: |
-      Fonctions fournissant les intervalles de confiance de statistiques
-      construites à partir de comptages perturbés.
+      Functions providing confidence intervals for statistics built from perturbed counts.
     contents:
-      - estimer_beta
-      - estimer_beta_df
-  - title: Construire la matrice de transition et préparer la table de perturbation
-    desc:  Les fonctions permettent de récupérer la matrice de transition.
+      - estimate_beta
+      - estimate_beta_df
+  - title: Build the transition matrix and prepare the perturbation table
+    desc:  Functions to retrieve the transition matrix and compare scenarios by visualizing the theoretical noise distribution.
     contents:
-      - creer_matrice_transition
+      - create_transition_matrix
       - creer_table_perturbation
-      - tester_matrices
-      - visualiser_distribution
-      desc: |
-        Permet de comparer des scénarios en visualisant
-        la distribution théorique du bruit.
-  - title: Autres fonctions
+      - test_matrices
+      - visualize_distribution
+  - title: Other functions
     contents:
-      - construire_table_parametres
-      - convertir_desc_table_en_liste
+      - build_parameters_table
+      - convert_desc_table_to_list
       - distance_euclid
       - distance_manhattan
-      - estimer_proba_precision_statistique
-      - estimer_proba_precision_statistique_df
-  - title: Données exemples
-    desc: Jeu de données fictives pour tester les fonctions du package
+      - estimate_proba_precision_statistic
+      - estimate_proba_precision_statistic_df
+  - title: Example data
+    desc: Example dataset to test the package functions
     contents:
       - dtest
+

@@ -7,7 +7,7 @@ Authors@R: c(
     person(, "Institut National de la Statistique et des Études Économiques", , role = "cph")
   )
 Maintainer: Julien Jamme <dg75-dmcsi-confidentialite@insee.fr>
-URL: https://github.com/InseeFrLab/ckm
+URL: https://github.com/InseeFrLab/ckm, https://inseefrlab.github.io/ckm/
 BugReports: https://github.com/InseeFrLab/ckm/issues
 Description: 
     The ckm package implements the Cell Key Method (CKM) to protect tabular data and

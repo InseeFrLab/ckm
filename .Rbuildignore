@@ -12,3 +12,13 @@
 ^docs$
 ^doc$
 ^Meta$
+
+^\.github$
+^CRAN-SUBMISSION$
+^CRAN-RELEASE$
+^gitlab_pkgdown\.yml$
+^README\.md$
+\.gitignore
+\.git/*
+^cran-comments\.md$
+images/*
