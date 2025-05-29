@@ -1,5 +1,5 @@
 
-[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-green.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![minimum R version](https://img.shields.io/badge/R%3E%3D-3.5-blue.svg)](https://gitlab.insee.fr/outilsconfidentialite/ckm/-/blob/main/DESCRIPTION)
 [![pipeline status](https://gitlab.insee.fr/outilsconfidentialite/ckm/badges/main/pipeline.svg)](https://gitlab.insee.fr/outilsconfidentialite/ckm/-/pipelines)
 
