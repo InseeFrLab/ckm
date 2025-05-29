@@ -1,47 +1,77 @@
-#' Wrapper de la fonction `ptable::create_cnt_ptable`
+#' Create Cell Key Method transition matrix
 #'
+#' Wrapper function for ptable::create_cnt_ptable that creates a transition matrix 
+#' for the Cell Key Method with specified parameters.
 #'
-#' @param D Déviation (integer strictement positif)
-#' @param V Variance du bruit (numeric strictement positif)
-#' @param js Seuil des valeurs interdites (integer). Si `js=0` (défaut), seule la
-#' valeur 0 sera interdite.
-#' @param ... Paramètres additionnels de la fonction `ptable::create_cnt_ptable`
+#' @param D integer. Deviation parameter (must be strictly positive)
+#' @param V numeric. Noise variance (must be strictly positive)  
+#' @param js integer. Threshold for sensitive values (default: 0). If js=0, only value 0 will be forbidden
+#' @param ... Additional parameters passed to ptable::create_cnt_ptable
 #'
-#' @return objet `ptable` contenant la matrice de transition
+#' @return ptable object containing the transition matrix, or NULL if matrix cannot be constructed
+#'
 #' @export
+#'
 #' @examples
+#' \dontrun{
 #' library(ptable)
 #' mat_trans <- creer_matrice_transition(D = 5, V = 2)
 #' plot(mat_trans, type="d") |> print()
-creer_matrice_transition <- function(D, V, js = 0, ...){
+#' }
+creer_matrice_transition <- function(D, V, js = 0, ...) {
 
+  # Validate parameters
+  assertthat::assert_that(
+    is.numeric(D) && D > 0 && D %% 1 == 0,
+    msg = "D must be a strictly positive integer."
+  )
+  assertthat::assert_that(
+    is.numeric(V) && V > 0,
+    msg = "V must be a strictly positive numeric value."
+  )
+  assertthat::assert_that(
+    is.numeric(js) && js >= 0 && js %% 1 == 0,
+    msg = "js must be a non-negative integer."
+  )
+  assertthat::assert_that(
+    length(D) == 1 && length(V) == 1 && length(js) == 1,
+    msg = "D, V, and js must be single numeric values."
+  )
+  
   tryCatch(
     expr = {
+      # Create the transition matrix using the specified parameters
       p_table <- ptable::create_cnt_ptable(D = D, V = V, js = js, ...)
       return(p_table)
     },
-    error = function(e){
-      message("Modifier les paramètres de la matrice de transition. Il est
-              probable que l'algorithme n'ait pas pu converger.\n")
+    error = function(e) {
+      message("Please modify the parameters of the transition matrix. It is likely that the algorithm could not converge.\n")
       print(e)
       return(NULL)
     },
-    warning = function(w){
+    warning = function(w) {
       print(w)
     }
   )
 
 }
 
-#' Prépare la table de perturbation à partir de la matrice de transition
+#' Create perturbation table from transition matrix
 #'
-#' @param matrice_transition objet créé par `creer_matrice_transition()`
+#' Prepares a perturbation lookup table from a transition matrix object
+#' for efficient application of the Cell Key Method.
 #'
-#' @return data.table  - la table de perturbation
+#' @param matrice_transition ptable object. Object created by creer_matrice_transition()
+#'
+#' @return data.table containing the perturbation table with columns i, v, p_int_lb, p_int_ub
+#'
 #' @export
+#'
 #' @examples
+#' \dontrun{
 #' mat_trans <- creer_matrice_transition(D = 5, V = 2)
 #' tab_pert <- creer_table_perturbation(mat_trans)
+#' }
 creer_table_perturbation <- function(matrice_transition){
 
   table_perturbation <- matrice_transition@pTable[, .(i,v,p_int_lb,p_int_ub)]

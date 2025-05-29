@@ -2,27 +2,24 @@
 % Please edit documentation in R/construire_cles_indiv.R
 \name{construire_cles_indiv}
 \alias{construire_cles_indiv}
-\title{Ajoute les clés aléatoires individuelles sur le jeu de microdonnées}
+\title{Generate individual record keys}
 \usage{
 construire_cles_indiv(microdata, nb_decim = NULL)
 }
 \arguments{
-\item{microdata}{jeu de données (data.frame, data.table ou tibble)
-représentant une table individuelle}
+\item{microdata}{data.frame. Input microdata}
 
-\item{nb_decim}{nb de décimales (integer) de la clé générée. Si `NULL` (défaut)
-le programme calcule un nombre idéal de décimales pour la clé aléatoire.}
+\item{nb_decim}{Integer. Key precision (auto-calculated if NULL)}
 }
 \value{
-jeu de données de départ transformé en data.table avec la variable
-`rkey` représentant la clé aléatoire individuelle en plus.
+data.table with added 'rkey' column
 }
 \description{
-Ajoute les clés aléatoires individuelles sur le jeu de microdonnées
+Adds random decimal keys to microdata for Cell Key Method implementation.
 }
 \examples{
-data("dtest", package = "ckm")
-set.seed(12345)
+data("dtest")
+set.seed(123)
 dtest_avec_cles <- construire_cles_indiv(dtest)
-hist(dtest_avec_cles$rkey)
+
 }

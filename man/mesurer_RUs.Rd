@@ -2,7 +2,7 @@
 % Please edit documentation in R/mesurer_RU.R
 \name{mesurer_RUs}
 \alias{mesurer_RUs}
-\title{Comparer le risque et l'utilité de plusieurs scénarios}
+\title{Compare risk and utility across multiple scenarios}
 \usage{
 mesurer_RUs(
   df,
@@ -16,40 +16,38 @@ mesurer_RUs(
 )
 }
 \arguments{
-\item{df}{data.frame or data.table}
+\item{df}{data.frame. Input microdata}
 
-\item{cat_vars}{vector of categorical variables but not hierarchical}
+\item{cat_vars}{Character vector. Categorical variables}
 
-\item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
+\item{hrc_vars}{Named list. Hierarchical variables}
 
-\item{parametres}{\code{data.frame}}
+\item{parametres}{data.frame. Parameter combinations to test with columns D, V, js}
 
-\item{confident}{\code{integer} Seuil (officiel) de confidentialité}
+\item{confident}{integer. Official confidentiality threshold}
 
-\item{gv}{\code{integer} seuil désignant les grands comptages}
+\item{gv}{integer. Threshold defining large counts (default: 50)}
 
-\item{pv}{\code{integer} seuil désignant les petits comptages}
+\item{pv}{integer. Threshold defining small counts (default: 20)}
 
-\item{seed}{\code{integer} numéro de graine aléatoire. Si \code{NULL},
-la graine aléatoire utilisée est celle du programme parent.}
+\item{seed}{integer. Random seed number. If NULL, uses parent program's seed}
 }
 \value{
-\code{data.frame} de taille \code{nrow(parametres)}
+data.frame with nrow(parametres) rows containing risk and utility measures
 }
 \description{
-`mesurer_RUs()` mesure le risque et l'utilité de
-plusieurs jeux de paramètres à partir d'un tableau,
-sur un seul jeu de clés généré aléatoirement.
+Measures risk and utility for multiple sets of CKM parameters 
+from a table, using one randomly generated set of record keys.
 }
-\section{La graine aléatoire}{
+\section{Random seed}{
 
-
-Avec cette fonction, il est conseillé d'utiliser l'argument `seed=` si on souhaite
-que tous les scénarios bénéficient de la même graine aléatoire et que les résultats
-obtenus permettent de comparer les scénarios équiatblement.
+With this function, it is recommended to use the seed= argument if you want
+all scenarios to benefit from the same random seed and ensure results
+allow fair comparison between scenarios.
 }
 
 \examples{
+\dontrun{
 parametres <- construire_table_parametres(c(10,15), c(10,20), js = 5)
 res_RUs <- mesurer_RUs(
   df = dtest,
@@ -58,4 +56,6 @@ res_RUs <- mesurer_RUs(
   confident = 10,
   seed = 1234
 )
+}
+
 }

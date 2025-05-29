@@ -1,99 +1,186 @@
-#' Distance de Hellinger
+
+#' Check and Preprocess Input Vectors for Utility Measurement
 #'
-#' @param o vecteur des valeurs originales
-#' @param p vecteur des valeurs perturbées
+#' This function validates and preprocesses two numeric vectors, typically representing
+#' original and perturbed data, to ensure they are suitable for utility measurement calculations.
+#' It performs several checks: equal length, non-zero sums, non-negativity, and absence of NA values.
+#' It then filters out elements where the original vector is zero to avoid division by zero in subsequent
+#' calculations (e.g., Hellinger distance), and ensures the resulting vectors are not empty.
 #'
-#' @return numeric
+#' @param o Numeric vector. The original data vector.
+#' @param p Numeric vector. The perturbed data vector.
+#'
+#' @return A concatenated numeric vector containing the filtered original and perturbed values.
+#'         The first half corresponds to the filtered original values, and the second half to the
+#'         corresponding perturbed values.
+#'
+#' @details
+#' The function stops with an error if:
+#' \itemize{
+#'   \item The vectors have different lengths.
+#'   \item Either vector sums to zero.
+#'   \item Either vector contains negative values.
+#'   \item Either vector contains NA values.
+#'   \item After filtering, either vector is empty.
+#' }
+#'
+#' @examples
+#' o <- c(1, 2, 0, 4)
+#' p <- c(1, 2, 3, 4)
+#' check_inputs(o, p)
+#' @export
+#' @keywords internal
+check_inputs <- function(o, p) {
+  if(length(o) != length(p)){
+    stop("Original and perturbed vectors must have the same length.")
+  }
+  if(sum(o) == 0 || sum(p) == 0){
+    stop("Original and perturbed vectors must not sum to zero.")
+  }
+  if(any(o < 0) || any(p < 0)){
+    stop("Original and perturbed vectors must be non-negative.")
+  }
+  if(any(is.na(o)) || any(is.na(p))){
+    stop("Original and perturbed vectors must not contain NA values.")
+  }
+
+  o <- o[o > 0]
+  p <- p[o > 0]
+  # some null values are removed to avoid division by zero
+  # the perturbation of a null value (o=0) is not considered in the Hellinger distance
+
+  if(length(o) == 0 || length(p) == 0){
+    stop("After filtering null original values, original and perturbed vectors must not be empty.")
+  }
+
+  return(c(o,p))
+
+}
+
+
+#' Hellinger distance
+#'
+#' Calculates the Hellinger distance between original and perturbed count vectors.
+#'
+#' @param o numeric vector. Original values
+#' @param p numeric vector. Perturbed values
+#'
+#' @return numeric. Hellinger distance value
+#'
 #' @export
 #'
 #' @examples
 #' distance_hellinger(1:100, 11:110)
 distance_hellinger <- function(o, p){
 
-  o <- o[o > 0]
-  p <- p[o > 0]
-  #on retire les p (nuls) correspondant à o = 0
-  #certains p=0 restent car un o non nul peut être perturbé en p=0
+  # Check inputs
+  inp <- check_inputs(o, p)
 
-  sqrt( 1/2 * sum( ( sqrt( o/sum(o) ) - sqrt( p/sum(p) ) )^2 ) )
+  o <- inp[1] / sum(inp[1])
+  p <- inp[2] / sum(inp[2])
+  # normalize the vectors to sum to 1
+  # to avoid division by zero in the Hellinger distance formula
+  # the Hellinger distance is defined for probability distributions
+
+  sqrt(1/2 * sum((sqrt(o) - sqrt(p))^2))
 
 }
 
-#' Ecarts absolus moyens
+#' Mean absolute deviations
 #'
-#' @param o vecteur des valeurs originales
-#' @param p vecteur des valeurs perturbées
+#' Calculates the mean absolute deviations between original and perturbed values.
 #'
-#' @return numeric
+#' @param o numeric vector. Original values
+#' @param p numeric vector. Perturbed values
+#'
+#' @return numeric. Mean absolute deviation
+#'
 #' @export
 #'
 #' @examples
 #' ecarts_absolus_moyens(1:100, 11:110)
 ecarts_absolus_moyens <- function(o, p){
 
-  o <- o[o > 0]
-  p <- p[o > 0]
+  # Check inputs
+  inp <- check_inputs(o, p)
+  o <- inp[1]
+  p <- inp[2]
 
   mean( abs( o - p ) )
 
 }
 
-#' Ecarts absolus relatifs moyens en \%
+#' Mean relative absolute deviations in percentage
 #'
-#' @param o vecteur des valeurs originales
-#' @param p vecteur des valeurs perturbées
+#' Calculates the mean relative absolute deviations between original and
+#' perturbed values, expressed as a percentage.
 #'
-#' @return numeric (en \%)
+#' @param o numeric vector. Original values
+#' @param p numeric vector. Perturbed values
+#'
+#' @return numeric. Mean relative absolute deviation in percentage
+#'
 #' @export
 #'
 #' @examples
 #' ecarts_absolus_moyens_relatifs(1:100, 11:110)
 ecarts_absolus_moyens_relatifs <- function(o, p){
 
-  o <- o[o > 0]
-  p <- p[o > 0]
+  # Check inputs
+  inp <- check_inputs(o, p)
+  o <- inp[1]
+  p <- inp[2]
 
-  mean( abs( o - p ) / o ) * 100
+  mean(abs(o - p) / o) * 100
 
 }
 
 
-#' Distance Euclidienne
+#' Euclidean distance
 #'
-#' @param o vecteur des valeurs originales
-#' @param p vecteur des valeurs perturbées
+#' Calculates the Euclidean distance between original and perturbed count vectors.
 #'
-#' @return numeric
+#' @param o numeric vector. Original values
+#' @param p numeric vector. Perturbed values
+#'
+#' @return numeric. Euclidean distance value
+#'
 #' @export
 #'
 #' @examples
 #' distance_euclid(1:100, 11:110)
 distance_euclid <- function(o, p){
 
-  o <- o[o > 0]
-  p <- p[o > 0]
+  # Check inputs
+  inp <- check_inputs(o, p)
+  o <- inp[1]
+  p <- inp[2]
 
-  sqrt( sum( ( o - p )^2 ) )
+  sqrt(sum((o - p)^2))
 
 }
 
 
-#' Distance de Manhattan
+#' Manhattan distance
 #'
-#' @param o vecteur des valeurs originales
-#' @param p vecteur des valeurs perturbées
+#' Calculates the Manhattan distance between original and perturbed count vectors.
 #'
-#' @return numeric
+#' @param o numeric vector. Original values
+#' @param p numeric vector. Perturbed values
+#'
+#' @return numeric. Manhattan distance value
+#'
 #' @export
 #'
 #' @examples
 #' distance_manhattan(1:100, 11:110)
 distance_manhattan <- function(o, p){
 
-  o <- o[o > 0]
-  p <- p[o > 0]
+  # Check inputs
+  inp <- check_inputs(o, p)
+  o <- inp[1]
+  p <- inp[2]
 
-  sum( abs( o - p ) )
+  sum(abs(o - p))
 
 }
-

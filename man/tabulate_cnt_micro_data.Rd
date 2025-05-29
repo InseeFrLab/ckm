@@ -2,9 +2,7 @@
 % Please edit documentation in R/generer_tableau.R
 \name{tabulate_cnt_micro_data}
 \alias{tabulate_cnt_micro_data}
-\title{Construit la table des effectifs en croisant l'ensemble des variables catégorielles
-et en construisant l'ensemble des marges possibles. La fonction construit
-également la clé aléatoire de la cellule à partir des clés individuelles.}
+\title{Build contingency table with margins from microdata}
 \usage{
 tabulate_cnt_micro_data(
   df,
@@ -17,38 +15,30 @@ tabulate_cnt_micro_data(
 )
 }
 \arguments{
-\item{df}{data.frame or data.table}
+\item{df}{data.frame. Input microdata}
 
-\item{rk_var}{(character) nom de la variable des clés individuelles}
+\item{rk_var}{Character. Individual key variable (NULL for no keys)}
 
-\item{cat_vars}{vector of categorical variables but not hierarchical}
+\item{cat_vars}{Character vector. Categorical variables}
 
-\item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
+\item{hrc_vars}{Named list. Hierarchical variables}
 
-\item{num_var}{nom d'une variable numérique à aggréger en même temps}
+\item{num_var}{Character. Numerical variable to aggregate}
 
-\item{marge_label}{label of margins (applied to all cat and hrc variables)}
+\item{marge_label}{Character. Margin label (default: "Total")}
 
-\item{freq_empiriq}{booléen. Si `TRUE`, génère également le tableau
-des fréquences empiriques des comptages (utile pour la mesure du risque).
-`FALSE` par défaut.}
+\item{freq_empiriq}{Logical. Generate empirical frequencies? (default: FALSE)}
 }
 \value{
-Si `freq_empiriq=FALSE`: un tibble. La variable de comptage est nommée
-`nb_obs`, la clé de la cellule est dénommée `ckey`. Si `freq_empiriq=TRUE`,
-une liste comprenant le tibble ci-dessus et un tiblle des fréquences empiriques.
+Tibble or list with table and frequencies
 }
 \description{
-Construit la table des effectifs en croisant l'ensemble des variables catégorielles
-et en construisant l'ensemble des marges possibles. La fonction construit
-également la clé aléatoire de la cellule à partir des clés individuelles.
+Constructs a complete contingency table with all possible margins from
+microdata, including cell keys and optional numerical aggregation.
 }
 \examples{
-library(data.table)
 library(dplyr)
-
 data("dtest")
-
 tab_comptage <- tabulate_cnt_micro_data(
   df = dtest,
   rk_var = NULL,
@@ -56,8 +46,8 @@ tab_comptage <- tabulate_cnt_micro_data(
   hrc_vars = list(GEO = c("REG", "DEP")),
   marge_label = "Total"
 )
-str(tab_comptage)
 
+# With numerical variable to aggregate
 tab_comptage_num <- tabulate_cnt_micro_data(
   df = dtest |> mutate(NUM = 12),
   rk_var = NULL,

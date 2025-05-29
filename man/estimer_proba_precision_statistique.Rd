@@ -2,8 +2,7 @@
 % Please edit documentation in R/estimer_intervalle_confiance_ratio.R
 \name{estimer_proba_precision_statistique}
 \alias{estimer_proba_precision_statistique}
-\title{Calcule P(|R-R'|>beta) pour R=une statistique fonction de A et B, et
-pour beta fixé.}
+\title{Estimate probability of ratio deviation}
 \usage{
 estimer_proba_precision_statistique(
   A,
@@ -20,54 +19,46 @@ estimer_proba_precision_statistique(
 )
 }
 \arguments{
-\item{A}{numérateur}
+\item{A}{Numerator value}
 
-\item{B}{dénominateur}
+\item{B}{Denominator value}
 
-\item{fun}{function, sert à calculer la statistique souhaitée
-à partir de A et B}
+\item{fun}{Function. Statistic calculation (default: a/b*100)}
 
-\item{D}{Déviation max de la CKM}
+\item{D}{Integer. Maximum deviation}
 
-\item{V}{Variance de la CKM}
+\item{V}{Numeric. Noise variance}
 
-\item{js}{Seuil interdiction de la CKM}
+\item{js}{Integer. Sensitivity threshold}
 
-\item{ptab}{data.frame issu de ptable}
+\item{ptab}{data.frame. Transition probabilities from ptable}
 
-\item{betas}{Seuil des écarts entre R et R'}
+\item{betas}{Numeric vector. Precision thresholds to evaluate}
 
-\item{posterior}{Booléen: Si \code{TRUE}, c'est beta' qui est calculé.}
+\item{posterior}{Logical. Use posterior approach? (default: FALSE)}
 }
 \value{
-dataframe de deux colonnes (beta, proba)
+data.frame with beta probabilities
 }
 \description{
-Calcule P(|R-R'|>beta) pour R=une statistique fonction de A et B, et
-pour beta fixé.
-}
-\details{
-La fonction prend un seul ratio en entrée.
-Si \code{posterior=FALSE}, le calcul repose sur l'approche a priori,
-c'est-à-dire que le ratio fourni (A/B) est le ratio réel/original.
-Sinon, le calcul repose sur l'approche a posteriori,
-c'est-à-dire que le ratio fourni (A/B) est le ratio issu de la perturbation
-par CKM.
+Calculates P(|R - R'| > \eqn{\beta}) for a statistic R = f(A, B) given CKM parameters.
 }
 \examples{
 ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
   as.data.frame()
-# Calcul de alpha pour la stat originale = 10/15 pour différents beta
+
+# Alpha value for the original statistic = 10/15 and different beta values
 estimer_proba_precision_statistique(A=10,B=15,D = 15, V = 30.1, js = 0, ptab = ptab)
-# Calcul de alpha pour la stat perturbée = 10/15 pour différentes valeurs
-# de beta'
+
+# Alpha value for the perturbed statistic = 10/15 and different beta' values
 estimer_proba_precision_statistique(
   A=10,B=15,
   D = 15, V = 30.1, js = 0,
   ptab = ptab,
   posterior = TRUE
 )
-#Calcul pour une évolution
+
+# For a ratio evolution
 estimer_proba_precision_statistique(
   A=10,B=15,
   fun = \(a,b){(b/a - 1)*100},

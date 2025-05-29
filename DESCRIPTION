@@ -17,6 +17,7 @@ Depends:
     R (>= 2.10)
 Imports: 
     assertthat,
+    methods,
     data.table,
     dplyr,
     tidyr,
@@ -24,7 +25,6 @@ Imports:
     tibble,
     lifecycle,
     purrr,
-    rlang,
     utils,
     furrr,
     future,

@@ -2,28 +2,30 @@
 % Please edit documentation in R/matrice_transition.R
 \name{creer_matrice_transition}
 \alias{creer_matrice_transition}
-\title{Wrapper de la fonction `ptable::create_cnt_ptable`}
+\title{Create Cell Key Method transition matrix}
 \usage{
 creer_matrice_transition(D, V, js = 0, ...)
 }
 \arguments{
-\item{D}{Déviation (integer strictement positif)}
+\item{D}{integer. Deviation parameter (must be strictly positive)}
 
-\item{V}{Variance du bruit (numeric strictement positif)}
+\item{V}{numeric. Noise variance (must be strictly positive)}
 
-\item{js}{Seuil des valeurs interdites (integer). Si `js=0` (défaut), seule la
-valeur 0 sera interdite.}
+\item{js}{integer. Threshold for sensitive values (default: 0). If js=0, only value 0 will be forbidden}
 
-\item{...}{Paramètres additionnels de la fonction `ptable::create_cnt_ptable`}
+\item{...}{Additional parameters passed to ptable::create_cnt_ptable}
 }
 \value{
-objet `ptable` contenant la matrice de transition
+ptable object containing the transition matrix, or NULL if matrix cannot be constructed
 }
 \description{
-Wrapper de la fonction `ptable::create_cnt_ptable`
+Wrapper function for ptable::create_cnt_ptable that creates a transition matrix 
+for the Cell Key Method with specified parameters.
 }
 \examples{
+\dontrun{
 library(ptable)
 mat_trans <- creer_matrice_transition(D = 5, V = 2)
 plot(mat_trans, type="d") |> print()
+}
 }

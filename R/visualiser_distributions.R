@@ -1,20 +1,28 @@
-#' Visualisation de distributions de probabilités
-#' issues de plusieurs scénarios
+#' Visualize probability distributions from multiple scenarios
+#'
+#' This function creates visualizations of probability distributions
+#' resulting from different parameter combinations of the Cell Key Method.
+#' It generates bar plots showing the probability mass function for each scenario.
 #'
 #' @inheritParams creer_matrice_transition
-#' @param precision \code{integer}
+#' @param DV data.frame. Alternative way to specify D and V parameters as a data frame
+#'   with columns "D" and "V". If provided, D and V parameters are ignored
+#' @param precision integer. Precision level for probability calculations (default: 5)
 #'
-#' @return cowplot object
+#' @return A cowplot object containing multiple ggplot bar charts showing
+#'   probability distributions for each parameter combination
+#'
 #' @export
 #'
 #' @examples
-#' visualiser_distribution(
-#'   D = c(11, 15),
-#'   V = c(10, 30)
-#' )
-#' visualiser_distribution(
-#'   DV = data.frame(D = c(11, 15), V = c(10, 30))
-#' )
+#' # Using separate D and V vectors
+#' visualiser_distribution(D = c(11, 15), V = c(10, 30))
+#'
+#' \dontrun{
+#' # Using a data frame
+#' params_df <- data.frame(D = c(11, 15), V = c(10, 30))
+#' visualiser_distribution(DV = params_df)
+#' }
 #' @import ggplot2
 #' @importFrom cowplot plot_grid
 #' @importFrom purrr map
@@ -22,11 +30,34 @@
 #' @importFrom purrr list_c
 #' @importFrom dplyr mutate
 #' @importFrom dplyr arrange
-visualiser_distribution <- function(D=NULL,V=NULL,DV=NULL,precision = 5){
+visualiser_distribution <- function(D=NULL, V=NULL, DV=NULL, precision=5){
 
+  # Validate parameters
+  assertthat::assert_that(
+    is.numeric(precision) && precision > 0 && precision %% 1 == 0,
+    msg = "Precision must be a positive integer."
+  )
+  assertthat::assert_that(
+    is.null(D) || (is.numeric(D) && all(D > 0) && all(D %% 1 == 0)),
+    msg = "D must be a strictly positive integer vector."
+  )
+  assertthat::assert_that(
+    is.null(V) || (is.numeric(V) && all(V > 0)),
+    msg = "V must be a strictly positive numeric vector."
+  )
   if(is.null(DV)){
 
-    # js n'a pas d'influence sur la distrib grandes valeurs
+    # js has no influence on large value distribution
+    if(is.null(D) || is.null(V)){
+      stop("Either provide D and V vectors or a data frame DV with columns D and V.")
+    }
+    if(!is.numeric(D) || !is.numeric(V)){
+      stop("D and V must be numeric vectors.")
+    }
+    if(any(D <= 0) || any(V <= 0)){
+      stop("D and V must be strictly positive.")
+    }
+    
     nV <- length(V)
     nD <- length(D)
     ncol <- nV
@@ -43,7 +74,7 @@ visualiser_distribution <- function(D=NULL,V=NULL,DV=NULL,precision = 5){
   }else{
 
     if(!is.data.frame(DV) | !all(names(DV) == c("D","V"))){
-      stop("DV doit être un dataframe avec les colonnes D et V dans cet ordre.")
+      stop("DV must be a data frame with columns D and V in this order.")
     }else{
       parametres <- DV
       nV <- length(unique(parametres$V))
@@ -78,7 +109,7 @@ visualiser_distribution <- function(D=NULL,V=NULL,DV=NULL,precision = 5){
         geom_bar(stat = "identity", position = "dodge") +
         scale_x_continuous(limits = limit_x, expand = c(0,0)) +
         scale_y_continuous(limits = c(0,round(p_max+0.01, digits = 2)), expand = c(0,0)) +
-        labs(x="Déviation",y="pij") +
+        labs(x="Deviation",y="pij") +
         ggtitle("", subtitle = ) +
         theme_light()
     }

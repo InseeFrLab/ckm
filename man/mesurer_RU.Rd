@@ -2,7 +2,7 @@
 % Please edit documentation in R/mesurer_RU.R
 \name{mesurer_RU}
 \alias{mesurer_RU}
-\title{Mesurer le risque et l'utilité d'un seul scénario}
+\title{Measure risk and utility for a single scenario}
 \usage{
 mesurer_RU(
   df,
@@ -18,47 +18,43 @@ mesurer_RU(
 )
 }
 \arguments{
-\item{df}{data.frame or data.table}
+\item{df}{data.frame. Input microdata}
 
-\item{cat_vars}{vector of categorical variables but not hierarchical}
+\item{cat_vars}{Character vector. Categorical variables}
 
-\item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
+\item{hrc_vars}{Named list. Hierarchical variables}
 
-\item{D}{Déviation (integer strictement positif)}
+\item{D}{integer. Deviation parameter (must be strictly positive)}
 
-\item{V}{Variance du bruit (numeric strictement positif)}
+\item{V}{numeric. Noise variance (must be strictly positive)}
 
-\item{js}{Seuil des valeurs interdites (integer). Si `js=0` (défaut), seule la
-valeur 0 sera interdite.}
+\item{js}{integer. Threshold for sensitive values (default: 0). If js=0, only value 0 will be forbidden}
 
-\item{confident}{\code{integer} Seuil (officiel) de confidentialité}
+\item{confident}{integer. Official confidentiality threshold}
 
-\item{gv}{\code{integer} seuil désignant les grands comptages}
+\item{gv}{integer. Threshold defining large counts (default: 50)}
 
-\item{pv}{\code{integer} seuil désignant les petits comptages}
+\item{pv}{integer. Threshold defining small counts (default: 20)}
 
-\item{seed}{\code{integer} numéro de graine aléatoire. Si \code{NULL},
-la graine aléatoire utilisée est celle du programme parent.}
+\item{seed}{integer. Random seed number. If NULL, uses parent program's seed}
 }
 \value{
-\code{data.frame} avec mesure de risque et mesure d'utilité pour
-le paramétrage choisi.
+data.frame with risk and utility measures for the chosen parameters
 }
 \description{
-`mesurer_RU()` mesure le risque et l'utilité d'un seul jeu de paramètres
-à partir d'un tableau, sur un seul jeu de clés généré aléatoirement.
+Measures risk and utility metrics for a single set of CKM parameters
+from a table, using one randomly generated set of record keys.
 }
-\section{La graine aléatoire}{
+\section{Random seed}{
 
-
-Le résultat sera identique si l'utilisateur choisi d'ajouter l'argument
-`seed=123` ou bien opte pour fixer la graine par le classique `set.seed(123)`
-dans son programme en amont de l'appel à la fonction.
-
-Si les deux sont renseignés, c'est l'argument interne de la fonction qui prévaut.
+The result will be identical if you choose to add the seed=123 argument
+or opt to set the seed with the classic set.seed(123) in your program
+before calling the function. If both are specified, the internal function
+argument takes precedence.
 }
 
 \examples{
+\dontrun{
 data("dtest")
 set.seed(123)
 
@@ -68,5 +64,6 @@ res_RU <- mesurer_RU(
   D = 10, V = 15, js = 4,
   confident = 10
 )
+}
 
 }

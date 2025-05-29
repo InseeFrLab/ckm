@@ -2,8 +2,7 @@
 % Please edit documentation in R/mesurer_RU.R
 \name{simuler_RUs}
 \alias{simuler_RUs}
-\title{Comparer le risque et l'utilité de plusieurs scénarios en se basant
-sur plusieurs simulations}
+\title{Compare risk and utility across multiple scenarios with multiple simulations}
 \usage{
 simuler_RUs(
   df,
@@ -21,72 +20,58 @@ simuler_RUs(
 )
 }
 \arguments{
-\item{df}{data.frame or data.table}
+\item{df}{data.frame. Input microdata}
 
-\item{cat_vars}{vector of categorical variables but not hierarchical}
+\item{cat_vars}{Character vector. Categorical variables}
 
-\item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
+\item{hrc_vars}{Named list. Hierarchical variables}
 
-\item{parametres}{\code{data.frame}}
+\item{parametres}{data.frame. Parameter combinations to test with columns D, V, js}
 
-\item{confident}{\code{integer} Seuil (officiel) de confidentialité}
+\item{confident}{integer. Official confidentiality threshold}
 
-\item{gv}{\code{integer} seuil désignant les grands comptages}
+\item{gv}{integer. Threshold defining large counts (default: 50)}
 
-\item{pv}{\code{integer} seuil désignant les petits comptages}
+\item{pv}{integer. Threshold defining small counts (default: 20)}
 
-\item{n_sim}{\code{integer} nombre de simulations}
+\item{n_sim}{integer. Number of simulations (default: 10)}
 
-\item{seed}{\code{integer} numéro de graine aléatoire. Si \code{NULL},
-une valeur par défaut est tirée aléatoirement en début de programme.}
+\item{seed}{integer. Random seed number. If NULL, a default value is randomly drawn}
 
-\item{parallel}{\code{Boolean} Si \code{TRUE}, les calculs sont parallélisés (avancé)}
+\item{parallel}{logical. If TRUE, calculations are parallelized (advanced, default: FALSE)}
 
-\item{max_cores}{\code{integer} Nombre maximum de travaux réalisés en parallèle (avancé)}
+\item{max_cores}{integer. Maximum number of parallel workers (advanced, default: 4)}
 
-\item{size_workers}{\code{integer} Taille en GB allouée à chaque thread lors d'un calcul
-en parallèle (avancé).
-\code{NULL} par défaut: le programme s'occupe de gérer cette taille par lui même.}
+\item{size_workers}{integer. Memory size in GB allocated to each thread during 
+parallel calculation (advanced). NULL by default: program manages size automatically}
 }
 \value{
-\code{data.frame} de taille \code{n_sim * nrow(parametres)}
+data.frame with n_sim * nrow(parametres) rows
 }
 \description{
-Mesurer le risque et l'utilité à partir d'un tableau,
-sur un ensemble de jeux de clés générés aléatoirement et
-sur plusieurs jeux de paramètres.
+Measures risk and utility from a table across multiple randomly generated 
+record key sets and multiple parameter combinations.
 }
-\section{La graine aléatoire}{
+\section{Random seed}{
 
-
-La graine aléatoire permet d'assurer la reproductibilité du travail. De plus,
-afin d'assurer que les résultats soient bien comparables entre les scénarios,
-le programme assure que les mêmes jeux de clés sont utilisés. C'est pourquoi,
-en l'absence de graine aléatoire renseignée, le programme se charge
-d'en tirer une aléatoirement.
+The random seed ensures work reproducibility. Additionally, to ensure results 
+are comparable between scenarios, the program ensures the same record key sets 
+are used. Therefore, when no random seed is provided, the program randomly 
+draws one automatically.
 }
 
-\section{La parallélisation}{
+\section{Parallelization}{
 
-
-Paralléliser son calcul permet d'utiliser une puissance de calculs plus importante
-pour réaliser les simulations. Cette technique permet en général un gain de temps
-appréciable.
-
-Ici, ce sont les `n_sim` simulations qui sont distribuées sur plusieurs coeurs.
-La parallélisation sera donc intéressante quand le temps pour réaliser ces simulations
-pour un scénario donné est supérieur au temps de créations des travaux.
-
-Enfin, il faut pouvoir s'assurer qu'on dispose des ressources suffisantes pour lancer
-le calcul. On pourra utiliser  [parallel::detectCores()] ou
-[future::availableCores()] pour connaître le nombre
-de coeurs disponibles sur votre machine, l'idée étant de ne pas saturer ces ressources.
-
-Si le nombre de travaux en parallèles demandé est supérieur aux ressources,
-le programme choisi un nombre égal à `future::availableCores() - 1`.
+Parallelizing calculations allows using more computational power for simulations, 
+generally providing appreciable time savings. Here, the n_sim simulations are 
+distributed across multiple cores. Parallelization will be beneficial when the 
+time to perform simulations for a given scenario exceeds the time to create workers.
+If the number of workers requested by the user exceeds the number of available workers,
+then the program will actually use \code{future::availableCores() - 1} workers.
 }
 
 \examples{
+\dontrun{
 parametres <- construire_table_parametres(c(10,15), c(10,20), js = 5)
 res_sim_RUs <- simuler_RUs(
   df = dtest,
@@ -96,4 +81,6 @@ res_sim_RUs <- simuler_RUs(
   n_sim = 10,
   seed = 1234
 )
+}
+
 }

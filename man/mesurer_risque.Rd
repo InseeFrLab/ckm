@@ -2,36 +2,35 @@
 % Please edit documentation in R/mesurer_risque.R
 \name{mesurer_risque}
 \alias{mesurer_risque}
-\title{Mesure du risque en estimant les probabilités de transition inverses
-Calcul les probabilités P(X=i|X'=j) où X désigne l'original et X' le perturbé}
+\title{Measure risk by estimating inverse transition probabilities}
 \usage{
 mesurer_risque(matrice_transition, freq, I, J)
 }
 \arguments{
-\item{matrice_transition}{objet retourné par `creer_matrice_transition`}
+\item{matrice_transition}{ptable object. Object returned by creer_matrice_transition}
 
-\item{freq}{objet retourné par `calculer_frequences_empiriques`}
+\item{freq}{data.frame. Object returned by calculer_frequences_empiriques}
 
-\item{I}{vecteur d'entiers (valeurs originales)}
+\item{I}{integer vector. Original values to consider}
 
-\item{J}{vecteur d'entiers (valeurs perturbées)}
+\item{J}{integer vector. Perturbed values to consider}
 }
 \value{
-`data.frame` de 5 colonnes:
-- `i`: valeur(s) prise(s) par X
-- `j`: valeur(s) prise(s) par X'
-- `pi_hat`: Estimation de `P( X = i )`
-- `pij`: Probabilité de transition `P(X' = j | X = i )`
-- `qij`: Probabilité de transition inverse `P( X = i | X' = j )`
+data.frame with 5 columns:
+  \itemize{
+    \item i: original value(s)
+    \item j: perturbed value(s)
+    \item pi_hat: estimated probability P(X = i)
+    \item pij: transition probability P(X' = j | X = i)
+    \item qij: inverse transition probability P(X = i | X' = j)
+  }
 }
 \description{
-Mesure du risque en estimant les probabilités de transition inverses
-Calcul les probabilités P(X=i|X'=j) où X désigne l'original et X' le perturbé
-}
-\details{
-Pour le code, voir les formules et algorithmes ici (ajouter lien vers document pdf).
+Calculates probabilities P(X=i|X'=j) where X denotes the original value
+and X' the perturbed value, providing risk measures for statistical disclosure control.
 }
 \examples{
+\dontrun{
 library(ptable)
 library(dplyr)
 mat_trans <- creer_matrice_transition(D = 5, V = 2)
@@ -44,12 +43,11 @@ tab_comptage <- tabulate_cnt_micro_data(
   freq_empiriq = TRUE
 )
 
-# Ci-dessous calcul des probabilités de transition inverses P(X=i|X'=1) avec
-#i qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble).
+# Calculate inverse transition probabilities P(X=i|X'=1) with i in 1:4
 mesurer_risque(mat_trans, tab_comptage$freq, 1:4, 1)
 
-# Ci-dessous calcul des probabilités de transition inverses P(X=i|X'=j) avec
-# i qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble)
-# et j qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble).
+# Calculate for multiple i and j values
 mesurer_risque(mat_trans, tab_comptage$freq, 1:4, 1:4)
+}
+
 }

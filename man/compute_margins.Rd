@@ -2,23 +2,23 @@
 % Please edit documentation in R/generer_tableau.R
 \name{compute_margins}
 \alias{compute_margins}
-\title{Fonction construisant les marges pour un croisement donné}
+\title{Compute margins for a contingency table}
 \usage{
 compute_margins(inner_cells, margins, resp_var = NULL, marge_label)
 }
 \arguments{
-\item{inner_cells}{data.table}
+\item{inner_cells}{data.table. Inner cells of the table}
 
-\item{margins}{character}
+\item{margins}{Character vector. Margin variables}
 
-\item{resp_var}{character}
+\item{resp_var}{Character. Response variable to aggregate}
 
-\item{marge_label}{character}
+\item{marge_label}{Character. Label for margin cells}
 }
 \value{
-data.table
+data.table with computed margins
 }
 \description{
-Fonction construisant les marges pour un croisement donné
+Compute margins for a contingency table
 }
 \keyword{internal}

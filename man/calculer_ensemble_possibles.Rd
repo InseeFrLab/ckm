@@ -2,30 +2,28 @@
 % Please edit documentation in R/mesurer_risque.R
 \name{calculer_ensemble_possibles}
 \alias{calculer_ensemble_possibles}
-\title{Calcule l'ensemble des possibles de j étant donnés les paramètres D et js
-de la matrice de transition}
+\title{Calculate possible set for a given perturbed value}
 \usage{
 calculer_ensemble_possibles(j, D, js = 0)
 }
 \arguments{
-\item{j}{valeur perturbée dont on souhaite calculer l'intervalle des possibles}
+\item{j}{integer. Perturbed value for which to calculate the possible set (must be non-negative)}
 
-\item{D}{la déviation de la CKM}
+\item{D}{integer. Deviation parameter of the CKM (must be strictly positive)}
 
-\item{js}{Maximum des valeurs interdites après perturbation}
+\item{js}{integer. Maximum forbidden value after perturbation (must be non-negative, default: 0)}
 }
 \value{
-vecteur des valeurs originales possibles si la valeur perturbée est j,
-calculé en fonction de D et js. `NULL` si j > 0 et j <= js
+integer vector or NULL. Vector of possible original values if the perturbed value is j,
+  NULL if j > 0 and j <= js
 }
 \description{
-Calcule l'ensemble des possibles de j étant donnés les paramètres D et js
-de la matrice de transition
+Calculates the set of possible original values for a perturbed value j,
+given the CKM parameters D and js.
 }
 \examples{
-
-calculer_ensemble_possibles(1, 5) #attendu 1:6
-calculer_ensemble_possibles(1, 5, 2) #attendu NULL
-calculer_ensemble_possibles(0, 5, 2) #attendu 0:5
-calculer_ensemble_possibles(5, 5, 2) #attendu 1:10
+calculer_ensemble_possibles(1, 5) # expected: 1:6
+calculer_ensemble_possibles(1, 5, 2) # expected: NULL
+calculer_ensemble_possibles(0, 5, 2) # expected: 0:5
+calculer_ensemble_possibles(5, 5, 2) # expected: 1:10
 }

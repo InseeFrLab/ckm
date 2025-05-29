@@ -1,31 +1,27 @@
-#' Calcule les fréquences empiriques des comptages à partir d'un tableau agrégé
-#' construit avec les fonctions `tabulate_cnt_micro_data` ou `appliquer_ckm` ou
-#' `tabuler_et_appliquer_ckm`.
+#' Calculate empirical frequencies from aggregated table
 #'
-#' @param tableau tableau généré avec les fonctions `tabulate_cnt_micro_data` ou
-#' `appliquer_ckm` ou `tabuler_et_appliquer_ckm`
+#' Calculates empirical frequencies of counts from an aggregated table
+#' constructed with tabulate_cnt_micro_data, appliquer_ckm,
+#' or tabuler_et_appliquer_ckm functions.
+#'
+#' @param tableau data.frame. Table generated with tabulate_cnt_micro_data,
+#'   appliquer_ckm, or tabuler_et_appliquer_ckm functions
 #' @inheritParams tabulate_cnt_micro_data
-#' @return data.frame avec 3 colonnes:
-#' - i = comptage
-#' - N = nb d'apparitions du comptage
-#' - p_hat = fréquence empirique du comptage
+#'
+#' @return data.frame with 3 columns:
+#'   \itemize{
+#'     \item i: count value
+#'     \item N: number of occurrences of the count
+#'     \item p_hat: empirical frequency of the count
+#'   }
 #'
 #' @export
 #' @keywords internal
-#' @importFrom dplyr all_of
-#' @importFrom dplyr across
-#' @importFrom dplyr mutate
-#' @importFrom dplyr full_join
-#' @importFrom dplyr starts_with
-#' @importFrom dplyr where
-#' @importFrom dplyr select
-#' @importFrom dplyr rename
-#' @importFrom dplyr count
-#' @importFrom purrr map
+#'
 #' @examples
+#' \dontrun{
 #' library(ptable)
 #' library(dplyr)
-#'
 #' data("dtest")
 #'
 #' cat_vars1 = c("DEP", "DIPLOME", "SEXE", "AGE")
@@ -37,6 +33,7 @@
 #' )
 #' p_hat1 <- calculer_frequences_empiriques(tab_comptage1, cat_vars1, hrc_vars1)
 #'
+#' # With hierarchical variables:
 #' cat_vars2 = c("DIPLOME", "SEXE", "AGE")
 #' hrc_vars2 = list(GEO = c("REG","DEP"), TYPES = c("TYPE","TYPE2"))
 #' tab_comptage2 <- tabulate_cnt_micro_data(
@@ -46,6 +43,18 @@
 #'   marge_label = "Total"
 #' )
 #' p_hat2 <- calculer_frequences_empiriques(tab_comptage2, cat_vars2, hrc_vars2)
+#' }
+#'
+#' @importFrom dplyr all_of
+#' @importFrom dplyr across
+#' @importFrom dplyr mutate
+#' @importFrom dplyr full_join
+#' @importFrom dplyr starts_with
+#' @importFrom dplyr where
+#' @importFrom dplyr select
+#' @importFrom dplyr rename
+#' @importFrom dplyr count
+#' @importFrom purrr map
 calculer_frequences_empiriques <- function(tableau, cat_vars, hrc_vars){
 
   cnt_var <- "nb_obs"
@@ -93,99 +102,104 @@ calculer_frequences_empiriques <- function(tableau, cat_vars, hrc_vars){
 
 }
 
-#' Calcule l'ensemble de déviation d'une valeur originale i étant donnés les paramètres D et js
-#' de la matrice de transition
+#' Calculate deviation set for a given original value
 #'
-#' @param i valeur originale dont on souhaite calculer l'ensemble de déviation
-#' @param D la déviation de la CKM
-#' @param js Maximum des valeurs interdites après perturbation
+#' Calculates the set of possible perturbed values for an original value i,
+#' given the CKM parameters D and js.
 #'
-#' @return vecteur des valeurs perturbées possibles si la valeur originale est i,
-#' calculé en fonction de D et js.
+#' @param i integer. Original value for which to calculate the deviation set (must be non-negative)
+#' @param D integer. Deviation parameter of the CKM (must be strictly positive)
+#' @param js integer. Maximum forbidden value after perturbation (must be non-negative, default: 0)
+#'
+#' @return integer vector. Vector of possible perturbed values if the original value is i
+#'
 #' @export
 #'
 #' @examples
-#'
-#' calculer_ensemble_deviation(1, 5) #attendu 0:6
-#' calculer_ensemble_deviation(1, 5, 2) #attendu c(0,3:6)
-#' calculer_ensemble_deviation(0, 5, 2) #attendu 0
-#' calculer_ensemble_deviation(5, 5, 2) #attendu c(0,3:10)
+#' calculer_ensemble_deviation(1, 5) # expected: 0:6
+#' calculer_ensemble_deviation(1, 5, 2) # expected: c(0,3:6)
+#' calculer_ensemble_deviation(0, 5, 2) # expected: 0
+#' calculer_ensemble_deviation(5, 5, 2) # expected: c(0,3:10)
 calculer_ensemble_deviation <- function(i, D, js = 0){
 
-  if(D <= 0) stop("D doit être strictement positif")
-  if(js < 0) stop("js doit être positif ou nul")
-  if(i < 0) stop("i doit être positif ou nul")
+  if(D <= 0) stop("D must be strictly positive")
+  if(js < 0) stop("js must be non-negative")
+  if(i < 0) stop("i must be non-negative")
 
   if(i == 0){
     dev <- 0
   }else{
     dev <- (i-D):(i+D)
-    # Exclusion des valeurs négatives et interdites
+    # Remove values that are not possible after perturbation
+    # If js > 0, we remove the values that are in the forbidden set
+    # If js == 0, we only keep the values that are greater than 0
     dev <- if(js > 0) dev[dev == 0 | dev > js] else dev[dev >= 0]
   }
 
   return(dev)
 }
 
-#' Calcule l'ensemble des possibles de j étant donnés les paramètres D et js
-#' de la matrice de transition
+#' Calculate possible set for a given perturbed value
 #'
-#' @param j valeur perturbée dont on souhaite calculer l'intervalle des possibles
-#' @param D la déviation de la CKM
-#' @param js Maximum des valeurs interdites après perturbation
+#' Calculates the set of possible original values for a perturbed value j,
+#' given the CKM parameters D and js.
 #'
-#' @return vecteur des valeurs originales possibles si la valeur perturbée est j,
-#' calculé en fonction de D et js. `NULL` si j > 0 et j <= js
+#' @param j integer. Perturbed value for which to calculate the possible set (must be non-negative)
+#' @param D integer. Deviation parameter of the CKM (must be strictly positive)
+#' @param js integer. Maximum forbidden value after perturbation (must be non-negative, default: 0)
+#'
+#' @return integer vector or NULL. Vector of possible original values if the perturbed value is j,
+#'   NULL if j > 0 and j <= js
+#'
 #' @export
 #'
 #' @examples
-#'
-#' calculer_ensemble_possibles(1, 5) #attendu 1:6
-#' calculer_ensemble_possibles(1, 5, 2) #attendu NULL
-#' calculer_ensemble_possibles(0, 5, 2) #attendu 0:5
-#' calculer_ensemble_possibles(5, 5, 2) #attendu 1:10
+#' calculer_ensemble_possibles(1, 5) # expected: 1:6
+#' calculer_ensemble_possibles(1, 5, 2) # expected: NULL
+#' calculer_ensemble_possibles(0, 5, 2) # expected: 0:5
+#' calculer_ensemble_possibles(5, 5, 2) # expected: 1:10
 calculer_ensemble_possibles <- function(j, D, js = 0){
 
-  if(D <= 0) stop("D doit être strictement positif")
-  if(js < 0) stop("js doit être positif ou nul")
-  if(j < 0) stop("j doit être positif ou nul")
+  if(D <= 0) stop("D must be strictly positive")
+  if(js < 0) stop("js must be non-negative")
+  if(j < 0) stop("j must be non-negative")
 
   if(j > 0 & j < js){
-    # Si j est dans l'ens des valeurs interdites alors ensemble vide
+    # If j is in the set of forbidden values then empty set
     poss <- NULL
   }else{
     poss <- (j-D):(j+D)
-    # l'ensemble des possibles est nécessairement dans N
-    # si j > 0, l'ensemble ne peut contenir 0 (car les 0 ne sont pas déviés)
+    # The set of possibles is necessarily in N
+    # If j > 0, the set cannot contain 0 (since 0 are not perturbed)
     poss <- if(j == 0) poss[poss >= 0] else poss[poss > 0]
   }
 
   return(poss)
 }
 
-
-#' Mesure du risque en estimant les probabilités de transition inverses
-#' Calcul les probabilités P(X=i|X'=j) où X désigne l'original et X' le perturbé
+#' Measure risk by estimating inverse transition probabilities
 #'
-#' @param matrice_transition objet retourné par `creer_matrice_transition`
-#' @param freq objet retourné par `calculer_frequences_empiriques`
-#' @param I vecteur d'entiers (valeurs originales)
-#' @param J vecteur d'entiers (valeurs perturbées)
+#' Calculates probabilities P(X=i|X'=j) where X denotes the original value
+#' and X' the perturbed value, providing risk measures for statistical disclosure control.
 #'
-#' @return `data.frame` de 5 colonnes:
-#' - `i`: valeur(s) prise(s) par X
-#' - `j`: valeur(s) prise(s) par X'
-#' - `pi_hat`: Estimation de `P( X = i )`
-#' - `pij`: Probabilité de transition `P(X' = j | X = i )`
-#' - `qij`: Probabilité de transition inverse `P( X = i | X' = j )`
+#' @param matrice_transition ptable object. Object returned by creer_matrice_transition
+#' @param freq data.frame. Object returned by calculer_frequences_empiriques
+#' @param I integer vector. Original values to consider
+#' @param J integer vector. Perturbed values to consider
+#'
+#' @return data.frame with 5 columns:
+#'   \itemize{
+#'     \item i: original value(s)
+#'     \item j: perturbed value(s)
+#'     \item pi_hat: estimated probability P(X = i)
+#'     \item pij: transition probability P(X' = j | X = i)
+#'     \item qij: inverse transition probability P(X = i | X' = j)
+#'   }
 #'
 #' @export
-#' @importFrom dplyr bind_rows
-#'
-#' @details
-#' Pour le code, voir les formules et algorithmes ici (ajouter lien vers document pdf).
 #'
 #' @examples
+#' \dontrun{
 #' library(ptable)
 #' library(dplyr)
 #' mat_trans <- creer_matrice_transition(D = 5, V = 2)
@@ -198,15 +212,38 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 #'   freq_empiriq = TRUE
 #' )
 #'
-#' # Ci-dessous calcul des probabilités de transition inverses P(X=i|X'=1) avec
-#' #i qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble).
+#' # Calculate inverse transition probabilities P(X=i|X'=1) with i in 1:4
 #' mesurer_risque(mat_trans, tab_comptage$freq, 1:4, 1)
 #'
-#' # Ci-dessous calcul des probabilités de transition inverses P(X=i|X'=j) avec
-#' # i qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble)
-#' # et j qui prend toutes les valeurs entre 1 et 4 (et aussi l'ensemble).
+#' # Calculate for multiple i and j values
 #' mesurer_risque(mat_trans, tab_comptage$freq, 1:4, 1:4)
+#' }
+#'
+#' @importFrom dplyr bind_rows
+#' @importFrom methods is
 mesurer_risque <- function(matrice_transition, freq, I, J){
+
+  # Validate parameters
+  assertthat::assert_that(
+    is(matrice_transition, "ptable"),
+    msg = "The transition matrix must be a ptable object."
+  )
+  assertthat::assert_that(
+    is.data.frame(freq) && all(c("i", "p_hat") %in% names(freq)),
+    msg = "The frequency data must be a data frame with columns 'i' and 'p_hat'."
+  )
+  assertthat::assert_that(
+    is.numeric(I) && all(I >= 0) && all(I %% 1 == 0),
+    msg = "I must be a numeric vector of non-negative integers."
+  )
+  assertthat::assert_that(
+    is.numeric(J) && all(J >= 0) && all(J %% 1 == 0),
+    msg = "J must be a numeric vector of non-negative integers."
+  )
+  assertthat::assert_that(
+    length(I) > 0 && length(J) > 0,
+    msg = "I and J must be non-empty vectors."
+  )
 
   p_transition <- matrice_transition@pTable[, .(i,j,p)]
   data.table::setnames(p_transition, c("i","j"), c("X","Xp"))
@@ -217,8 +254,9 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
   J <- J[J > js | J == 0]
   if(length(J) == 0){
     message(
-      "Avertissement: Les valeurs perturbées renseignées ne peuvent pas exister dans les données finales, au regard des paramètres de la matrice de transition.
-    Pour obtenir une mesure de risque, modifier l'argument `J`."
+      "Warning: The perturbed values provided do not exist in the final data,
+      given the transition matrix parameters.
+      To obtain a risk measure, modify the `J` argument."
     )
     return(NULL)
   }
@@ -230,9 +268,9 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
 
   if(p_hat[ X %in% I, sum(p_hat)] == 0){
     message(
-      paste0("Avertissement: Dans votre tableau agrégé original, aucune case ne prend les valeurs ",
+      paste0("In your original aggregated table, no cell takes the values ",
              paste0(I, collapse = ", "),
-             "\n Le risque n'est donc pas mesurable."
+             "\n The risk is therefore not measurable."
       )
     )
     return(NULL)
@@ -240,9 +278,10 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
 
   nb_compt_sup_D <- nrow(p_hat |> dplyr::filter(X > top_i))
 
-  #p_transition_augmentee = table de perturbation augmentee des valeurs
-  #de l'intervalle des possibles qui sont supérieures à la dernière
-  #valeur i de la mat de transition
+  # p_transition_augmentee = Augmented transition table
+  # We add the transition probabilities for the values of X
+  # that are greater than the maximum value of X in the original table
+  # (top_i) to the transition table.
   p_transition_augmentee <- rbind(
     p_transition,
     p_transition[X == top_i,][
@@ -257,7 +296,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
     )
   p_transition_augmentee[is.na(p_hat), p_hat := 0]
 
-  # Calcul des qj
+  # Computation of qj
   calculer_qj <- function(tab, j, Dposs_j){
 
     qj <- 0
@@ -269,7 +308,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
     return(qj)
   }
 
-  # Calcul des q_ij
+  # Computation of q_ij
 
   calculer_qij <- function(tab,i,j){
 
@@ -285,7 +324,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
   }
 
 
-  # Calcul des piJ
+  # Computation of piJ
   calculer_piJ <- function(tab, i, J){
 
     piJ <- 0
@@ -296,7 +335,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
     return(piJ)
   }
 
-  # Calcul des pIj
+  # Computation of pIj
   calculer_pIj <- function(tab, I, j){
 
     num <- 0
@@ -310,7 +349,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
     return(num/denom)
   }
 
-  # Calcul des pIJ
+  # Computation of pIJ
   calculer_pIJ <- function(tab, I, J){
 
     pIJ <- 0
@@ -321,7 +360,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
   }
 
 
-  # Calcul des qJ
+  # Computation of qJ
   calculer_qJ <- function(tab, J){
     qJ <- 0
     for(j in J){
@@ -331,7 +370,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
     return(qJ)
   }
 
-  # Calcul des q_iJ
+  # Computation of q_iJ
 
   calculer_qiJ <- function(tab, i, J){
 
@@ -344,7 +383,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
     return(piJ * pi/qJ)
   }
 
-  # Calcul des q_IJ
+  # Computation of q_IJ
 
   calculer_qIJ <- function(tab, I, J){
 
@@ -352,14 +391,14 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
 
   }
 
-  # Calcul des q_Ij
+  # Computation of q_Ij
   calculer_qIj <- function(tab, I, j){
 
     sum(sapply(I, \(i) calculer_qij(tab,i,j)))
 
   }
 
-  # Résultats:
+  # Results:
   all_origs = paste0(I, collapse = ", ")
   all_perts = paste0(J, collapse = ", ")
 
@@ -427,5 +466,3 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
   return(res_q)
 
 }
-
-

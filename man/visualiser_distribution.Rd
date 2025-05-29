@@ -2,31 +2,36 @@
 % Please edit documentation in R/visualiser_distributions.R
 \name{visualiser_distribution}
 \alias{visualiser_distribution}
-\title{Visualisation de distributions de probabilités
-issues de plusieurs scénarios}
+\title{Visualize probability distributions from multiple scenarios}
 \usage{
 visualiser_distribution(D = NULL, V = NULL, DV = NULL, precision = 5)
 }
 \arguments{
-\item{D}{Déviation (integer strictement positif)}
+\item{D}{integer. Deviation parameter (must be strictly positive)}
 
-\item{V}{Variance du bruit (numeric strictement positif)}
+\item{V}{numeric. Noise variance (must be strictly positive)}
 
-\item{precision}{\code{integer}}
+\item{DV}{data.frame. Alternative way to specify D and V parameters as a data frame
+with columns "D" and "V". If provided, D and V parameters are ignored}
+
+\item{precision}{integer. Precision level for probability calculations (default: 5)}
 }
 \value{
-cowplot object
+A cowplot object containing multiple ggplot bar charts showing
+  probability distributions for each parameter combination
 }
 \description{
-Visualisation de distributions de probabilités
-issues de plusieurs scénarios
+This function creates visualizations of probability distributions
+resulting from different parameter combinations of the Cell Key Method.
+It generates bar plots showing the probability mass function for each scenario.
 }
 \examples{
-visualiser_distribution(
-  D = c(11, 15),
-  V = c(10, 30)
-)
-visualiser_distribution(
-  DV = data.frame(D = c(11, 15), V = c(10, 30))
-)
+# Using separate D and V vectors
+visualiser_distribution(D = c(11, 15), V = c(10, 30))
+
+\dontrun{
+# Using a data frame
+params_df <- data.frame(D = c(11, 15), V = c(10, 30))
+visualiser_distribution(DV = params_df)
+}
 }

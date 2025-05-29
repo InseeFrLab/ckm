@@ -2,8 +2,7 @@
 % Please edit documentation in R/estimer_intervalle_confiance_ratio.R
 \name{estimer_beta_df}
 \alias{estimer_beta_df}
-\title{Estime le beta minimal tel que P(|R-R'|>beta) < alpha, pour alpha fixé et
-pour chacun des ratio R=A/B fournis dans le dataframe en entrée.}
+\title{Estimate Confidence Intervals for Ratios Using Beta Distribution}
 \usage{
 estimer_beta_df(
   data,
@@ -23,71 +22,65 @@ estimer_beta_df(
 )
 }
 \arguments{
-\item{data}{dataframe avec deux colonnes correspondant aux numérateurs et
-dénominateurs des ratios}
+\item{data}{A data frame or tibble with two columns: numerators and denominators.}
 
-\item{fun}{function, sert à calculer la statistique souhaitée
-à partir de A et B}
+\item{fun}{Function. Statistic calculation (default: a/b*100)}
 
-\item{D}{Déviation max de la CKM}
+\item{D}{Integer. Maximum deviation}
 
-\item{V}{Variance de la CKM}
+\item{V}{Numeric. Noise variance}
 
-\item{js}{Seuil interdiction de la CKM}
+\item{js}{Integer. Sensitivity threshold}
 
-\item{beta_min}{integer, seuil de précision minimal}
+\item{beta_min}{Numeric. Minimum of the search range for \eqn{\beta}}
 
-\item{beta_max}{integer, seuil de précision maximal}
+\item{beta_max}{Numeric. Maximum of the search range for \eqn{\beta}}
 
-\item{precision}{double, niveau de précision de l'estimation de beta}
+\item{precision}{Numeric. Search step size}
 
-\item{alpha}{double, niveau d'erreur fixé}
+\item{alpha}{Numeric. Target error level}
 
-\item{posterior}{Booléen: Si \code{TRUE}, c'est beta' qui est calculé.}
+\item{posterior}{Logical. Use posterior approach? (default: FALSE)}
 
-\item{parallel}{Booléen, si le calcul doit être parallélisé}
+\item{parallel}{Logical. If \code{TRUE}, computations are performed in parallel using available CPU cores. Default is \code{FALSE}.}
 
-\item{max_cores, }{integer, nombre maximal de travaux à réaliser en parallèle}
+\item{max_cores}{Integer or \code{NULL}. Maximum number of CPU cores to use for parallel computation. If \code{NULL}, uses all but one core.}
 }
 \value{
-data.frame avec les colonnes suivantes:
-- A = numérateur
-- B = dénominateur
-- R = ratio = A/B*100
-- alpha
-- beta = correspondant à beta0 si \code{posterior=FALSE} ou
-à beta0' si \code{posterior=TRUE}
+A tibble with columns:
+  \describe{
+    \item{A}{Numerator value}
+    \item{B}{Denominator value}
+    \item{R}{Computed ratio using \code{fun}}
+    \item{alpha}{Significance level used}
+    \item{beta}{Estimated confidence interval or beta parameter}
+  }
 }
 \description{
-Détermine la meilleure précision qu'il est possible d'atteindre dans le cas
-du calcul d'un ratio. La fonction prend en entrée un dataframe et calcule
-la précision pour chacun des ratios du dataframe.
+This function computes confidence intervals for ratios using the beta distribution,
+for each unique pair of numerator and denominator in the provided data. It supports
+both sequential and parallel computation, and allows customization of the ratio function,
+confidence level, and beta estimation parameters.
 }
 \details{
-Si posterior = FALSE: détermine beta0 pour alpha fixé
-Si posterior = TRUE: détermine beta0' pour alpha fixé
-
-
-Si \code{posterior=FALSE}, le calcul repose sur l'approche a priori,
-c'est-à-dire que le ratio fourni (A/B) est le ratio réel/original.
-Sinon, le calcul repose sur l'approche a posteriori,
-c'est-à-dire que le ratio fourni (A/B) est le ratio issu de la perturbation
-par CKM.
-
-Le meilleur beta est recherché dans l'intervalle [beta_min; beta_max].
+The function removes duplicate rows from the input data before computation.
+Parallel computation is handled via the \code{future} and \code{furrr} packages.
 }
 \examples{
+nums <- c(20, 80)
+denoms <- c(100, 200)
 test <- data.frame(
-  A = sort(rep(c(1,50,100),4)),
-  B = rep(c(100,200,300,500), 3)
+  A = sort(rep(nums,length(denoms))),
+  B = rep(denoms, each = length(nums))
 )
 
 fun = \(a,b){a/b * 100}
 D = 5
 V = 1
 
-# Approche a priori
-res <- estimer_beta_df(test, fun, D=5, V=1)
-# Approche a posteriori
+# A priori approach
+res <- estimer_beta_df(test, fun, D, V)
+# A posteriori approach
 res_ap <- estimer_beta_df(test, fun, D, V, posterior = TRUE)
+
 }

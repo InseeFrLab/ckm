@@ -2,20 +2,20 @@
 % Please edit documentation in R/mesurer_utilite.R
 \name{distance_hellinger}
 \alias{distance_hellinger}
-\title{Distance de Hellinger}
+\title{Hellinger distance}
 \usage{
 distance_hellinger(o, p)
 }
 \arguments{
-\item{o}{vecteur des valeurs originales}
+\item{o}{numeric vector. Original values}
 
-\item{p}{vecteur des valeurs perturbées}
+\item{p}{numeric vector. Perturbed values}
 }
 \value{
-numeric
+numeric. Hellinger distance value
 }
 \description{
-Distance de Hellinger
+Calculates the Hellinger distance between original and perturbed count vectors.
 }
 \examples{
 distance_hellinger(1:100, 11:110)

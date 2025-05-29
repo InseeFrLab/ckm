@@ -2,35 +2,35 @@
 % Please edit documentation in R/mesurer_risque.R
 \name{calculer_frequences_empiriques}
 \alias{calculer_frequences_empiriques}
-\title{Calcule les fréquences empiriques des comptages à partir d'un tableau agrégé
-construit avec les fonctions `tabulate_cnt_micro_data` ou `appliquer_ckm` ou
-`tabuler_et_appliquer_ckm`.}
+\title{Calculate empirical frequencies from aggregated table}
 \usage{
 calculer_frequences_empiriques(tableau, cat_vars, hrc_vars)
 }
 \arguments{
-\item{tableau}{tableau généré avec les fonctions `tabulate_cnt_micro_data` ou
-`appliquer_ckm` ou `tabuler_et_appliquer_ckm`}
+\item{tableau}{data.frame. Table generated with tabulate_cnt_micro_data,
+appliquer_ckm, or tabuler_et_appliquer_ckm functions}
 
-\item{cat_vars}{vector of categorical variables but not hierarchical}
+\item{cat_vars}{Character vector. Categorical variables}
 
-\item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
+\item{hrc_vars}{Named list. Hierarchical variables}
 }
 \value{
-data.frame avec 3 colonnes:
-- i = comptage
-- N = nb d'apparitions du comptage
-- p_hat = fréquence empirique du comptage
+data.frame with 3 columns:
+  \itemize{
+    \item i: count value
+    \item N: number of occurrences of the count
+    \item p_hat: empirical frequency of the count
+  }
 }
 \description{
-Calcule les fréquences empiriques des comptages à partir d'un tableau agrégé
-construit avec les fonctions `tabulate_cnt_micro_data` ou `appliquer_ckm` ou
-`tabuler_et_appliquer_ckm`.
+Calculates empirical frequencies of counts from an aggregated table
+constructed with tabulate_cnt_micro_data, appliquer_ckm,
+or tabuler_et_appliquer_ckm functions.
 }
 \examples{
+\dontrun{
 library(ptable)
 library(dplyr)
-
 data("dtest")
 
 cat_vars1 = c("DEP", "DIPLOME", "SEXE", "AGE")
@@ -42,6 +42,7 @@ tab_comptage1 <- tabulate_cnt_micro_data(
 )
 p_hat1 <- calculer_frequences_empiriques(tab_comptage1, cat_vars1, hrc_vars1)
 
+# With hierarchical variables:
 cat_vars2 = c("DIPLOME", "SEXE", "AGE")
 hrc_vars2 = list(GEO = c("REG","DEP"), TYPES = c("TYPE","TYPE2"))
 tab_comptage2 <- tabulate_cnt_micro_data(
@@ -51,5 +52,7 @@ tab_comptage2 <- tabulate_cnt_micro_data(
   marge_label = "Total"
 )
 p_hat2 <- calculer_frequences_empiriques(tab_comptage2, cat_vars2, hrc_vars2)
+}
+
 }
 \keyword{internal}

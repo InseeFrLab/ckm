@@ -2,20 +2,20 @@
 % Please edit documentation in R/mesurer_utilite.R
 \name{distance_euclid}
 \alias{distance_euclid}
-\title{Distance Euclidienne}
+\title{Euclidean distance}
 \usage{
 distance_euclid(o, p)
 }
 \arguments{
-\item{o}{vecteur des valeurs originales}
+\item{o}{numeric vector. Original values}
 
-\item{p}{vecteur des valeurs perturbées}
+\item{p}{numeric vector. Perturbed values}
 }
 \value{
-numeric
+numeric. Euclidean distance value
 }
 \description{
-Distance Euclidienne
+Calculates the Euclidean distance between original and perturbed count vectors.
 }
 \examples{
 distance_euclid(1:100, 11:110)

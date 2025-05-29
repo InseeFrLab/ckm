@@ -2,20 +2,20 @@
 % Please edit documentation in R/mesurer_utilite.R
 \name{distance_manhattan}
 \alias{distance_manhattan}
-\title{Distance de Manhattan}
+\title{Manhattan distance}
 \usage{
 distance_manhattan(o, p)
 }
 \arguments{
-\item{o}{vecteur des valeurs originales}
+\item{o}{numeric vector. Original values}
 
-\item{p}{vecteur des valeurs perturbées}
+\item{p}{numeric vector. Perturbed values}
 }
 \value{
-numeric
+numeric. Manhattan distance value
 }
 \description{
-Distance de Manhattan
+Calculates the Manhattan distance between original and perturbed count vectors.
 }
 \examples{
 distance_manhattan(1:100, 11:110)

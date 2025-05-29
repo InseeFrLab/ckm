@@ -2,8 +2,8 @@
 % Please edit documentation in R/estimer_intervalle_confiance_ratio.R
 \name{estimer_proba_precision_statistique_df}
 \alias{estimer_proba_precision_statistique_df}
-\title{Calcule P(|R-R'|>beta) pour chaque R=A/B d'un dataframe donné et pour
-chaque beta fixé.}
+\title{Calculate P(|R-R'|>\eqn{\beta}), the probability of ratio deviation for a dataframe
+and given CKM parameter and for each \eqn{\beta} value.}
 \usage{
 estimer_proba_precision_statistique_df(
   data,
@@ -20,39 +20,44 @@ estimer_proba_precision_statistique_df(
 )
 }
 \arguments{
-\item{data}{data.frame à 2 colonnes, le numérateur et le dénominateur
+\item{data}{data.frame with two columns corresponding to the numerators
+and denominators of the ratios
 de chaque ratio}
 
-\item{fun}{function, sert à calculer la statistique souhaitée
-à partir de A et B}
+\item{fun}{Function. Statistic calculation (default: a/b*100)}
 
-\item{D}{Déviation max de la CKM}
+\item{D}{Integer. Maximum deviation}
 
-\item{V}{Variance de la CKM}
+\item{V}{Numeric. Noise variance}
 
-\item{js}{Seuil interdiction de la CKM}
+\item{js}{Integer. Sensitivity threshold}
 
-\item{betas}{Seuil des écarts entre R et R'}
+\item{betas}{Numeric vector. Precision thresholds to evaluate}
 
-\item{posterior}{Booléen: Si \code{TRUE}, c'est beta' qui est calculé.}
+\item{posterior}{Logical. Use posterior approach? (default: FALSE)}
 
-\item{parallel}{Booléen, si le calcul doit être parallélisé}
+\item{parallel}{Boolean, whether the calculation should be parallelized}
 
-\item{max_cores, }{integer, nombre maximal de travaux à réaliser en parallèle}
+\item{max_cores, }{integer, maximum number of jobs to run in parallel}
 }
 \value{
-un dataframe
+a dataframe
 }
 \description{
-Calcule P(|R-R'|>beta) pour chaque R=A/B d'un dataframe donné et pour
-chaque beta fixé.
+Calculate P(|R-R'|>\eqn{\beta}), the probability of ratio deviation for a dataframe
+and given CKM parameter and for each \eqn{\beta} value.
 }
 \details{
-Si \code{posterior=FALSE}, le calcul repose sur l'approche a priori,
-c'est-à-dire que le ratio fourni (A/B) est le ratio réel/original.
-Sinon, le calcul repose sur l'approche a posteriori,
-c'est-à-dire que le ratio fourni (A/B) est le ratio issu de la perturbation
-par CKM.
+If \code{posterior=FALSE}, the calculation is based on the a priori approach,
+that is, the provided ratio (A/B) is the original/real ratio.
+Otherwise, the calculation is based on the a posteriori approach,
+that is, the provided ratio (A/B) is the ratio resulting from CKM perturbation.
+#' The output dataframe contains the following columns:
+- beta: precision threshold
+- A: numerator
+- B: denominator
+- R: ratio = A/B*100
+- proba: P(|R-R'|>\eqn{\beta}) for the given \eqn{\beta}
 }
 \examples{
 test <- data.frame(
@@ -65,9 +70,9 @@ D = 10
 V = 10
 js = 4
 
-# Approche a priori
+# A priori approach (given R the original ratio)
 res <- estimer_proba_precision_statistique_df(test, fun, D, V)
 
-# Approche a posteriori
+# A posteriori approach (given R the perturbed ratio)
 res_ap <- estimer_proba_precision_statistique_df(test, fun, D, V, posterior = TRUE)
 }

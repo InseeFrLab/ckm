@@ -1,25 +1,55 @@
-#' Teste la construction des matrices de
-#' transition pour différentes valeurs de variance à D et js fixés
+#' Test transition matrix construction for different variance values
 #'
-#' @param D \code{integer} déviation
-#' @param js \code{integer} seuil des valeurs sensibles
-#' @param Vmin \code{numeric} Variance minimum à tester
-#' @param Vmax \code{numeric} Variance maximum à tester
-#' @param precision \code{numeric} Précision
+#' This function tests whether transition matrices can be constructed for 
+#' different variance values, given fixed deviation (D) and sensitive threshold (js) parameters.
+#' It uses binary search to find the minimum variance value that allows matrix construction.
 #'
-#' @return \code{NULL} si aucune solution n'existe dans l'intervalle demandé
-#' \code{numeric} Valeur de la variance qui rend la matrice constructible
+#' @param D integer. Deviation parameter (must be strictly positive)
+#' @param js integer. Threshold for sensitive values (default: 0). If js=0, only value 0 will be forbidden
+#' @param Vmin numeric. Minimum variance value to test (default: 0)
+#' @param Vmax numeric. Maximum variance value to test (default: 30)
+#' @param precision numeric. Precision for the binary search algorithm (default: 1)
+#'
+#' @return NULL if no solution exists in the requested interval, 
+#'   or numeric value of the variance that makes the matrix constructible
 #'
 #' @export
+#' 
+#' @examples
+#' # Test with basic parameters
+#' tester_matrices(5, 1)
+#'
 #' @importFrom purrr map
 #' @importFrom purrr list_rbind
-#' @examples
-#' tester_matrices(5, 1)
-#' tester_matrices(10, js = 9)
-#' tester_matrices(10, js = 9, Vmin=25, Vmax=30, precision=0.5)
 tester_matrices <- function(D, js = 0, Vmin = 0, Vmax = 30, precision=1){
 
-  cat("Intervalle testé: [",Vmin, ";", Vmax, "]\n")
+  # Validate parameters
+  assertthat::assert_that(
+    is.numeric(D) && D > 0 && D %% 1 == 0,
+    msg = "D must be a strictly positive integer."
+  )
+  assertthat::assert_that(
+    is.numeric(js) && js >= 0 && js %% 1 == 0,
+    msg = "js must be a non-negative integer."
+  )
+  assertthat::assert_that(
+    is.numeric(Vmin) && Vmin >= 0,
+    msg = "Vmin must be a non-negative numeric value."
+  )
+  assertthat::assert_that(
+    is.numeric(Vmax) && Vmax > Vmin,
+    msg = "Vmax must be greater than Vmin."
+  )
+  assertthat::assert_that(
+    is.numeric(precision) && precision > 0,
+    msg = "Precision must be a positive numeric value."
+  )
+  assertthat::assert_that(
+    length(D) == 1 && length(js) == 1 && length(Vmin) == 1 && length(Vmax) == 1 && length(precision) == 1,
+    msg = "D, js, Vmin, Vmax, and precision must be single numeric values."
+  )
+
+  cat("Tested interval: [",Vmin, ";", Vmax, "]\n")
   res_min <- !is.null(
     tryCatch({
       mat <- creer_matrice_transition(D, Vmin, js)

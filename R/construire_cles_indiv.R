@@ -1,27 +1,40 @@
-#' Ajoute les clés aléatoires individuelles sur le jeu de microdonnées
+#' Generate individual record keys
 #'
-#' @param microdata jeu de données (data.frame, data.table ou tibble)
-#' représentant une table individuelle
-#' @param nb_decim nb de décimales (integer) de la clé générée. Si `NULL` (défaut)
-#' le programme calcule un nombre idéal de décimales pour la clé aléatoire.
+#' Adds random decimal keys to microdata for Cell Key Method implementation.
 #'
-#' @return jeu de données de départ transformé en data.table avec la variable
-#' `rkey` représentant la clé aléatoire individuelle en plus.
-#'
+#' @param microdata data.frame. Input microdata
+#' @param nb_decim Integer. Key precision (auto-calculated if NULL)
+#' 
+#' @return data.table with added 'rkey' column
 #' @export
-#' @importFrom stats runif
 #' @examples
-#' data("dtest", package = "ckm")
-#' set.seed(12345)
+#' data("dtest")
+#' set.seed(123)
 #' dtest_avec_cles <- construire_cles_indiv(dtest)
-#' hist(dtest_avec_cles$rkey)
+#'
+#' @importFrom stats runif
+#' @importFrom data.table as.data.table
 construire_cles_indiv <- function(microdata, nb_decim = NULL){
 
+  assertthat::assert_that(
+    is.data.frame(microdata),
+    msg = "The input data must be a data frame."
+  )
+  
   N <- nrow(microdata)
+
+  assertthat::assert_that(
+    N > 0,
+    msg = "The input data must contain at least one row."
+  )
+  assertthat::assert_that(
+    is.null(nb_decim) || (is.numeric(nb_decim) && length(nb_decim) == 1 && nb_decim >= 0),
+    msg = "nb_decim must be a non-negative numeric value or NULL."
+  )
+
   if(is.null(nb_decim)) nb_decim <- min(ceiling(5+log(N)/log(10)), 20)
 
   mdata <- data.table::as.data.table(microdata)
-
   mdata[ , rkey := round(stats::runif(N, 0, 1), digits = nb_decim)]
 
   return(mdata)

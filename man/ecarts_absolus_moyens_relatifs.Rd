@@ -2,20 +2,21 @@
 % Please edit documentation in R/mesurer_utilite.R
 \name{ecarts_absolus_moyens_relatifs}
 \alias{ecarts_absolus_moyens_relatifs}
-\title{Ecarts absolus relatifs moyens en \%}
+\title{Mean relative absolute deviations in percentage}
 \usage{
 ecarts_absolus_moyens_relatifs(o, p)
 }
 \arguments{
-\item{o}{vecteur des valeurs originales}
+\item{o}{numeric vector. Original values}
 
-\item{p}{vecteur des valeurs perturbées}
+\item{p}{numeric vector. Perturbed values}
 }
 \value{
-numeric (en \%)
+numeric. Mean relative absolute deviation in percentage
 }
 \description{
-Ecarts absolus relatifs moyens en \%
+Calculates the mean relative absolute deviations between original and
+perturbed values, expressed as a percentage.
 }
 \examples{
 ecarts_absolus_moyens_relatifs(1:100, 11:110)

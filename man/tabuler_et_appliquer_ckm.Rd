@@ -2,7 +2,7 @@
 % Please edit documentation in R/tabuler_et_appliquer_ckm.R
 \name{tabuler_et_appliquer_ckm}
 \alias{tabuler_et_appliquer_ckm}
-\title{Cette fonction construit le tableau et applique la CKM.}
+\title{Build table and apply Cell Key Method}
 \usage{
 tabuler_et_appliquer_ckm(
   df,
@@ -20,38 +20,39 @@ tabuler_et_appliquer_ckm(
 )
 }
 \arguments{
-\item{df}{data.frame or data.table}
+\item{df}{data.frame. Input microdata}
 
-\item{rk_var}{(character) nom de la variable des clés individuelles}
+\item{rk_var}{Character. Individual key variable (NULL for no keys)}
 
-\item{cat_vars}{vector of categorical variables but not hierarchical}
+\item{cat_vars}{Character vector. Categorical variables}
 
-\item{hrc_vars}{named list (name = VAR final name, value = VAR current names)}
+\item{hrc_vars}{Named list. Hierarchical variables}
 
-\item{num_var}{nom d'une variable numérique à aggréger en même temps}
+\item{num_var}{Character. Numerical variable to aggregate}
 
-\item{marge_label}{label of margins (applied to all cat and hrc variables)}
+\item{marge_label}{Character. Margin label (default: "Total")}
 
-\item{D}{Déviation (integer strictement positif)}
+\item{D}{integer. Deviation parameter (must be strictly positive)}
 
-\item{V}{Variance du bruit (numeric strictement positif)}
+\item{V}{numeric. Noise variance (must be strictly positive)}
 
-\item{js}{Seuil des valeurs interdites (integer). Si `js=0` (défaut), seule la
-valeur 0 sera interdite.}
+\item{js}{integer. Threshold for sensitive values (default: 0). If js=0, only value 0 will be forbidden}
 
-\item{I}{vecteur d'entiers (valeurs originales)}
+\item{I}{integer vector. Original values to consider}
 
-\item{J}{vecteur d'entiers (valeurs perturbées)}
+\item{J}{integer vector. Perturbed values to consider}
 
-\item{...}{Paramètres additionnels de la fonction `ptable::create_cnt_ptable`}
+\item{...}{Additional parameters passed to transition matrix creation}
 }
 \value{
-liste comprenant la table perturbée et la matrice de transition
+A list containing the perturbed table and transition matrix
 }
 \description{
-Cette fonction construit le tableau et applique la CKM.
+This function constructs a contingency table from microdata and applies
+the Cell Key Method for statistical disclosure control.
 }
 \examples{
+\dontrun{
 data("dtest")
 set.seed(123)
 dtest_avec_cles <- construire_cles_indiv(dtest)
@@ -63,4 +64,5 @@ res_ckm <- tabuler_et_appliquer_ckm(
   marge_label = "Total",
   D = 10, V = 15, js = 4
 )
+}
 }

@@ -1,16 +1,18 @@
-#' Données de test#'
+#' Sample dataset for CKM package
 #'
-#' @format data.table, données individuelles contenant 9 variables et 6 000
-#' lignes:
+#' A synthetic microdata dataset containing 6,000 records with demographic and
+#' geographic variables for testing purposes.
+#'
+#' @format data.table with 9 variables:
 #' \describe{
-#'    \item{SEXE}{sexe : "G" = garçon, "F" = fille}
-#'    \item{DIPLOME}{Type de diplôme}
-#'    \item{AGE}{Âge en trois classes}
-#'    \item{DEP}{numéro de département}
-#'    \item{REG}{numéro de région}
-#'    \item{TYPE}{catégorie détaillée en 5 classes}
-#'    \item{TYPE2}{catégorie agrégée en 2 classes}
-#'    \item{VAL}{paleur numérique aléatoire}
-#'    \item{WEIGHT}{pondération individuelle aléatoire}
+#'   \item{SEXE}{Gender (G = male, F = female)}
+#'   \item{DIPLOME}{Education level (5 categories)}
+#'   \item{AGE}{Age group (3 categories)}
+#'   \item{DEP}{Department code}
+#'   \item{REG}{Region code}
+#'   \item{TYPE}{Detailed category (5 levels)}
+#'   \item{TYPE2}{Aggregated category (2 levels)}
+#'   \item{VAL}{Random numeric value}
+#'   \item{WEIGHT}{Sampling weight}
 #' }
 "dtest"

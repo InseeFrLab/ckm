@@ -2,22 +2,22 @@
 % Please edit documentation in R/construire_table_parametres.R
 \name{construire_table_parametres}
 \alias{construire_table_parametres}
-\title{Construit un data.frame de tous les jeux de paramètres possibles}
+\title{Generate parameter combinations table}
 \usage{
 construire_table_parametres(Ds, Vs, jss = 0)
 }
 \arguments{
-\item{Ds}{\code{integer} vecteur de déviations}
+\item{Ds}{Integer vector. Deviation values}
 
-\item{Vs}{\code{numeric} vecteur de variance}
+\item{Vs}{Numeric vector. Variance values}
 
-\item{jss}{\code{integer} vecteur de seuil de sensibilité}
+\item{jss}{Integer vector. Sensitivity thresholds}
 }
 \value{
-\code{data.frame}
+data.frame of parameter combinations
 }
 \description{
-Construit un data.frame de tous les jeux de paramètres possibles
+Creates a data.frame of all possible parameter combinations for CKM analysis.
 }
 \examples{
 construire_table_parametres(c(10,15), c(10,20), js = 5)

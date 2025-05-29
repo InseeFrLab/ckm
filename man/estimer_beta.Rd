@@ -2,8 +2,7 @@
 % Please edit documentation in R/estimer_intervalle_confiance_ratio.R
 \name{estimer_beta}
 \alias{estimer_beta}
-\title{Estime le beta minimal tel que P(|R-R'|>beta) < alpha, pour alpha fixé et
-pour un ratio R=A/B fourni en entrée.}
+\title{Estimate minimal precision threshold \eqn{\beta} for given error level α}
 \usage{
 estimer_beta(
   A,
@@ -23,46 +22,42 @@ estimer_beta(
 )
 }
 \arguments{
-\item{A}{numérateur}
+\item{A}{Numerator value}
 
-\item{B}{dénominateur}
+\item{B}{Denominator value}
 
-\item{fun}{function, sert à calculer la statistique souhaitée
-à partir de A et B}
+\item{fun}{Function. Statistic calculation (default: a/b*100)}
 
-\item{D}{Déviation max de la CKM}
+\item{D}{Integer. Maximum deviation}
 
-\item{V}{Variance de la CKM}
+\item{V}{Numeric. Noise variance}
 
-\item{js}{Seuil interdiction de la CKM}
+\item{js}{Integer. Sensitivity threshold}
 
-\item{ptab}{data.frame issu de ptable}
+\item{ptab}{data.frame. Transition probabilities from ptable}
 
-\item{beta_min}{integer, seuil de précision minimal}
+\item{beta_min}{Numeric. Minimum of the search range for \eqn{\beta}}
 
-\item{beta_max}{integer, seuil de précision maximal}
+\item{beta_max}{Numeric. Maximum of the search range for \eqn{\beta}}
 
-\item{precision}{double, niveau de précision de l'estimation de beta}
+\item{precision}{Numeric. Search step size}
 
-\item{alpha}{double, niveau d'erreur fixé}
+\item{alpha}{Numeric. Target error level}
 
-\item{posterior}{Booléen: Si \code{TRUE}, c'est beta' qui est calculé.}
+\item{posterior}{Logical. Use posterior approach? (default: FALSE)}
 }
 \value{
-numeric value
+Numeric. Minimal \eqn{\beta} value
 }
 \description{
-Estime le beta minimal tel que P(|R-R'|>beta) < alpha, pour alpha fixé et
-pour un ratio R=A/B fourni en entrée.
+Finds minimal \eqn{\beta} where P(|R-R'|>\eqn{\beta}) < α for given α and CKM parameters.
 }
 \details{
-Si \code{posterior=FALSE}, le calcul repose sur l'approche a priori,
-c'est-à-dire que le ratio fourni (A/B) est le ratio réel/original.
-Sinon, le calcul repose sur l'approche a posteriori,
-c'est-à-dire que le ratio fourni (A/B) est le ratio issu de la perturbation
-par CKM.
-
-Le meilleur beta est recherché dans l'intervalle [beta_min; beta_max].
+If \code{posterior=FALSE}, the calculation is based on the a priori approach,
+that is, the provided ratio (A/B) is the original/real ratio.
+Otherwise, the calculation is based on the a posteriori approach,
+that is, the provided ratio (A/B) is the ratio resulting from CKM perturbation.
+The best beta is searched in the interval [beta_min; beta_max].
 }
 \examples{
 library(dplyr)

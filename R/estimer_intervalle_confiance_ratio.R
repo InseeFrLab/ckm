@@ -1,42 +1,35 @@
-#' Calcule P(|R-R'|>beta) pour R=une statistique fonction de A et B, et
-#' pour beta fixé.
+#' Estimate probability of ratio deviation
 #'
-#' @param A numérateur
-#' @param B dénominateur
-#' @param fun function, sert à calculer la statistique souhaitée
-#' à partir de A et B
-#' @param D Déviation max de la CKM
-#' @param V Variance de la CKM
-#' @param js Seuil interdiction de la CKM
-#' @param ptab data.frame issu de ptable
-#' @param betas Seuil des écarts entre R et R'
-#' @param posterior Booléen: Si \code{TRUE}, c'est beta' qui est calculé.
+#' Calculates P(|R - R'| > \eqn{\beta}) for a statistic R = f(A, B) given CKM parameters.
 #'
-#' @return dataframe de deux colonnes (beta, proba)
+#' @param A Numerator value
+#' @param B Denominator value
+#' @param fun Function. Statistic calculation (default: a/b*100)
+#' @param D Integer. Maximum deviation
+#' @param V Numeric. Noise variance
+#' @param js Integer. Sensitivity threshold
+#' @param ptab data.frame. Transition probabilities from ptable
+#' @param betas Numeric vector. Precision thresholds to evaluate
+#' @param posterior Logical. Use posterior approach? (default: FALSE)
 #'
-#' @details
-#' La fonction prend un seul ratio en entrée.
-#' Si \code{posterior=FALSE}, le calcul repose sur l'approche a priori,
-#' c'est-à-dire que le ratio fourni (A/B) est le ratio réel/original.
-#' Sinon, le calcul repose sur l'approche a posteriori,
-#' c'est-à-dire que le ratio fourni (A/B) est le ratio issu de la perturbation
-#' par CKM.
-#'
-#'
+#' @return data.frame with beta probabilities
+#' @export
 #' @examples
 #' ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
 #'   as.data.frame()
-#' # Calcul de alpha pour la stat originale = 10/15 pour différents beta
+#'
+#' # Alpha value for the original statistic = 10/15 and different beta values
 #' estimer_proba_precision_statistique(A=10,B=15,D = 15, V = 30.1, js = 0, ptab = ptab)
-#' # Calcul de alpha pour la stat perturbée = 10/15 pour différentes valeurs
-#' # de beta'
+#'
+#' # Alpha value for the perturbed statistic = 10/15 and different beta' values
 #' estimer_proba_precision_statistique(
 #'   A=10,B=15,
 #'   D = 15, V = 30.1, js = 0,
 #'   ptab = ptab,
 #'   posterior = TRUE
 #' )
-#' #Calcul pour une évolution
+#'
+#' # For a ratio evolution
 #' estimer_proba_precision_statistique(
 #'   A=10,B=15,
 #'   fun = \(a,b){(b/a - 1)*100},
@@ -51,8 +44,7 @@
 #' @importFrom dplyr filter
 #' @importFrom dplyr arrange
 #' @importFrom dplyr tibble
-#'
-#' @export
+#' @importFrom assertthat assert_that
 estimer_proba_precision_statistique <- function(
     A,
     B,
@@ -64,12 +56,18 @@ estimer_proba_precision_statistique <- function(
     betas = c(0, 1, 5, 10, 20),
     posterior = FALSE
 ) {
+  assertthat::assert_that(
+    is.numeric(A), is.numeric(B), is.numeric(D), is.numeric(V),
+    length(A) == 1, length(B) == 1, length(D) == 1, length(V) == 1,
+    A >= 0, B >= 0, D > 0, V > 0,
+    msg = "A, B, D, and V must be single numeric values: A and B non-negative, D and V strictly positive."
+  )
 
   if (posterior) {
     if ((A <= js & A > 0) | A < 0 | (B <= js & B > 0) | B < 0) {
       message(
-        "Les comptages A et B ne sont pas cohérents (négatifs ou inférieurs
-        au seuil de sensibilité js)"
+        "The provided counts A and B are not consistent with the sensitivity threshold js.
+        \nEither A or B is less than or equal to the sensitivity threshold js, or one of them is negative."
       )
       return(NULL)
     } else{
@@ -87,11 +85,9 @@ estimer_proba_precision_statistique <- function(
           Ao = Ap - zA,
           Bo = Bp - zB,
           Ro = fun(Ao, Bo), #Ao / Bo * 100,
-          # Par convention l'écart relatif est passé à 1 si le dénominateur
-          # est nul
-          # Delta_R = ifelse(is.nan(Rp) | is.infinite(Rp), 1, abs(R - Rp)/R),
-          # Choix pour l'écart absolu: passé à R si le ratio perturbé est
-          # infini ou indéterminé
+            # By convention, the relative difference is set to 1 if the denominator is zero
+            # Delta_R = ifelse(is.nan(Rp) | is.infinite(Rp), 1, abs(R - Rp)/R),
+            # For the absolute difference: set to R if the perturbed ratio is infinite or indeterminate
           Delta_R = ifelse(
             is.nan(Ro) |
               is.infinite(Ro),
@@ -121,7 +117,7 @@ estimer_proba_precision_statistique <- function(
     }
   } else{
     if (A < 0 | B < 0) {
-      message("Les comptages A et B ne sont pas cohérents (négatifs)")
+      message("Counts A and B are not consistent (negative values)")
       return(NULL)
     } else{
       probas_ecarts <- expand.grid(
@@ -138,11 +134,9 @@ estimer_proba_precision_statistique <- function(
           Ap = Ao + zA,
           Bp = Bo + zB,
           Rp = fun(Ap, Bp), #Ap / Bp * 100,
-          # Par convention l'écart relatif est passé à 1 si le dénominateur
-          # est nul
-          # Delta_R = ifelse(is.nan(Rp) | is.infinite(Rp), 1, abs(R - Rp)/R),
-          # Choix pour l'écart absolu: passé à R si le ratio perturbé est
-          # infini ou indéterminé
+            # By convention, the relative difference is set to 1 if the denominator is zero
+            # Delta_R = ifelse(is.nan(Rp) | is.infinite(Rp), 1, abs(R - Rp)/R),
+            # For the absolute difference: set to R if the perturbed ratio is infinite or indeterminate
           Delta_R = ifelse(is.nan(Rp) |
                              is.infinite(Rp), Ro, abs(Ro - Rp)),
           iA = ifelse(Ao > max(ptab$i), max(ptab$i), Ao),
@@ -195,22 +189,28 @@ estimer_proba_precision_statistique <- function(
 }
 
 
-#' Calcule P(|R-R'|>beta) pour chaque R=A/B d'un dataframe donné et pour
-#' chaque beta fixé.
+#' Calculate P(|R-R'|>\eqn{\beta}), the probability of ratio deviation for a dataframe
+#' and given CKM parameter and for each \eqn{\beta} value.
 #'
-#' @param data data.frame à 2 colonnes, le numérateur et le dénominateur
+#' @param data data.frame with two columns corresponding to the numerators
+#' and denominators of the ratios
 #' de chaque ratio
 #' @inheritParams estimer_proba_precision_statistique
-#' @param parallel Booléen, si le calcul doit être parallélisé
-#' @param max_cores, integer, nombre maximal de travaux à réaliser en parallèle
+#' @param parallel Boolean, whether the calculation should be parallelized
+#' @param max_cores, integer, maximum number of jobs to run in parallel
 #'
-#' @return un dataframe
+#' @return a dataframe
 #' @details
-#' Si \code{posterior=FALSE}, le calcul repose sur l'approche a priori,
-#' c'est-à-dire que le ratio fourni (A/B) est le ratio réel/original.
-#' Sinon, le calcul repose sur l'approche a posteriori,
-#' c'est-à-dire que le ratio fourni (A/B) est le ratio issu de la perturbation
-#' par CKM.
+#' If \code{posterior=FALSE}, the calculation is based on the a priori approach,
+#' that is, the provided ratio (A/B) is the original/real ratio.
+#' Otherwise, the calculation is based on the a posteriori approach,
+#' that is, the provided ratio (A/B) is the ratio resulting from CKM perturbation.
+#' #' The output dataframe contains the following columns:
+#' - beta: precision threshold
+#' - A: numerator
+#' - B: denominator
+#' - R: ratio = A/B*100
+#' - proba: P(|R-R'|>\eqn{\beta}) for the given \eqn{\beta}
 #'
 #' @examples
 #' test <- data.frame(
@@ -223,10 +223,10 @@ estimer_proba_precision_statistique <- function(
 #' V = 10
 #' js = 4
 #'
-#' # Approche a priori
+#' # A priori approach (given R the original ratio)
 #' res <- estimer_proba_precision_statistique_df(test, fun, D, V)
 #'
-#' # Approche a posteriori
+#' # A posteriori approach (given R the perturbed ratio)
 #' res_ap <- estimer_proba_precision_statistique_df(test, fun, D, V, posterior = TRUE)
 #' @importFrom dplyr %>%
 #' @export
@@ -246,7 +246,7 @@ estimer_proba_precision_statistique_df <- function(
     as.data.frame()
 
   data_f <- unique(data)
-  print(paste0("Doublons supprimés: ", nrow(data) - nrow(data_f)))
+  message(paste0("Duplicates removed: ", nrow(data) - nrow(data_f)))
 
   names(data_f) <- c("num", "denom")
 
@@ -293,25 +293,25 @@ estimer_proba_precision_statistique_df <- function(
   return(res |> select(beta, A, B, R, proba))
 }
 
-
-#' Estime le beta minimal tel que P(|R-R'|>beta) < alpha, pour alpha fixé et
-#' pour un ratio R=A/B fourni en entrée.
+#' Estimate minimal precision threshold \eqn{\beta} for given error level α
+#'
+#' Finds minimal \eqn{\beta} where P(|R-R'|>\eqn{\beta}) < α for given α and CKM parameters.
 #'
 #' @inheritParams estimer_proba_precision_statistique
-#' @param beta_min integer, seuil de précision minimal
-#' @param beta_max integer, seuil de précision maximal
-#' @param precision double, niveau de précision de l'estimation de beta
-#' @param alpha double, niveau d'erreur fixé
+#' @param beta_min Numeric. Minimum of the search range for \eqn{\beta}
+#' @param beta_max Numeric. Maximum of the search range for \eqn{\beta}
+#' @param precision Numeric. Search step size
+#' @param alpha Numeric. Target error level
 #'
-#' @return numeric value
+#' @return Numeric. Minimal \eqn{\beta} value
+#' @export
+#'
 #' @details
-#' Si \code{posterior=FALSE}, le calcul repose sur l'approche a priori,
-#' c'est-à-dire que le ratio fourni (A/B) est le ratio réel/original.
-#' Sinon, le calcul repose sur l'approche a posteriori,
-#' c'est-à-dire que le ratio fourni (A/B) est le ratio issu de la perturbation
-#' par CKM.
-#'
-#' Le meilleur beta est recherché dans l'intervalle [beta_min; beta_max].
+#' If \code{posterior=FALSE}, the calculation is based on the a priori approach,
+#' that is, the provided ratio (A/B) is the original/real ratio.
+#' Otherwise, the calculation is based on the a posteriori approach,
+#' that is, the provided ratio (A/B) is the ratio resulting from CKM perturbation.
+#' The best beta is searched in the interval [beta_min; beta_max].
 #'
 #' @examples
 #' library(dplyr)
@@ -339,7 +339,6 @@ estimer_proba_precision_statistique_df <- function(
 #' @importFrom dplyr pull
 #' @importFrom dplyr filter
 #' @importFrom dplyr %>%
-#' @export
 estimer_beta <- function(
     A,
     B,
@@ -378,13 +377,13 @@ estimer_beta <- function(
 
   if (round(ecart - precision, 8) > 0) {
     if (proba_min <= alpha) {
-      #dans ce cas on atteint l'objectif avec le seuil min
+      # in this case, the objective is reached with the minimum threshold
       return(probas$beta[1])
     } else if (proba_max >= alpha) {
-      #dans ce cas on atteindra jamais l'objectif même avec seuil max
+      # in this case, the objective will never be reached even with the maximum threshold
       return(probas$beta[2])
     } else{
-      #cas général où le beta est entre les deux
+      # general case where beta is between the two
       proba_mid <- estimer_proba_precision_statistique(
         A,
         B,
@@ -441,64 +440,52 @@ estimer_beta <- function(
 }
 
 
-
-
-#' Estime le beta minimal tel que P(|R-R'|>beta) < alpha, pour alpha fixé et
-#' pour chacun des ratio R=A/B fournis dans le dataframe en entrée.
+#' Estimate Confidence Intervals for Ratios Using Beta Distribution
 #'
-
+#' This function computes confidence intervals for ratios using the beta distribution,
+#' for each unique pair of numerator and denominator in the provided data. It supports
+#' both sequential and parallel computation, and allows customization of the ratio function,
+#' confidence level, and beta estimation parameters.
 #'
-#' Détermine la meilleure précision qu'il est possible d'atteindre dans le cas
-#' du calcul d'un ratio. La fonction prend en entrée un dataframe et calcule
-#' la précision pour chacun des ratios du dataframe.
-#'
-#' Si posterior = FALSE: détermine beta0 pour alpha fixé
-#' Si posterior = TRUE: détermine beta0' pour alpha fixé
-#'
-#' @param data dataframe avec deux colonnes correspondant aux numérateurs et
-#' dénominateurs des ratios
+#' @param data A data frame or tibble with two columns: numerators and denominators.
 #' @inheritParams estimer_beta
-#' @param parallel Booléen, si le calcul doit être parallélisé
-#' @param max_cores, integer, nombre maximal de travaux à réaliser en parallèle
+#' @param parallel Logical. If \code{TRUE}, computations are performed in parallel using available CPU cores. Default is \code{FALSE}.
+#' @param max_cores Integer or \code{NULL}. Maximum number of CPU cores to use for parallel computation. If \code{NULL}, uses all but one core.
 #'
-#' @return data.frame avec les colonnes suivantes:
-#' - A = numérateur
-#' - B = dénominateur
-#' - R = ratio = A/B*100
-#' - alpha
-#' - beta = correspondant à beta0 si \code{posterior=FALSE} ou
-#' à beta0' si \code{posterior=TRUE}
+#' @return A tibble with columns:
+#'   \describe{
+#'     \item{A}{Numerator value}
+#'     \item{B}{Denominator value}
+#'     \item{R}{Computed ratio using \code{fun}}
+#'     \item{alpha}{Significance level used}
+#'     \item{beta}{Estimated confidence interval or beta parameter}
+#'   }
 #'
 #' @details
-#' Si \code{posterior=FALSE}, le calcul repose sur l'approche a priori,
-#' c'est-à-dire que le ratio fourni (A/B) est le ratio réel/original.
-#' Sinon, le calcul repose sur l'approche a posteriori,
-#' c'est-à-dire que le ratio fourni (A/B) est le ratio issu de la perturbation
-#' par CKM.
-#'
-#' Le meilleur beta est recherché dans l'intervalle [beta_min; beta_max].
+#' The function removes duplicate rows from the input data before computation.
+#' Parallel computation is handled via the \code{future} and \code{furrr} packages.
 #'
 #' @examples
+#' nums <- c(20, 80)
+#' denoms <- c(100, 200)
 #' test <- data.frame(
-#'   A = sort(rep(c(1,50,100),4)),
-#'   B = rep(c(100,200,300,500), 3)
+#'   A = sort(rep(nums,length(denoms))),
+#'   B = rep(denoms, each = length(nums))
 #' )
 #'
 #' fun = \(a,b){a/b * 100}
 #' D = 5
 #' V = 1
 #'
-#' # Approche a priori
-#' res <- estimer_beta_df(test, fun, D=5, V=1)
-#' # Approche a posteriori
+#' # A priori approach
+#' res <- estimer_beta_df(test, fun, D, V)
+#' # A posteriori approach
 #' res_ap <- estimer_beta_df(test, fun, D, V, posterior = TRUE)
-#' @importFrom future plan
-#' @importFrom future sequential
-#' @importFrom future availableCores
-#' @importFrom future multisession
+#'
+#' @importFrom future plan sequential multisession availableCores
 #' @importFrom furrr future_map2
-#' @importFrom purrr list_rbind
-#' @importFrom dplyr tibble
+#' @importFrom purrr map2 list_rbind
+#' @importFrom tibble tibble
 #' @export
 estimer_beta_df <- function(
     data,
@@ -519,7 +506,7 @@ estimer_beta_df <- function(
     as.data.frame()
 
   data_f <- unique(data)
-  print(paste0("Doublons supprimés: ", nrow(data) - nrow(data_f)))
+  print(paste0("Duplicates removed: ", nrow(data) - nrow(data_f)))
 
   names(data_f) <- c("num", "denom")
 

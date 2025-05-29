@@ -2,30 +2,27 @@
 % Please edit documentation in R/mesurer_risque.R
 \name{calculer_ensemble_deviation}
 \alias{calculer_ensemble_deviation}
-\title{Calcule l'ensemble de déviation d'une valeur originale i étant donnés les paramètres D et js
-de la matrice de transition}
+\title{Calculate deviation set for a given original value}
 \usage{
 calculer_ensemble_deviation(i, D, js = 0)
 }
 \arguments{
-\item{i}{valeur originale dont on souhaite calculer l'ensemble de déviation}
+\item{i}{integer. Original value for which to calculate the deviation set (must be non-negative)}
 
-\item{D}{la déviation de la CKM}
+\item{D}{integer. Deviation parameter of the CKM (must be strictly positive)}
 
-\item{js}{Maximum des valeurs interdites après perturbation}
+\item{js}{integer. Maximum forbidden value after perturbation (must be non-negative, default: 0)}
 }
 \value{
-vecteur des valeurs perturbées possibles si la valeur originale est i,
-calculé en fonction de D et js.
+integer vector. Vector of possible perturbed values if the original value is i
 }
 \description{
-Calcule l'ensemble de déviation d'une valeur originale i étant donnés les paramètres D et js
-de la matrice de transition
+Calculates the set of possible perturbed values for an original value i,
+given the CKM parameters D and js.
 }
 \examples{
-
-calculer_ensemble_deviation(1, 5) #attendu 0:6
-calculer_ensemble_deviation(1, 5, 2) #attendu c(0,3:6)
-calculer_ensemble_deviation(0, 5, 2) #attendu 0
-calculer_ensemble_deviation(5, 5, 2) #attendu c(0,3:10)
+calculer_ensemble_deviation(1, 5) # expected: 0:6
+calculer_ensemble_deviation(1, 5, 2) # expected: c(0,3:6)
+calculer_ensemble_deviation(0, 5, 2) # expected: 0
+calculer_ensemble_deviation(5, 5, 2) # expected: c(0,3:10)
 }

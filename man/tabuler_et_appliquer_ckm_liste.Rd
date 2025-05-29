@@ -2,7 +2,7 @@
 % Please edit documentation in R/tabuler_et_appliquer_ckm_sur_liste.R
 \name{tabuler_et_appliquer_ckm_liste}
 \alias{tabuler_et_appliquer_ckm_liste}
-\title{Cette fonction construit le tableau et applique la CKM.}
+\title{Build tables and apply Cell Key Method on a list}
 \usage{
 tabuler_et_appliquer_ckm_liste(
   df,
@@ -19,77 +19,81 @@ tabuler_et_appliquer_ckm_liste(
 )
 }
 \arguments{
-\item{df}{data.frame or data.table}
+\item{df}{data.frame. Input microdata}
 
-\item{rk_var}{(character) nom de la variable des clés individuelles}
+\item{rk_var}{Character. Individual key variable (NULL for no keys)}
 
-\item{desc_tab}{data.frame de 3 colonnes décrivant les tableaux à construire}
+\item{desc_tab}{data.frame. Table description with 3 columns (TAB, VAR, HRC)
+describing the tables to construct}
 
-\item{marge_label}{label of margins (applied to all cat and hrc variables)}
+\item{marge_label}{Character. Margin label (default: "Total")}
 
-\item{prefix}{character Préfixe à ajouter aux noms de tables fournis dans desc_tab}
+\item{prefix}{character. Prefix to add to table names provided in desc_tab (default: "tab")}
 
-\item{D}{Déviation (integer strictement positif)}
+\item{D}{integer. Deviation parameter (must be strictly positive)}
 
-\item{V}{Variance du bruit (numeric strictement positif)}
+\item{V}{numeric. Noise variance (must be strictly positive)}
 
-\item{js}{Seuil des valeurs interdites (integer). Si `js=0` (défaut), seule la
-valeur 0 sera interdite.}
+\item{js}{integer. Threshold for sensitive values (default: 0). If js=0, only value 0 will be forbidden}
 
-\item{I}{vecteur d'entiers (valeurs originales)}
+\item{I}{integer vector. Original values to consider}
 
-\item{J}{vecteur d'entiers (valeurs perturbées)}
+\item{J}{integer vector. Perturbed values to consider}
 
-\item{...}{Paramètres additionnels de la fonction `ptable::create_cnt_ptable`}
+\item{...}{Additional parameters passed to transition matrix creation}
 }
 \value{
-liste comprenant les éléments
-\itemize{
-\item \code{tab}: liste des tables (tibbles) construites sur chacune desquelles a été appliquée la CKM
-\item \code{ptab}: La matrice de transition qui a servi au calcul
-\item \code{risque}: Tibble regroupant l'ensemble des mesures de risque correspondant à chacune des tables
-\item \code{utilite}: Tibble regroupant l'ensemble des mesures d'utilité correspondant à chacune des tables
-}
+A list containing:
+  \itemize{
+    \item tab: list of tables (tibbles) with CKM applied to each
+    \item ptab: transition matrix used for calculations
+    \item risque: tibble with risk measures for each table
+    \item utilite: tibble with utility measures for each table
+  }
 }
 \description{
-Cette fonction construit le tableau et applique la CKM.
+This function constructs multiple tables from microdata and applies the Cell Key Method
+to each table based on a description data frame specifying the table structure.
 }
 \details{
-Le data.frame à fournir dans l'argument \code{desc_tab} doit être constitué de telle façon que:
-\enumerate{
-\item Le data.frame doit contenir les 3 colonnes suivantes:
-}
+The desc_tab data frame must have the following structure:
 \itemize{
-\item \code{TAB}: Nom ou numéro de la table
-\item \code{VAR}: Nom d'une variable de la table
-\item \code{HRC}: Si la variable a une relation hiérarchique avec une autre des variables de la table
-mentionner un nom pour cette hiérarchie. Sinon, \code{NA}
+  \item TAB: Table name or number
+  \item VAR: Variable name for the table
+  \item HRC: Hierarchy name if the variable has hierarchical relationship, NA otherwise
 }
-\enumerate{
-\item Une ligne correspond à une variable d'une table donnée
-\item Deux variables (ex: REGION et DEPARTEMENT) d'une même table ayant une relation hiérarchique
-doivent recevoir la même valeur dans la colonne \code{HRC}. Ces variables
-doivent être renseignées dans l'ordre décroissant de la hiérarchie,
-cad du niveau le plus large (ex: REGION) au niveau le plus fin (ex: DEPARTEMENT).
-}
+Variables with hierarchical relationships should be listed in decreasing order
+of hierarchy (from broadest to finest level).
 
-Voir la partie exemple pour une illustration.
+Le data.frame à fournir dans l'argument \code{desc_tab} doit être constitué de telle façon que:
+
+1) Le data.frame doit contenir les 3 colonnes suivantes:
+  * \code{TAB}: Nom ou numéro de la table
+  * \code{VAR}: Nom d'une variable de la table
+  * \code{HRC}: Si la variable a une relation hiérarchique avec une autre des variables de la table
+ mentionner un nom pour cette hiérarchie. Sinon, \code{NA}
+
+2) Une ligne correspond à une variable d'une table donnée
+
+3) Deux variables (ex: REGION et DEPARTEMENT) d'une même table ayant une relation hiérarchique
+ doivent recevoir la même valeur dans la colonne \code{HRC}. Ces variables
+ doivent être renseignées dans l'ordre décroissant de la hiérarchie,
+ cad du niveau le plus large (ex: REGION) au niveau le plus fin (ex: DEPARTEMENT).
 }
 \examples{
+\dontrun{
 data("dtest")
 set.seed(123)
 dtest_avec_cles <- construire_cles_indiv(dtest)
 
-# On se base sur deux tableaux:
+# Define two tables:
 # tab1: DIPLOME * SEXE * AGE
-# tab1: DIPLOME * TYPE * REG * DEP, où REG > DEP
-
+# tab2: DIPLOME * TYPE * REG * DEP, where REG > DEP
 desc_tableaux <- data.frame(
   TAB = c(rep(1,3), rep(2,4)),
   VAR = c("DIPLOME", "SEXE", "AGE", "DIPLOME", "TYPE", "REG", "DEP"),
   HRC = c(rep(NA, 5), rep("GEO",2))
 )
-desc_tableaux
 
 res_ckm <- tabuler_et_appliquer_ckm_liste(
   df = dtest_avec_cles,
@@ -97,4 +101,6 @@ res_ckm <- tabuler_et_appliquer_ckm_liste(
   marge_label = "Total",
   D = 10, V = 15, js = 4
 )
+}
+
 }

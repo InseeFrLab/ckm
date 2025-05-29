@@ -1,23 +1,66 @@
-#' Convertit un tableau de description en listes de variables
+#' Convert table description to variable lists
 #'
-#' @inheritParams tabuler_et_appliquer_ckm_liste
+#' This function converts a table description data frame into lists of
+#' categorical and hierarchical variables for multiple tables.
 #'
-#' @return listes
-#' @importFrom dplyr pull
-#' @importFrom dplyr filter
-#' @importFrom stats setNames
+#' @param desc_tab data.frame. Table description with columns TAB, VAR, and HRC
+#' @param prefix character. Prefix to add to table names provided in desc_tab (default: "tab")
+#'
+#' @return A list containing:
+#'   \itemize{
+#'     \item tableaux: vector of table names
+#'     \item list_cat_vars: list of categorical variables for each table
+#'     \item list_hrc_vars: list of hierarchical variables for each table
+#'   }
+#'
 #' @export
 #'
 #' @examples
-#' # example code
-#'
+#' # Create example table description
 #' desc_tableaux <- data.frame(
 #'   TAB = c(rep(1,3), rep(2,4)),
 #'   VAR = c("DIPLOME", "SEXE", "AGE", "DIPLOME", "TYPE", "REG", "DEP"),
 #'   HRC = c(rep(NA, 5), rep("GEO",2))
 #' )
 #' convertir_desc_table_en_liste(desc_tableaux)
+#'
+#' @importFrom dplyr pull
+#' @importFrom dplyr filter
+#' @importFrom stats setNames
 convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
+
+  assertthat::assert_that(
+    is.data.frame(desc_tab),
+    msg = "The description table must be a data frame."
+  )
+  assertthat::assert_that(
+    all(c("TAB", "VAR", "HRC") %in% names(desc_tab)),
+    msg = "The description table must contain the columns: TAB, VAR, and HRC."
+  )
+  assertthat::assert_that(
+    is.character(prefix) && length(prefix) == 1,
+    msg = "The prefix must be a single character string."
+  )
+  assertthat::assert_that(
+    !is.null(desc_tab$TAB) && !is.null(desc_tab$VAR),
+    msg = "The description table must have non-null TAB and VAR columns."
+  )
+  assertthat::assert_that(
+    is.null(desc_tab$HRC) || is.character(desc_tab$HRC),
+    msg = "The HRC column must be character or NULL."
+  )
+  assertthat::assert_that(
+    !any(is.na(desc_tab$TAB)),
+    msg = "The TAB column must not contain NA values."
+  )
+  assertthat::assert_that(
+    !any(is.na(desc_tab$VAR)),
+    msg = "The VAR column must not contain NA values."
+  )
+  assertthat::assert_that(
+    !any(duplicated(desc_tab[, c("TAB", "VAR")])),
+    msg = "The combination of TAB and VAR must be unique in the description table."
+  )
 
   df_cat_vars <- desc_tab |>
     filter(is.na(HRC))
@@ -70,19 +113,34 @@ convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
   )
 }
 
-#' Cette fonction construit le tableau et applique la CKM.
+#' Build tables and apply Cell Key Method on a list
+#'
+#' This function constructs multiple tables from microdata and applies the Cell Key Method
+#' to each table based on a description data frame specifying the table structure.
 #'
 #' @inheritParams tabuler_et_appliquer_ckm
-#' @param desc_tab data.frame de 3 colonnes décrivant les tableaux à construire
-#' @param prefix character Préfixe à ajouter aux noms de tables fournis dans desc_tab
+#' @param desc_tab data.frame. Table description with 3 columns (TAB, VAR, HRC)
+#'   describing the tables to construct
+#' @param prefix character. Prefix to add to table names provided in desc_tab (default: "tab")
 #'
-#' @return liste comprenant les éléments
-#' * \code{tab}: liste des tables (tibbles) construites sur chacune desquelles a été appliquée la CKM
-#' * \code{ptab}: La matrice de transition qui a servi au calcul
-#' * \code{risque}: Tibble regroupant l'ensemble des mesures de risque correspondant à chacune des tables
-#' * \code{utilite}: Tibble regroupant l'ensemble des mesures d'utilité correspondant à chacune des tables
+#' @return A list containing:
+#'   \itemize{
+#'     \item tab: list of tables (tibbles) with CKM applied to each
+#'     \item ptab: transition matrix used for calculations
+#'     \item risque: tibble with risk measures for each table
+#'     \item utilite: tibble with utility measures for each table
+#'   }
 #'
 #' @details
+#' The desc_tab data frame must have the following structure:
+#' \itemize{
+#'   \item TAB: Table name or number
+#'   \item VAR: Variable name for the table
+#'   \item HRC: Hierarchy name if the variable has hierarchical relationship, NA otherwise
+#' }
+#' Variables with hierarchical relationships should be listed in decreasing order
+#' of hierarchy (from broadest to finest level).
+#'
 #' Le data.frame à fournir dans l'argument \code{desc_tab} doit être constitué de telle façon que:
 #'
 #' 1) Le data.frame doit contenir les 3 colonnes suivantes:
@@ -98,26 +156,22 @@ convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
 #'  doivent être renseignées dans l'ordre décroissant de la hiérarchie,
 #'  cad du niveau le plus large (ex: REGION) au niveau le plus fin (ex: DEPARTEMENT).
 #'
-#' Voir la partie exemple pour une illustration.
-#' @md
-#'
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' data("dtest")
 #' set.seed(123)
 #' dtest_avec_cles <- construire_cles_indiv(dtest)
 #'
-#' # On se base sur deux tableaux:
+#' # Define two tables:
 #' # tab1: DIPLOME * SEXE * AGE
-#' # tab1: DIPLOME * TYPE * REG * DEP, où REG > DEP
-#'
+#' # tab2: DIPLOME * TYPE * REG * DEP, where REG > DEP
 #' desc_tableaux <- data.frame(
 #'   TAB = c(rep(1,3), rep(2,4)),
 #'   VAR = c("DIPLOME", "SEXE", "AGE", "DIPLOME", "TYPE", "REG", "DEP"),
 #'   HRC = c(rep(NA, 5), rep("GEO",2))
 #' )
-#' desc_tableaux
 #'
 #' res_ckm <- tabuler_et_appliquer_ckm_liste(
 #'   df = dtest_avec_cles,
@@ -125,6 +179,8 @@ convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
 #'   marge_label = "Total",
 #'   D = 10, V = 15, js = 4
 #' )
+#' }
+#'
 #' @importFrom purrr imap
 tabuler_et_appliquer_ckm_liste <- function(
     df,
@@ -139,12 +195,30 @@ tabuler_et_appliquer_ckm_liste <- function(
     J = NULL,
     ...){
 
+  # Check inputs
   assertthat::assert_that(
-    (!is.null(rk_var) && rk_var %in% names(df)),
-    msg = "La clé individuelle est absente de vos données."
+    is.data.frame(desc_tab),
+    msg = "The description table must be a data frame."
   )
-
+  assertthat::assert_that(
+    is.character(prefix) && length(prefix) == 1,
+    msg = "The prefix must be a single character string."
+  )
   listes_tab_vars <- convertir_desc_table_en_liste(desc_tab, prefix)
+
+  check_inputs_tabulate(
+    df = df,
+    rk_var = rk_var,
+    cat_vars = NULL,  # Not used here, handled in desc_tab
+    hrc_vars = NULL,  # Not used here, handled in desc_tab
+    num_var = NULL,   # Not used here
+    marge_label = marge_label,
+    D = D,
+    V = V,
+    js = js,
+    I = I,
+    J = J
+  )
 
   args_add <- c(...)
   args_trans <- if(length(args_add) == 0){
@@ -161,7 +235,7 @@ tabuler_et_appliquer_ckm_liste <- function(
     listes_tab_vars$tableaux,
     \(tableau){
 
-      cat("---- Traitement de ", tableau, "  ----- \n")
+      cat("---- Treatment of ", tableau, " ----- \n")
       cat_vars <- if(tableau %in% names(listes_tab_vars$list_cat_vars)) listes_tab_vars$list_cat_vars[[tableau]] else NULL
       hrc_vars <- if(tableau %in% names(listes_tab_vars$list_hrc_vars)) listes_tab_vars$list_hrc_vars[[tableau]] else NULL
 

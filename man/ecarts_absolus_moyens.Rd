@@ -2,20 +2,20 @@
 % Please edit documentation in R/mesurer_utilite.R
 \name{ecarts_absolus_moyens}
 \alias{ecarts_absolus_moyens}
-\title{Ecarts absolus moyens}
+\title{Mean absolute deviations}
 \usage{
 ecarts_absolus_moyens(o, p)
 }
 \arguments{
-\item{o}{vecteur des valeurs originales}
+\item{o}{numeric vector. Original values}
 
-\item{p}{vecteur des valeurs perturbées}
+\item{p}{numeric vector. Perturbed values}
 }
 \value{
-numeric
+numeric. Mean absolute deviation
 }
 \description{
-Ecarts absolus moyens
+Calculates the mean absolute deviations between original and perturbed values.
 }
 \examples{
 ecarts_absolus_moyens(1:100, 11:110)

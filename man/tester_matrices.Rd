@@ -2,32 +2,32 @@
 % Please edit documentation in R/tester_matrices.R
 \name{tester_matrices}
 \alias{tester_matrices}
-\title{Teste la construction des matrices de
-transition pour différentes valeurs de variance à D et js fixés}
+\title{Test transition matrix construction for different variance values}
 \usage{
 tester_matrices(D, js = 0, Vmin = 0, Vmax = 30, precision = 1)
 }
 \arguments{
-\item{D}{\code{integer} déviation}
+\item{D}{integer. Deviation parameter (must be strictly positive)}
 
-\item{js}{\code{integer} seuil des valeurs sensibles}
+\item{js}{integer. Threshold for sensitive values (default: 0). If js=0, only value 0 will be forbidden}
 
-\item{Vmin}{\code{numeric} Variance minimum à tester}
+\item{Vmin}{numeric. Minimum variance value to test (default: 0)}
 
-\item{Vmax}{\code{numeric} Variance maximum à tester}
+\item{Vmax}{numeric. Maximum variance value to test (default: 30)}
 
-\item{precision}{\code{numeric} Précision}
+\item{precision}{numeric. Precision for the binary search algorithm (default: 1)}
 }
 \value{
-\code{NULL} si aucune solution n'existe dans l'intervalle demandé
-\code{numeric} Valeur de la variance qui rend la matrice constructible
+NULL if no solution exists in the requested interval, 
+  or numeric value of the variance that makes the matrix constructible
 }
 \description{
-Teste la construction des matrices de
-transition pour différentes valeurs de variance à D et js fixés
+This function tests whether transition matrices can be constructed for 
+different variance values, given fixed deviation (D) and sensitive threshold (js) parameters.
+It uses binary search to find the minimum variance value that allows matrix construction.
 }
 \examples{
+# Test with basic parameters
 tester_matrices(5, 1)
-tester_matrices(10, js = 9)
-tester_matrices(10, js = 9, Vmin=25, Vmax=30, precision=0.5)
+
 }
