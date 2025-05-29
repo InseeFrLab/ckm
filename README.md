@@ -96,5 +96,3 @@ res_ckm <- tabuler_et_appliquer_ckm(
 )
 str(res_ckm$tab)                   
 ```
-
-
