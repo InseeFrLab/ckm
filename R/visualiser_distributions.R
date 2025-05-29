@@ -4,7 +4,7 @@
 #' resulting from different parameter combinations of the Cell Key Method.
 #' It generates bar plots showing the probability mass function for each scenario.
 #'
-#' @inheritParams creer_matrice_transition
+#' @inheritParams create_transition_matrix
 #' @param DV data.frame. Alternative way to specify D and V parameters as a data frame
 #'   with columns "D" and "V". If provided, D and V parameters are ignored
 #' @param precision integer. Precision level for probability calculations (default: 5)
@@ -16,12 +16,12 @@
 #'
 #' @examples
 #' # Using separate D and V vectors
-#' visualiser_distribution(D = c(11, 15), V = c(10, 30))
+#' visualize_distribution(D = c(11, 15), V = c(10, 30))
 #'
 #' \dontrun{
 #' # Using a data frame
 #' params_df <- data.frame(D = c(11, 15), V = c(10, 30))
-#' visualiser_distribution(DV = params_df)
+#' visualize_distribution(DV = params_df)
 #' }
 #' @import ggplot2
 #' @importFrom cowplot plot_grid
@@ -30,7 +30,7 @@
 #' @importFrom purrr list_c
 #' @importFrom dplyr mutate
 #' @importFrom dplyr arrange
-visualiser_distribution <- function(D=NULL, V=NULL, DV=NULL, precision=5){
+visualize_distribution <- function(D=NULL, V=NULL, DV=NULL, precision=5){
 
   # Validate parameters
   assertthat::assert_that(
@@ -88,7 +88,7 @@ visualiser_distribution <- function(D=NULL, V=NULL, DV=NULL, precision=5){
   pmat_list <- pmap(
     parametres,
     \(D, V){
-      mat <- creer_matrice_transition(D, V, js = 0)
+      mat <- create_transition_matrix(D, V, js = 0)
       mat_extract <- mat@pTable %>% filter(i == max(i)) %>%
         select(i,v,p)
     }

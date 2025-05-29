@@ -1,11 +1,11 @@
 #' Calculate empirical frequencies from aggregated table
 #'
 #' Calculates empirical frequencies of counts from an aggregated table
-#' constructed with tabulate_cnt_micro_data, appliquer_ckm,
-#' or tabuler_et_appliquer_ckm functions.
+#' constructed with tabulate_cnt_micro_data, apply_ckm,
+#' or tabulate_and_apply_ckm functions.
 #'
 #' @param tableau data.frame. Table generated with tabulate_cnt_micro_data,
-#'   appliquer_ckm, or tabuler_et_appliquer_ckm functions
+#'   apply_ckm, or tabulate_and_apply_ckm functions
 #' @inheritParams tabulate_cnt_micro_data
 #'
 #' @return data.frame with 3 columns:
@@ -31,7 +31,7 @@
 #'   cat_vars = cat_vars1,
 #'   marge_label = "Total"
 #' )
-#' p_hat1 <- calculer_frequences_empiriques(tab_comptage1, cat_vars1, hrc_vars1)
+#' p_hat1 <- compute_frequencies(tab_comptage1, cat_vars1, hrc_vars1)
 #'
 #' # With hierarchical variables:
 #' cat_vars2 = c("DIPLOME", "SEXE", "AGE")
@@ -42,7 +42,7 @@
 #'   hrc_vars = hrc_vars2,
 #'   marge_label = "Total"
 #' )
-#' p_hat2 <- calculer_frequences_empiriques(tab_comptage2, cat_vars2, hrc_vars2)
+#' p_hat2 <- compute_frequencies(tab_comptage2, cat_vars2, hrc_vars2)
 #' }
 #'
 #' @importFrom dplyr all_of
@@ -55,7 +55,7 @@
 #' @importFrom dplyr rename
 #' @importFrom dplyr count
 #' @importFrom purrr map
-calculer_frequences_empiriques <- function(tableau, cat_vars, hrc_vars){
+compute_frequencies <- function(tableau, cat_vars, hrc_vars){
 
   cnt_var <- "nb_obs"
 
@@ -116,11 +116,11 @@ calculer_frequences_empiriques <- function(tableau, cat_vars, hrc_vars){
 #' @export
 #'
 #' @examples
-#' calculer_ensemble_deviation(1, 5) # expected: 0:6
-#' calculer_ensemble_deviation(1, 5, 2) # expected: c(0,3:6)
-#' calculer_ensemble_deviation(0, 5, 2) # expected: 0
-#' calculer_ensemble_deviation(5, 5, 2) # expected: c(0,3:10)
-calculer_ensemble_deviation <- function(i, D, js = 0){
+#' get_deviation_set(1, 5) # expected: 0:6
+#' get_deviation_set(1, 5, 2) # expected: c(0,3:6)
+#' get_deviation_set(0, 5, 2) # expected: 0
+#' get_deviation_set(5, 5, 2) # expected: c(0,3:10)
+get_deviation_set <- function(i, D, js = 0){
 
   if(D <= 0) stop("D must be strictly positive")
   if(js < 0) stop("js must be non-negative")
@@ -154,11 +154,11 @@ calculer_ensemble_deviation <- function(i, D, js = 0){
 #' @export
 #'
 #' @examples
-#' calculer_ensemble_possibles(1, 5) # expected: 1:6
-#' calculer_ensemble_possibles(1, 5, 2) # expected: NULL
-#' calculer_ensemble_possibles(0, 5, 2) # expected: 0:5
-#' calculer_ensemble_possibles(5, 5, 2) # expected: 1:10
-calculer_ensemble_possibles <- function(j, D, js = 0){
+#' get_possibles_set(1, 5) # expected: 1:6
+#' get_possibles_set(1, 5, 2) # expected: NULL
+#' get_possibles_set(0, 5, 2) # expected: 0:5
+#' get_possibles_set(5, 5, 2) # expected: 1:10
+get_possibles_set <- function(j, D, js = 0){
 
   if(D <= 0) stop("D must be strictly positive")
   if(js < 0) stop("js must be non-negative")
@@ -182,8 +182,8 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 #' Calculates probabilities P(X=i|X'=j) where X denotes the original value
 #' and X' the perturbed value, providing risk measures for statistical disclosure control.
 #'
-#' @param matrice_transition ptable object. Object returned by creer_matrice_transition
-#' @param freq data.frame. Object returned by calculer_frequences_empiriques
+#' @param matrice_transition ptable object. Object returned by create_transition_matrix
+#' @param freq data.frame. Object returned by compute_frequencies
 #' @param I integer vector. Original values to consider
 #' @param J integer vector. Perturbed values to consider
 #'
@@ -202,7 +202,7 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 #' \dontrun{
 #' library(ptable)
 #' library(dplyr)
-#' mat_trans <- creer_matrice_transition(D = 5, V = 2)
+#' mat_trans <- create_transition_matrix(D = 5, V = 2)
 #' data("dtest")
 #'
 #' tab_comptage <- tabulate_cnt_micro_data(
@@ -213,15 +213,15 @@ calculer_ensemble_possibles <- function(j, D, js = 0){
 #' )
 #'
 #' # Calculate inverse transition probabilities P(X=i|X'=1) with i in 1:4
-#' mesurer_risque(mat_trans, tab_comptage$freq, 1:4, 1)
+#' assess_risk(mat_trans, tab_comptage$freq, 1:4, 1)
 #'
 #' # Calculate for multiple i and j values
-#' mesurer_risque(mat_trans, tab_comptage$freq, 1:4, 1:4)
+#' assess_risk(mat_trans, tab_comptage$freq, 1:4, 1:4)
 #' }
 #'
 #' @importFrom dplyr bind_rows
 #' @importFrom methods is
-mesurer_risque <- function(matrice_transition, freq, I, J){
+assess_risk <- function(matrice_transition, freq, I, J){
 
   # Validate parameters
   assertthat::assert_that(
@@ -312,7 +312,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
 
   calculer_qij <- function(tab,i,j){
 
-    Dposs_j <- calculer_ensemble_possibles(j,D,js)
+    Dposs_j <- get_possibles_set(j,D,js)
 
     if(! i %in% Dposs_j) return(0)
     pi <- tab[X == i, p_hat][1]
@@ -364,7 +364,7 @@ mesurer_risque <- function(matrice_transition, freq, I, J){
   calculer_qJ <- function(tab, J){
     qJ <- 0
     for(j in J){
-      Dposs_j <- calculer_ensemble_possibles(j,D,js)
+      Dposs_j <- get_possibles_set(j,D,js)
       qJ <- qJ + calculer_qj(tab, j, Dposs_j)
     }
     return(qJ)

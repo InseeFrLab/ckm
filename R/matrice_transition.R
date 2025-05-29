@@ -15,10 +15,10 @@
 #' @examples
 #' \dontrun{
 #' library(ptable)
-#' mat_trans <- creer_matrice_transition(D = 5, V = 2)
+#' mat_trans <- create_transition_matrix(D = 5, V = 2)
 #' plot(mat_trans, type="d") |> print()
 #' }
-creer_matrice_transition <- function(D, V, js = 0, ...) {
+create_transition_matrix <- function(D, V, js = 0, ...) {
 
   # Validate parameters
   assertthat::assert_that(
@@ -37,7 +37,7 @@ creer_matrice_transition <- function(D, V, js = 0, ...) {
     length(D) == 1 && length(V) == 1 && length(js) == 1,
     msg = "D, V, and js must be single numeric values."
   )
-  
+
   tryCatch(
     expr = {
       # Create the transition matrix using the specified parameters
@@ -61,7 +61,7 @@ creer_matrice_transition <- function(D, V, js = 0, ...) {
 #' Prepares a perturbation lookup table from a transition matrix object
 #' for efficient application of the Cell Key Method.
 #'
-#' @param matrice_transition ptable object. Object created by creer_matrice_transition()
+#' @param matrice_transition ptable object. Object created by create_transition_matrix()
 #'
 #' @return data.table containing the perturbation table with columns i, v, p_int_lb, p_int_ub
 #'
@@ -69,7 +69,7 @@ creer_matrice_transition <- function(D, V, js = 0, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' mat_trans <- creer_matrice_transition(D = 5, V = 2)
+#' mat_trans <- create_transition_matrix(D = 5, V = 2)
 #' tab_pert <- creer_table_perturbation(mat_trans)
 #' }
 creer_table_perturbation <- function(matrice_transition){

@@ -19,10 +19,10 @@
 #'   as.data.frame()
 #'
 #' # Alpha value for the original statistic = 10/15 and different beta values
-#' estimer_proba_precision_statistique(A=10,B=15,D = 15, V = 30.1, js = 0, ptab = ptab)
+#' estimate_proba_precision_statistic(A=10,B=15,D = 15, V = 30.1, js = 0, ptab = ptab)
 #'
 #' # Alpha value for the perturbed statistic = 10/15 and different beta' values
-#' estimer_proba_precision_statistique(
+#' estimate_proba_precision_statistic(
 #'   A=10,B=15,
 #'   D = 15, V = 30.1, js = 0,
 #'   ptab = ptab,
@@ -30,7 +30,7 @@
 #' )
 #'
 #' # For a ratio evolution
-#' estimer_proba_precision_statistique(
+#' estimate_proba_precision_statistic(
 #'   A=10,B=15,
 #'   fun = \(a,b){(b/a - 1)*100},
 #'   D = 15, V = 30.1, js = 0,
@@ -45,7 +45,7 @@
 #' @importFrom dplyr arrange
 #' @importFrom dplyr tibble
 #' @importFrom assertthat assert_that
-estimer_proba_precision_statistique <- function(
+estimate_proba_precision_statistic <- function(
     A,
     B,
     fun = function(a,b){a/b*100},
@@ -195,7 +195,7 @@ estimer_proba_precision_statistique <- function(
 #' @param data data.frame with two columns corresponding to the numerators
 #' and denominators of the ratios
 #' de chaque ratio
-#' @inheritParams estimer_proba_precision_statistique
+#' @inheritParams estimate_proba_precision_statistic
 #' @param parallel Boolean, whether the calculation should be parallelized
 #' @param max_cores, integer, maximum number of jobs to run in parallel
 #'
@@ -224,13 +224,13 @@ estimer_proba_precision_statistique <- function(
 #' js = 4
 #'
 #' # A priori approach (given R the original ratio)
-#' res <- estimer_proba_precision_statistique_df(test, fun, D, V)
+#' res <- estimate_proba_precision_statistic_df(test, fun, D, V)
 #'
 #' # A posteriori approach (given R the perturbed ratio)
-#' res_ap <- estimer_proba_precision_statistique_df(test, fun, D, V, posterior = TRUE)
+#' res_ap <- estimate_proba_precision_statistic_df(test, fun, D, V, posterior = TRUE)
 #' @importFrom dplyr %>%
 #' @export
-estimer_proba_precision_statistique_df <- function(
+estimate_proba_precision_statistic_df <- function(
     data,
     fun = function(a,b){a/b*100},
     D,
@@ -266,7 +266,7 @@ estimer_proba_precision_statistique_df <- function(
     res <- furrr::future_map2(
       data_f$num,
       data_f$denom,
-      \(n, d) estimer_proba_precision_statistique(
+      \(n, d) estimate_proba_precision_statistic(
         n, d, fun, D, V, js, ptab, betas, posterior
       ) |>
         mutate(A = n, B = d, R = fun(n,d)), #n / d * 100),
@@ -280,7 +280,7 @@ estimer_proba_precision_statistique_df <- function(
     res <- purrr::map2(
       data_f$num,
       data_f$denom,
-      \(n, d) estimer_proba_precision_statistique(
+      \(n, d) estimate_proba_precision_statistic(
         n, d, fun, D, V, js, ptab, betas, posterior
       ) |>
         mutate(A = n, B = d, R = fun(n,d)), #n / d * 100),
@@ -297,7 +297,7 @@ estimer_proba_precision_statistique_df <- function(
 #'
 #' Finds minimal \eqn{\beta} where P(|R-R'|>\eqn{\beta}) < α for given α and CKM parameters.
 #'
-#' @inheritParams estimer_proba_precision_statistique
+#' @inheritParams estimate_proba_precision_statistic
 #' @param beta_min Numeric. Minimum of the search range for \eqn{\beta}
 #' @param beta_max Numeric. Maximum of the search range for \eqn{\beta}
 #' @param precision Numeric. Search step size
@@ -317,12 +317,12 @@ estimer_proba_precision_statistique_df <- function(
 #' library(dplyr)
 #' ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
 #'   as.data.frame()
-#' r1 <- estimer_proba_precision_statistique(
+#' r1 <- estimate_proba_precision_statistic(
 #'   A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab, betas = seq(0,10,0.1)
 #' )
 #' r1 |> filter(proba <= 0.05) |> head(1) |> pull(beta)
-#' estimer_beta(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab)
-#' r2 <- estimer_proba_precision_statistique(
+#' estimate_beta(A=100,B=1500,D = 15, V = 30.1, js = 0, ptab = ptab)
+#' r2 <- estimate_proba_precision_statistic(
 #'   A=100,B=1500,
 #'   D = 15, V = 30.1, js = 0,
 #'   ptab = ptab,
@@ -330,7 +330,7 @@ estimer_proba_precision_statistique_df <- function(
 #'   posterior = TRUE
 #' )
 #' r2 |> filter(proba <= 0.05) |> head(1) |> pull(beta)
-#' estimer_beta(
+#' estimate_beta(
 #'   A=100,B=1500,
 #'   D = 15, V = 30.1, js = 0,
 #'   ptab = ptab,
@@ -339,7 +339,7 @@ estimer_proba_precision_statistique_df <- function(
 #' @importFrom dplyr pull
 #' @importFrom dplyr filter
 #' @importFrom dplyr %>%
-estimer_beta <- function(
+estimate_beta <- function(
     A,
     B,
     fun = function(a,b){a/b*100},
@@ -360,7 +360,7 @@ estimer_beta <- function(
   smax = betas[ns]
   smid = betas[ifelse(ns %% 2 == 0, ns / 2, (ns + 1) / 2)]
 
-  probas <- estimer_proba_precision_statistique(
+  probas <- estimate_proba_precision_statistic(
     A,
     B,
     fun,
@@ -384,7 +384,7 @@ estimer_beta <- function(
       return(probas$beta[2])
     } else{
       # general case where beta is between the two
-      proba_mid <- estimer_proba_precision_statistique(
+      proba_mid <- estimate_proba_precision_statistic(
         A,
         B,
         fun,
@@ -399,7 +399,7 @@ estimer_beta <- function(
         pull(proba)
       if (proba_mid > alpha) {
         return(
-          estimer_beta(
+          estimate_beta(
             A,
             B,
             fun,
@@ -416,7 +416,7 @@ estimer_beta <- function(
         )
       } else{
         return(
-          estimer_beta(
+          estimate_beta(
             A,
             B,
             fun,
@@ -448,7 +448,7 @@ estimer_beta <- function(
 #' confidence level, and beta estimation parameters.
 #'
 #' @param data A data frame or tibble with two columns: numerators and denominators.
-#' @inheritParams estimer_beta
+#' @inheritParams estimate_beta
 #' @param parallel Logical. If \code{TRUE}, computations are performed in parallel using available CPU cores. Default is \code{FALSE}.
 #' @param max_cores Integer or \code{NULL}. Maximum number of CPU cores to use for parallel computation. If \code{NULL}, uses all but one core.
 #'
@@ -478,16 +478,16 @@ estimer_beta <- function(
 #' V = 1
 #'
 #' # A priori approach
-#' res <- estimer_beta_df(test, fun, D, V)
+#' res <- estimate_beta_df(test, fun, D, V)
 #' # A posteriori approach
-#' res_ap <- estimer_beta_df(test, fun, D, V, posterior = TRUE)
+#' res_ap <- estimate_beta_df(test, fun, D, V, posterior = TRUE)
 #'
 #' @importFrom future plan sequential multisession availableCores
 #' @importFrom furrr future_map2
 #' @importFrom purrr map2 list_rbind
 #' @importFrom tibble tibble
 #' @export
-estimer_beta_df <- function(
+estimate_beta_df <- function(
     data,
     fun = function(a,b){a/b*100},
     D,
@@ -531,7 +531,7 @@ estimer_beta_df <- function(
         B = d,
         R = fun(n,d), # n / d * 100,
         alpha = alpha,
-        beta = estimer_beta(
+        beta = estimate_beta(
           n,
           d,
           fun,
@@ -560,7 +560,7 @@ estimer_beta_df <- function(
         B = d,
         R = fun(n,d), # n / d * 100,
         alpha = alpha,
-        beta = estimer_beta(
+        beta = estimate_beta(
           n,
           d,
           fun,

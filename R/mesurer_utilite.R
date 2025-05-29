@@ -53,7 +53,7 @@ check_inputs <- function(o, p) {
     stop("After filtering null original values, original and perturbed vectors must not be empty.")
   }
 
-  return(c(o,p))
+  return(list(o=o,p=p))
 
 }
 
@@ -76,8 +76,8 @@ distance_hellinger <- function(o, p){
   # Check inputs
   inp <- check_inputs(o, p)
 
-  o <- inp[1] / sum(inp[1])
-  p <- inp[2] / sum(inp[2])
+  o <- inp$o / sum(inp$o)
+  p <- inp$p / sum(inp$p)
   # normalize the vectors to sum to 1
   # to avoid division by zero in the Hellinger distance formula
   # the Hellinger distance is defined for probability distributions
@@ -98,13 +98,13 @@ distance_hellinger <- function(o, p){
 #' @export
 #'
 #' @examples
-#' ecarts_absolus_moyens(1:100, 11:110)
-ecarts_absolus_moyens <- function(o, p){
+#' mean_absolute_deviation(1:100, 11:110)
+mean_absolute_deviation <- function(o, p){
 
   # Check inputs
   inp <- check_inputs(o, p)
-  o <- inp[1]
-  p <- inp[2]
+  o <- inp$o
+  p <- inp$p
 
   mean( abs( o - p ) )
 
@@ -123,13 +123,13 @@ ecarts_absolus_moyens <- function(o, p){
 #' @export
 #'
 #' @examples
-#' ecarts_absolus_moyens_relatifs(1:100, 11:110)
-ecarts_absolus_moyens_relatifs <- function(o, p){
+#' mean_relative_absolute_deviation(1:100, 11:110)
+mean_relative_absolute_deviation <- function(o, p){
 
   # Check inputs
   inp <- check_inputs(o, p)
-  o <- inp[1]
-  p <- inp[2]
+  o <- inp$o
+  p <- inp$p
 
   mean(abs(o - p) / o) * 100
 
@@ -153,8 +153,8 @@ distance_euclid <- function(o, p){
 
   # Check inputs
   inp <- check_inputs(o, p)
-  o <- inp[1]
-  p <- inp[2]
+  o <- inp$o
+  p <- inp$p
 
   sqrt(sum((o - p)^2))
 
@@ -178,8 +178,8 @@ distance_manhattan <- function(o, p){
 
   # Check inputs
   inp <- check_inputs(o, p)
-  o <- inp[1]
-  p <- inp[2]
+  o <- inp$o
+  p <- inp$p
 
   sum(abs(o - p))
 

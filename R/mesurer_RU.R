@@ -44,7 +44,7 @@ check_inputs_RU <- function(df, cat_vars, hrc_vars, D, V, js, confident, gv, pv)
 #' from a table, using one randomly generated set of record keys.
 #'
 #' @inheritParams tabulate_cnt_micro_data
-#' @inheritParams appliquer_ckm
+#' @inheritParams apply_ckm
 #' @param confident integer. Official confidentiality threshold
 #' @param gv integer. Threshold defining large counts (default: 50)
 #' @param pv integer. Threshold defining small counts (default: 20)
@@ -65,7 +65,7 @@ check_inputs_RU <- function(df, cat_vars, hrc_vars, D, V, js, confident, gv, pv)
 #' data("dtest")
 #' set.seed(123)
 #'
-#' res_RU <- mesurer_RU(
+#' res_RU <- assess_RU(
 #'   df = dtest,
 #'   cat_vars = c("REG", "DIPLOME", "SEXE", "AGE"),
 #'   D = 10, V = 15, js = 4,
@@ -76,7 +76,7 @@ check_inputs_RU <- function(df, cat_vars, hrc_vars, D, V, js, confident, gv, pv)
 #' @import dplyr
 #' @importFrom tidyr pivot_wider
 #' @importFrom stats quantile
-mesurer_RU <- function(
+assess_RU <- function(
     df,
     cat_vars,
     hrc_vars = NULL,
@@ -89,15 +89,15 @@ mesurer_RU <- function(
     seed  = NULL
 ){
   check_inputs_RU(df, cat_vars, hrc_vars, D, V, js, confident, gv, pv)
-  
+
   if (!is.null(seed)) set.seed(seed)
 
   I = 1:(confident - 1)
   J = js + 1
 
   res <- df |>
-    construire_cles_indiv() |>
-    tabuler_et_appliquer_ckm(
+    build_individual_keys() |>
+    tabulate_and_apply_ckm(
       cat_vars = cat_vars,
       hrc_vars = hrc_vars,
       D = D, V = V, js = js,
@@ -113,8 +113,8 @@ mesurer_RU <- function(
   }
 
   grandes_vals <- res$tab |> dplyr::filter(nb_obs > gv)
-  MAD_gv <- ecarts_absolus_moyens(grandes_vals$nb_obs, grandes_vals$nb_obs_ckm)
-  RMAD_gv <- ecarts_absolus_moyens_relatifs(grandes_vals$nb_obs, grandes_vals$nb_obs_ckm)
+  MAD_gv <- mean_absolute_deviation(grandes_vals$nb_obs, grandes_vals$nb_obs_ckm)
+  RMAD_gv <- mean_relative_absolute_deviation(grandes_vals$nb_obs, grandes_vals$nb_obs_ckm)
   HD_gv <- distance_hellinger(grandes_vals$nb_obs, grandes_vals$nb_obs_ckm)
   MAD_quants <- res$tab |>
     dplyr::reframe(quantile_df(abs(nb_obs-nb_obs_ckm))) |>
@@ -141,10 +141,10 @@ mesurer_RU <- function(
 
 #' Compare risk and utility across multiple scenarios
 #'
-#' Measures risk and utility for multiple sets of CKM parameters 
+#' Measures risk and utility for multiple sets of CKM parameters
 #' from a table, using one randomly generated set of record keys.
 #'
-#' @inheritParams mesurer_RU
+#' @inheritParams assess_RU
 #' @param parametres data.frame. Parameter combinations to test with columns D, V, js
 #'
 #' @return data.frame with nrow(parametres) rows containing risk and utility measures
@@ -158,8 +158,8 @@ mesurer_RU <- function(
 #'
 #' @examples
 #' \dontrun{
-#' parametres <- construire_table_parametres(c(10,15), c(10,20), js = 5)
-#' res_RUs <- mesurer_RUs(
+#' parametres <- build_parameters_table(c(10,15), c(10,20), js = 5)
+#' res_RUs <- assess_RUs(
 #'   df = dtest,
 #'   cat_vars = c("REG", "DIPLOME", "SEXE", "AGE"),
 #'   parametres = parametres,
@@ -170,7 +170,7 @@ mesurer_RU <- function(
 #'
 #' @importFrom purrr pmap
 #' @importFrom purrr list_rbind
-mesurer_RUs <- function(
+assess_RUs <- function(
     df,
     cat_vars,
     hrc_vars = NULL,
@@ -189,20 +189,18 @@ mesurer_RUs <- function(
     msg = "The parameter table must contain at least one row."
   )
 
-  check_inputs_RU(df, cat_vars, hrc_vars, parametres$D, parametres$V, parametres$js, confident, gv, pv)
-  
   assertthat::assert_that(
     is.null(seed) || (is.numeric(seed) && length(seed) == 1 && seed > 0),
     msg = "The parameter seed must be a positive numeric value or NULL."
   )
-  
+
   purrr::pmap(
     parametres,
     \(D,V,js){
 
       if(!is.null(seed)) set.seed(seed)
 
-      mesurer_RU(
+      assess_RU(
         df = df,
         cat_vars = cat_vars,
         hrc_vars = hrc_vars,
@@ -222,29 +220,29 @@ mesurer_RUs <- function(
 
 #' Compare risk and utility across multiple scenarios with multiple simulations
 #'
-#' Measures risk and utility from a table across multiple randomly generated 
+#' Measures risk and utility from a table across multiple randomly generated
 #' record key sets and multiple parameter combinations.
 #'
-#' @inheritParams mesurer_RUs
+#' @inheritParams assess_RUs
 #' @param n_sim integer. Number of simulations (default: 10)
 #' @param seed integer. Random seed number. If NULL, a default value is randomly drawn
 #' @param parallel logical. If TRUE, calculations are parallelized (advanced, default: FALSE)
 #' @param max_cores integer. Maximum number of parallel workers (advanced, default: 4)
-#' @param size_workers integer. Memory size in GB allocated to each thread during 
+#' @param size_workers integer. Memory size in GB allocated to each thread during
 #'   parallel calculation (advanced). NULL by default: program manages size automatically
 #'
 #' @return data.frame with n_sim * nrow(parametres) rows
 #'
 #' @section Random seed:
-#' The random seed ensures work reproducibility. Additionally, to ensure results 
-#' are comparable between scenarios, the program ensures the same record key sets 
-#' are used. Therefore, when no random seed is provided, the program randomly 
+#' The random seed ensures work reproducibility. Additionally, to ensure results
+#' are comparable between scenarios, the program ensures the same record key sets
+#' are used. Therefore, when no random seed is provided, the program randomly
 #' draws one automatically.
 #'
 #' @section Parallelization:
-#' Parallelizing calculations allows using more computational power for simulations, 
-#' generally providing appreciable time savings. Here, the n_sim simulations are 
-#' distributed across multiple cores. Parallelization will be beneficial when the 
+#' Parallelizing calculations allows using more computational power for simulations,
+#' generally providing appreciable time savings. Here, the n_sim simulations are
+#' distributed across multiple cores. Parallelization will be beneficial when the
 #' time to perform simulations for a given scenario exceeds the time to create workers.
 #' If the number of workers requested by the user exceeds the number of available workers,
 #' then the program will actually use \code{future::availableCores() - 1} workers.
@@ -253,8 +251,8 @@ mesurer_RUs <- function(
 #'
 #' @examples
 #' \dontrun{
-#' parametres <- construire_table_parametres(c(10,15), c(10,20), js = 5)
-#' res_sim_RUs <- simuler_RUs(
+#' parametres <- build_parameters_table(c(10,15), c(10,20), js = 5)
+#' res_sim_RUs <- simulate_RUs(
 #'   df = dtest,
 #'   cat_vars = c("REG", "DIPLOME", "SEXE", "AGE"),
 #'   parametres = parametres,
@@ -269,7 +267,7 @@ mesurer_RUs <- function(
 #' @import dplyr
 #' @importFrom purrr pmap
 #' @importFrom purrr list_rbind
-simuler_RUs <- function(
+simulate_RUs <- function(
     df,
     cat_vars,
     hrc_vars = NULL,
@@ -292,8 +290,6 @@ simuler_RUs <- function(
     nrow(parametres) > 0,
     msg = "The parameter table must contain at least one row."
   )
-  
-  check_inputs_RU(df, cat_vars, hrc_vars, parametres$D, parametres$V, parametres$js, confident, gv, pv)
 
   assertthat::assert_that(
     is.numeric(n_sim) && length(n_sim) == 1 && n_sim > 0,
@@ -351,7 +347,7 @@ simuler_RUs <- function(
         \(n){
           tryCatch(
             expr = {
-              mesurer_RU(
+              assess_RU(
                 df = df,
                 cat_vars = cat_vars,
                 hrc_vars = hrc_vars,

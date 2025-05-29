@@ -7,7 +7,7 @@
 creer_table_perturbation(matrice_transition)
 }
 \arguments{
-\item{matrice_transition}{ptable object. Object created by creer_matrice_transition()}
+\item{matrice_transition}{ptable object. Object created by create_transition_matrix()}
 }
 \value{
 data.table containing the perturbation table with columns i, v, p_int_lb, p_int_ub
@@ -18,7 +18,7 @@ for efficient application of the Cell Key Method.
 }
 \examples{
 \dontrun{
-mat_trans <- creer_matrice_transition(D = 5, V = 2)
+mat_trans <- create_transition_matrix(D = 5, V = 2)
 tab_pert <- creer_table_perturbation(mat_trans)
 }
 }

@@ -4,9 +4,18 @@
 \name{ckm-package}
 \alias{ckm}
 \alias{ckm-package}
-\title{ckm: Appliquer la méthode des clés aléatoires (Cell Key Method) pour protéger des données tabulées}
+\title{ckm: Applying the Cell Key Method (CKM) to protect tabular data}
 \description{
-More about what it does (maybe more than one line) Use four spaces when indenting paragraphs within the Description.
+The ckm package implements the Cell Key Method (CKM) to protect tabular data and provides tools to choose the best parameters to ensure the balance between data utility and privacy protection. The CKM is a method for protecting sensitive data in tabular form by applying random keys to cells.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/InseeFrLab/ckm}
+  \item \url{https://inseefrlab.github.io/ckm/}
+  \item Report bugs at \url{https://github.com/InseeFrLab/ckm/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Julien Jamme \email{julien.jamme@insee.fr}

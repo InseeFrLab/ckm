@@ -17,11 +17,11 @@
 #' 
 #' @examples
 #' # Test with basic parameters
-#' tester_matrices(5, 1)
+#' test_matrices(5, 1)
 #'
 #' @importFrom purrr map
 #' @importFrom purrr list_rbind
-tester_matrices <- function(D, js = 0, Vmin = 0, Vmax = 30, precision=1){
+test_matrices <- function(D, js = 0, Vmin = 0, Vmax = 30, precision=1){
 
   # Validate parameters
   assertthat::assert_that(
@@ -52,7 +52,7 @@ tester_matrices <- function(D, js = 0, Vmin = 0, Vmax = 30, precision=1){
   cat("Tested interval: [",Vmin, ";", Vmax, "]\n")
   res_min <- !is.null(
     tryCatch({
-      mat <- creer_matrice_transition(D, Vmin, js)
+      mat <- create_transition_matrix(D, Vmin, js)
     },
     error = function(e) NULL,
     warning = function(w) NULL,
@@ -61,7 +61,7 @@ tester_matrices <- function(D, js = 0, Vmin = 0, Vmax = 30, precision=1){
   )
   res_max <- !is.null(
     tryCatch({
-      mat <- creer_matrice_transition(D, Vmax, js)
+      mat <- create_transition_matrix(D, Vmax, js)
     },
     error = function(e) NULL,
     warning = function(w) NULL,
@@ -80,7 +80,7 @@ tester_matrices <- function(D, js = 0, Vmin = 0, Vmax = 30, precision=1){
       Vmilieu = (Vmax + Vmin)/2
       res_milieu <- !is.null(
         tryCatch({
-          mat <- creer_matrice_transition(D, Vmilieu, js)
+          mat <- create_transition_matrix(D, Vmilieu, js)
         },
         error = function(e) NULL,
         warning = function(w) NULL,
@@ -88,9 +88,9 @@ tester_matrices <- function(D, js = 0, Vmin = 0, Vmax = 30, precision=1){
         )
       )
       if(res_milieu){
-        return(tester_matrices(D, js, Vmin, Vmilieu, precision = precision))
+        return(test_matrices(D, js, Vmin, Vmilieu, precision = precision))
       }else{
-        return(tester_matrices(D, js, Vmin = Vmilieu, Vmax = Vmax, precision = precision))
+        return(test_matrices(D, js, Vmin = Vmilieu, Vmax = Vmax, precision = precision))
       }
     }
   }

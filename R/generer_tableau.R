@@ -161,7 +161,7 @@ tabulate_cnt_micro_data <- function(
     return(
       list(
         tab = tab,
-        freq = calculer_frequences_empiriques(tab, cat_vars, hrc_vars)
+        freq = compute_frequencies(tab, cat_vars, hrc_vars)
       )
     )
   } else {

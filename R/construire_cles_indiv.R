@@ -10,11 +10,11 @@
 #' @examples
 #' data("dtest")
 #' set.seed(123)
-#' dtest_avec_cles <- construire_cles_indiv(dtest)
+#' dtest_with_keys <- build_individual_keys(dtest)
 #'
 #' @importFrom stats runif
 #' @importFrom data.table as.data.table
-construire_cles_indiv <- function(microdata, nb_decim = NULL){
+build_individual_keys <- function(microdata, nb_decim = NULL){
 
   assertthat::assert_that(
     is.data.frame(microdata),

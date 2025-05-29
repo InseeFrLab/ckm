@@ -37,6 +37,8 @@
 #' }
 #'
 #' @importFrom assertthat assert_that
+#' @export
+#' @keywords internal
 check_inputs_tabulate <- function(df, rk_var, cat_vars, hrc_vars, num_var, marge_label, D, V, js, I, J) {
 
   assertthat::assert_that(
@@ -96,12 +98,12 @@ check_inputs_tabulate <- function(df, rk_var, cat_vars, hrc_vars, num_var, marge
     msg = "js must be a non-negative numeric value."
   )
   assertthat::assert_that(
-    is.null(I) || (is.numeric(I) && length(I) == 1 && I > 0),
-    msg = "I must be a positive numeric value or NULL."
+    is.null(I) || (is.numeric(I) && all(I > 0)),
+    msg = "I must be a positive numeric vector or NULL."
   )
   assertthat::assert_that(
-    is.null(J) || (is.numeric(J) && length(J) == 1 && J >= 0),
-    msg = "J must be a non-negative numeric value or NULL."
+    is.null(J) || (is.numeric(J) && all(J >= 0)),
+    msg = "J must be a non-negative numeric vector or NULL."
   )
   assertthat::assert_that(
     (!is.null(rk_var) && rk_var %in% names(df)),
@@ -115,7 +117,7 @@ check_inputs_tabulate <- function(df, rk_var, cat_vars, hrc_vars, num_var, marge
 #' the Cell Key Method for statistical disclosure control.
 #'
 #' @inheritParams tabulate_cnt_micro_data
-#' @inheritParams appliquer_ckm
+#' @inheritParams apply_ckm
 #'
 #' @return A list containing the perturbed table and transition matrix
 #'
@@ -125,9 +127,9 @@ check_inputs_tabulate <- function(df, rk_var, cat_vars, hrc_vars, num_var, marge
 #' \dontrun{
 #' data("dtest")
 #' set.seed(123)
-#' dtest_avec_cles <- construire_cles_indiv(dtest)
+#' dtest_avec_cles <- build_individual_keys(dtest)
 #'
-#' res_ckm <- tabuler_et_appliquer_ckm(
+#' res_ckm <- tabulate_and_apply_ckm(
 #'   df = dtest_avec_cles,
 #'   cat_vars = c("DIPLOME", "SEXE", "AGE"),
 #'   hrc_vars = list(GEO = c("REG", "DEP")),
@@ -135,7 +137,7 @@ check_inputs_tabulate <- function(df, rk_var, cat_vars, hrc_vars, num_var, marge
 #'   D = 10, V = 15, js = 4
 #' )
 #' }
-tabuler_et_appliquer_ckm <- function(
+tabulate_and_apply_ckm <- function(
     df,
     rk_var = "rkey",
     cat_vars = NULL,
@@ -186,7 +188,7 @@ tabuler_et_appliquer_ckm <- function(
   args_trans[["I"]] <- I
   args_trans[["J"]] <- J
 
-  res_ckm <- do.call("appliquer_ckm", args_trans)
+  res_ckm <- do.call("apply_ckm", args_trans)
 
   return(res_ckm)
 }

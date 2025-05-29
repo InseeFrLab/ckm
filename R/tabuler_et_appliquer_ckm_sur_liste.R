@@ -22,12 +22,12 @@
 #'   VAR = c("DIPLOME", "SEXE", "AGE", "DIPLOME", "TYPE", "REG", "DEP"),
 #'   HRC = c(rep(NA, 5), rep("GEO",2))
 #' )
-#' convertir_desc_table_en_liste(desc_tableaux)
+#' convert_desc_table_to_list(desc_tableaux)
 #'
 #' @importFrom dplyr pull
 #' @importFrom dplyr filter
 #' @importFrom stats setNames
-convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
+convert_desc_table_to_list <- function(desc_tab, prefix = "tab"){
 
   assertthat::assert_that(
     is.data.frame(desc_tab),
@@ -118,7 +118,7 @@ convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
 #' This function constructs multiple tables from microdata and applies the Cell Key Method
 #' to each table based on a description data frame specifying the table structure.
 #'
-#' @inheritParams tabuler_et_appliquer_ckm
+#' @inheritParams tabulate_and_apply_ckm
 #' @param desc_tab data.frame. Table description with 3 columns (TAB, VAR, HRC)
 #'   describing the tables to construct
 #' @param prefix character. Prefix to add to table names provided in desc_tab (default: "tab")
@@ -162,7 +162,7 @@ convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
 #' \dontrun{
 #' data("dtest")
 #' set.seed(123)
-#' dtest_avec_cles <- construire_cles_indiv(dtest)
+#' dtest_avec_cles <- build_individual_keys(dtest)
 #'
 #' # Define two tables:
 #' # tab1: DIPLOME * SEXE * AGE
@@ -173,7 +173,7 @@ convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
 #'   HRC = c(rep(NA, 5), rep("GEO",2))
 #' )
 #'
-#' res_ckm <- tabuler_et_appliquer_ckm_liste(
+#' res_ckm <- tabulate_and_apply_ckm_list(
 #'   df = dtest_avec_cles,
 #'   desc_tab = desc_tableaux,
 #'   marge_label = "Total",
@@ -182,7 +182,7 @@ convertir_desc_table_en_liste <- function(desc_tab, prefix = "tab"){
 #' }
 #'
 #' @importFrom purrr imap
-tabuler_et_appliquer_ckm_liste <- function(
+tabulate_and_apply_ckm_list <- function(
     df,
     rk_var = "rkey",
     desc_tab,
@@ -204,7 +204,7 @@ tabuler_et_appliquer_ckm_liste <- function(
     is.character(prefix) && length(prefix) == 1,
     msg = "The prefix must be a single character string."
   )
-  listes_tab_vars <- convertir_desc_table_en_liste(desc_tab, prefix)
+  listes_tab_vars <- convert_desc_table_to_list(desc_tab, prefix)
 
   check_inputs_tabulate(
     df = df,
@@ -242,7 +242,7 @@ tabuler_et_appliquer_ckm_liste <- function(
       args_trans[["cat_vars"]] <- cat_vars
       args_trans[["hrc_vars"]] <- hrc_vars
 
-      do.call("tabuler_et_appliquer_ckm", args_trans)
+      do.call("tabulate_and_apply_ckm", args_trans)
     }
   )
   names(res) <- listes_tab_vars$tableaux

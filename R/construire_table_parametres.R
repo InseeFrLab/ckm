@@ -9,8 +9,8 @@
 #' @return data.frame of parameter combinations
 #' @export
 #' @examples
-#' construire_table_parametres(c(10,15), c(10,20), js = 5)
-construire_table_parametres <- function(Ds, Vs, jss = 0){
+#' build_parameters_table(c(10,15), c(10,20), js = 5)
+build_parameters_table <- function(Ds, Vs, jss = 0){
 
   assertthat::assert_that(
     is.numeric(Ds) && all(Ds > 0),

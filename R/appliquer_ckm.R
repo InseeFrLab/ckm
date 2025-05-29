@@ -6,8 +6,8 @@
 #' @param tab_data Object returned by `tabulate_cnt_micro_data` (data.frame or list)
 #' @param cnt_var Character. Name of the count variable (default: "nb_obs")
 #' @param ck_var Character. Name of the cell key variable (must be decimal between 0-1)
-#' @inheritParams creer_matrice_transition
-#' @inheritParams mesurer_risque
+#' @inheritParams create_transition_matrix
+#' @inheritParams assess_risk
 #' @param ... Additional parameters passed to transition matrix creation
 #'
 #' @return List containing:
@@ -21,7 +21,7 @@
 #' \dontrun{
 #' data("dtest")
 #' set.seed(8245)
-#' dtest_avec_cles <- construire_cles_indiv(dtest)
+#' dtest_avec_cles <- build_individual_keys(dtest)
 #'
 #' tab_avant <- tabulate_cnt_micro_data(
 #'   df = dtest_avec_cles,
@@ -31,7 +31,7 @@
 #'   freq_empiriq = TRUE
 #' )
 #'
-#' res_ckm <- appliquer_ckm(tab_avant, D = 5, V = 2)
+#' res_ckm <- apply_ckm(tab_avant, D = 5, V = 2)
 #' str(res_ckm, max.level = 2)
 #'
 #' # With a hierarchical structure
@@ -44,14 +44,14 @@
 #'   freq_empiriq = TRUE #pour pouvoir mesurer le risque
 #' )
 #'
-#' res_ckm2 <- appliquer_ckm(tab_avant2, cnt_var = "num_tot", D = 5, V = 2)
+#' res_ckm2 <- apply_ckm(tab_avant2, cnt_var = "num_tot", D = 5, V = 2)
 #' head(res_ckm2$tab)
 #' }
 #' @importFrom data.table as.data.table setkeyv foverlaps .N .SD :=
 #' @importFrom dplyr mutate rename_with select
 #' @importFrom tibble as_tibble tibble
 #' @importFrom assertthat assert_that
-appliquer_ckm <- function(
+apply_ckm <- function(
   tab_data,
   cnt_var = "nb_obs",
   ck_var = "ckey",
@@ -111,7 +111,7 @@ appliquer_ckm <- function(
   args_add <- c(...)
   args_trans <- if (length(args_add) == 0) as.list(c(D = D, V = V, js = js)) else as.list(c(D = D, V = V, js = js, args_add))
 
-  mat_trans <- do.call("creer_matrice_transition", args_trans)
+  mat_trans <- do.call("create_transition_matrix", args_trans)
   tab_pert <- creer_table_perturbation(mat_trans)
   max_i <- max(tab_pert$i)
 
@@ -131,15 +131,15 @@ appliquer_ckm <- function(
 
   # Risk measures if empirical frequencies are provided in tab_data
   if (!is.null(p_hat) & !is.null(I) & !is.null(J)) {
-    risque <- mesurer_risque(mat_trans, p_hat, I, J)
+    risque <- assess_risk(mat_trans, p_hat, I, J)
   } else {
     risque <- NULL
   }
 
   # Utility measures
   utilite <- tibble::tibble(
-    MAD = ecarts_absolus_moyens(res[[cnt_var]], res[[cnt_var_ckm]]),
-    RMAD = ecarts_absolus_moyens_relatifs(res[[cnt_var]], res[[cnt_var_ckm]]),
+    MAD = mean_absolute_deviation(res[[cnt_var]], res[[cnt_var_ckm]]),
+    RMAD = mean_relative_absolute_deviation(res[[cnt_var]], res[[cnt_var_ckm]]),
     HD = distance_hellinger(res[[cnt_var]], res[[cnt_var_ckm]])
   )
 
