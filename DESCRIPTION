@@ -10,7 +10,7 @@ Maintainer: Julien Jamme <julien.jamme@insee.fr>
 URL: https://github.com/InseeFrLab/ckm, https://inseefrlab.github.io/ckm/
 BugReports: https://github.com/InseeFrLab/ckm/issues
 Description: 
-    The ckm package implements the Cell Key Method to protect tabular data and
+    The package implements the Cell Key Method to protect tabular data and
     provides tools to choose the best parameters to ensure the balance between 
     data utility and privacy protection. The Cell Key Method is a method for 
     protecting sensitive data in tabular form by applying random keys to cells.
