@@ -293,9 +293,9 @@ estimate_proba_precision_statistic_df <- function(
   return(res |> select(beta, A, B, R, proba))
 }
 
-#' Estimate minimal precision threshold \eqn{\beta} for given error level α
+#' Estimate minimal precision threshold \eqn{\beta} for given error level \eqn{\alpha}
 #'
-#' Finds minimal \eqn{\beta} where P(|R-R'|>\eqn{\beta}) < α for given α and CKM parameters.
+#' Finds minimal \eqn{\beta} where P(|R-R'|>\eqn{\beta}) < \eqn{\alpha} for given \eqn{\alpha} and CKM parameters.
 #'
 #' @inheritParams estimate_proba_precision_statistic
 #' @param beta_min Numeric. Minimum of the search range for \eqn{\beta}

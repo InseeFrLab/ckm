@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimer_intervalle_confiance_ratio.R
 \name{estimate_beta}
 \alias{estimate_beta}
-\title{Estimate minimal precision threshold \eqn{\beta} for given error level α}
+\title{Estimate minimal precision threshold \eqn{\beta} for given error level \eqn{\alpha}}
 \usage{
 estimate_beta(
   A,
@@ -50,7 +50,7 @@ estimate_beta(
 Numeric. Minimal \eqn{\beta} value
 }
 \description{
-Finds minimal \eqn{\beta} where P(|R-R'|>\eqn{\beta}) < α for given α and CKM parameters.
+Finds minimal \eqn{\beta} where P(|R-R'|>\eqn{\beta}) < \eqn{\alpha} for given \eqn{\alpha} and CKM parameters.
 }
 \details{
 If \code{posterior=FALSE}, the calculation is based on the a priori approach,
