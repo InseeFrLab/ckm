@@ -112,7 +112,7 @@ apply_ckm <- function(
   args_trans <- if (length(args_add) == 0) as.list(c(D = D, V = V, js = js)) else as.list(c(D = D, V = V, js = js, args_add))
 
   mat_trans <- do.call("create_transition_matrix", args_trans)
-  tab_pert <- creer_table_perturbation(mat_trans)
+  tab_pert <- prepare_perturbation_table(mat_trans)
   max_i <- max(tab_pert$i)
 
   dt_data[, `:=`(i = ifelse(get(cnt_var) <= max_i, get(cnt_var), max_i))]

@@ -70,9 +70,9 @@ create_transition_matrix <- function(D, V, js = 0, ...) {
 #' @examples
 #' \dontrun{
 #' mat_trans <- create_transition_matrix(D = 5, V = 2)
-#' tab_pert <- creer_table_perturbation(mat_trans)
+#' tab_pert <- prepare_perturbation_table(mat_trans)
 #' }
-creer_table_perturbation <- function(matrice_transition){
+prepare_perturbation_table <- function(matrice_transition){
 
   table_perturbation <- matrice_transition@pTable[, .(i,v,p_int_lb,p_int_ub)]
   data.table::setkey(table_perturbation, i, p_int_lb, p_int_ub)
