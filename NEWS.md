@@ -1,25 +1,40 @@
----
-title: Package 'ckm'
-subtitle: Historique des modifications
-output: rmarkdown::html_vignette
----
+# ckm 1.0.0
 
-## ckm 0.3.0
+Initial CRAN release
 
-[XX/XX/2025]
+Original names of the functions have been translated to English:
 
-Modification:
+- `construire_cles_indiv` -> `build_individual_keys`
+- `tabuler_et_appliquer_ckm` -> `tabulate_and_apply_ckm`
+- `appliquer_ckm` -> `apply_ckm`
+- `creer_matrice_transition` -> `create_transition_matrix`
+- `creer_table_perturbation` -> `create_perturbation_table`
+- `tester_matrices` -> `test_matrices`
+- `mesurer_risque` -> `assess_risk`
+- `mesurer_RU` -> `assess_RU`
+- `mesurer_RUs` -> `assess_RUs`
+- `simuler_RUs` -> `simulate_RUs`
+- `tabuler_et_appliquer_ckm_liste` -> `tabulate_and_apply_ckm_list`
+- `visualiser_distribution` -> `visualize_distribution`
+- `estimer_beta` -> `estimate_beta`
+- `estimer_beta_df` -> `estimate_beta_df`
 
-- Possibilité de mesurer le risque et l'utilité d'un ou plusieurs scénarios:
-  - `mesurer_RU`: Permet de mesurer le risque et l'utilité d'un scénario donné
-  - `mesurer_RUs`: Compare le risque et l'utilité de plusieurs scénarios
-  - `simuler_RUs`: Compare le risque et l'utilité de plusieurs scénarios en se basant
-  sur plusieurs simulations
-- Appliquer la méthode sur plusieurs tableaux à la fois:
-  - `tabuler_et_appliquer_ckm_liste`
-- Par défaut, les arguments `I` et `J` sont par défaut renseignés à `NULL`, 
-désactivant la mesure du risque par défaut en utilisant `appliquer_ckm` ou 
+## ckm 0.3.9410
+
+  Modification:
+
+- Possibility to measure the risk and utility of one or more scenarios:
+  - `measure_RU`: Measures the risk and utility of a given scenario
+  - `measure_RUs`: Compares the risk and utility of several scenarios
+  - `simulate_RUs`: Compares the risk and utility of several scenarios based on
+  multiple simulations
+- By default, the arguments `I` and `J` are set to `NULL`,
+disabling risk measurement by default when using `apply_ckm` or
 `tabuler_et_appliquer_ckm`.
+
+New function:
+
+- Apply the method to several tables at once: `tabulate_and_apply_ckm_list`
 
 
 ## ckm 0.2.2

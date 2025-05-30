@@ -1,0 +1,84 @@
+template:
+  bootstrap: 5
+
+destination: public
+
+lang: fr
+
+navbar:
+  structure:
+    left:  [home, reference, articles, news]
+    right: [search, gitlab]
+
+  components:
+    reference:
+      text: Contenu du package
+      href: reference/index.html
+    news:
+      text: Nouveautés
+      href: news/index.html
+    gitlab:
+      icon: fa-gitlab
+      aria-label: Gitlab
+      text: Code source
+      href: https://gitlab.insee.fr/outilsconfidentialite/ckm
+
+home:
+  title: Package R pour appliquer la méthode des clés aléatoires
+
+reference:
+  - title: Générer les clés individuelles dans un jeu de microdonnées
+    desc:  Une fonction pour créer la clé associée à chaque individu
+    contents:
+      - build_individual_keys
+  - title: Construire un tableau de comptage et appliquer la CKM
+    desc: |
+      Fonctions qui permettent de construire et appliquer la CKM, sur
+      un seul tableau ou sur une liste de tableaux.
+    contents:
+      - tabulate_cnt_micro_data
+      - apply_ckm
+      - tabulate_and_apply_ckm
+      - tabulate_and_apply_ckm_list
+  - title: Réaliser l'arbitrage risque - utilité
+    desc: Un ensemble de fonctions pour faciliter le choix des paramètres
+    contents:
+      - assess_RU
+      - assess_RUs
+      - simulate_RUs
+      - assess_risk
+      - get_deviation_set
+      - get_possibles_set
+      - compute_frequencies
+      - distance_hellinger
+      - mean_absolute_deviation
+      - mean_relative_absolute_deviation
+  - title: Calculer des intervalles de confiance
+    desc: |
+      Fonctions fournissant les intervalles de confiance de statistiques
+      construites à partir de comptages perturbés.
+    contents:
+      - estimate_beta
+      - estimate_beta_df
+  - title: Construire la matrice de transition et préparer la table de perturbation
+    desc:  Les fonctions permettent de récupérer la matrice de transition.
+    contents:
+      - create_transition_matrix
+      - prepare_perturbation_table
+      - test_matrices
+      - visualize_distribution
+      desc: |
+        Permet de comparer des scénarios en visualisant
+        la distribution théorique du bruit.
+  - title: Autres fonctions
+    contents:
+      - build_parameters_table
+      - convert_desc_table_to_list
+      - distance_euclid
+      - distance_manhattan
+      - estimate_proba_precision_statistic
+      - estimate_proba_precision_statistic_df
+  - title: Données exemples
+    desc: Jeu de données fictives pour tester les fonctions du package
+    contents:
+      - dtest

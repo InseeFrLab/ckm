@@ -59,7 +59,7 @@ reference:
     desc:  Functions to retrieve the transition matrix and compare scenarios by visualizing the theoretical noise distribution.
     contents:
       - create_transition_matrix
-      - creer_table_perturbation
+      - prepare_perturbation_table
       - test_matrices
       - visualize_distribution
   - title: Other functions

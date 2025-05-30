@@ -6,7 +6,7 @@ Authors@R: c(
     person("Julien", "Jamme", , "julien.jamme@insee.fr", role = c("aut", "cre")),
     person(, "Institut National de la Statistique et des Études Économiques", , role = "cph")
   )
-Maintainer: Julien Jamme <dg75-dmcsi-confidentialite@insee.fr>
+Maintainer: Julien Jamme <julien.jamme@insee.fr>
 URL: https://github.com/InseeFrLab/ckm, https://inseefrlab.github.io/ckm/
 BugReports: https://github.com/InseeFrLab/ckm/issues
 Description: 
