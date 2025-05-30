@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ckm</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,24 +130,15 @@ The best beta is searched in the interval [beta_min; beta_max].</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘dplyr’</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:stats’:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     filter, lag</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, setdiff, setequal, union</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ptab</span> <span class="op">&lt;-</span> <span class="fu">ptable</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ptable/man/ptable_pkg.html" class="external-link">create_cnt_ptable</a></span><span class="op">(</span>D <span class="op">=</span> <span class="fl">15</span>, V <span class="op">=</span> <span class="fl">30.1</span>, js <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">@</span><span class="va">pTable</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">r1</span> <span class="op">&lt;-</span> <span class="fu"><a href="estimate_proba_precision_statistic.html">estimate_proba_precision_statistic</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  A<span class="op">=</span><span class="fl">100</span>,B<span class="op">=</span><span class="fl">1500</span>,D <span class="op">=</span> <span class="fl">15</span>, V <span class="op">=</span> <span class="fl">30.1</span>, js <span class="op">=</span> <span class="fl">0</span>, ptab <span class="op">=</span> <span class="va">ptab</span>, betas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">10</span>,<span class="fl">0.1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">r1</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">proba</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">beta</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8</span>
 <span class="r-in"><span><span class="fu">estimate_beta</span><span class="op">(</span>A<span class="op">=</span><span class="fl">100</span>,B<span class="op">=</span><span class="fl">1500</span>,D <span class="op">=</span> <span class="fl">15</span>, V <span class="op">=</span> <span class="fl">30.1</span>, js <span class="op">=</span> <span class="fl">0</span>, ptab <span class="op">=</span> <span class="va">ptab</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8</span>
 <span class="r-in"><span><span class="va">r2</span> <span class="op">&lt;-</span> <span class="fu"><a href="estimate_proba_precision_statistic.html">estimate_proba_precision_statistic</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  A<span class="op">=</span><span class="fl">100</span>,B<span class="op">=</span><span class="fl">1500</span>,</span></span>
 <span class="r-in"><span>  D <span class="op">=</span> <span class="fl">15</span>, V <span class="op">=</span> <span class="fl">30.1</span>, js <span class="op">=</span> <span class="fl">0</span>,</span></span>
@@ -156,14 +147,13 @@ The best beta is searched in the interval [beta_min; beta_max].</p>
 <span class="r-in"><span>  posterior <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">r2</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">proba</span> <span class="op">&lt;=</span> <span class="fl">0.05</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">beta</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8</span>
 <span class="r-in"><span><span class="fu">estimate_beta</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  A<span class="op">=</span><span class="fl">100</span>,B<span class="op">=</span><span class="fl">1500</span>,</span></span>
 <span class="r-in"><span>  D <span class="op">=</span> <span class="fl">15</span>, V <span class="op">=</span> <span class="fl">30.1</span>, js <span class="op">=</span> <span class="fl">0</span>,</span></span>
 <span class="r-in"><span>  ptab <span class="op">=</span> <span class="va">ptab</span>,</span></span>
 <span class="r-in"><span>  posterior <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span> <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8</span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
