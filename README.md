@@ -1,7 +1,10 @@
+<!-- badges: start -->
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![minimum R version](https://img.shields.io/badge/R%3E%3D-3.5-blue.svg)](https://gitlab.insee.fr/outilsconfidentialite/ckm/-/blob/main/DESCRIPTION)
-[![pipeline status](https://gitlab.insee.fr/outilsconfidentialite/ckm/badges/main/pipeline.svg)](https://gitlab.insee.fr/outilsconfidentialite/ckm/-/pipelines)
-
+[![CRAN status](https://www.r-pkg.org/badges/version/ckm)](https://cran.r-project.org/package=ckm)
+[![Codecov test coverage](https://codecov.io/gh/InseeFr/ckm/branch/main/graph/badge.svg)](https://codecov.io/gh/InseeFr/ckm?branch=main)
+[![R-CMD-check](https://github.com/InseeFr/ckm/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/InseeFr/ckm/actions/workflows/R-CMD-check.yaml)
+  <!-- badges: end -->
 # Applying the Cell Key Method
 
 ## Overview
