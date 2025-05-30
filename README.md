@@ -4,6 +4,7 @@
 [![CRAN status](https://www.r-pkg.org/badges/version/ckm)](https://cran.r-project.org/package=ckm)
 [![R-CMD-check](https://github.com/InseeFrLab/ckm/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/InseeFrLab/ckm/actions/workflows/R-CMD-check.yaml)
   <!-- badges: end -->
+  
 # Applying the Cell Key Method
 
 ## Overview
