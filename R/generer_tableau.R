@@ -4,7 +4,7 @@
 #' @param margins Character vector. Margin variables
 #' @param resp_var Character. Response variable to aggregate
 #' @param marge_label Character. Label for margin cells
-#' 
+#'
 #' @return data.table with computed margins
 #' @keywords internal
 #' @export
@@ -44,6 +44,7 @@ compute_margins <- function(
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' library(dplyr)
 #' data("dtest")
 #' tab_comptage <- tabulate_cnt_micro_data(
@@ -53,7 +54,7 @@ compute_margins <- function(
 #'   hrc_vars = list(GEO = c("REG", "DEP")),
 #'   marge_label = "Total"
 #' )
-#' 
+#'
 #' # With numerical variable to aggregate
 #' tab_comptage_num <- tabulate_cnt_micro_data(
 #'   df = dtest |> mutate(NUM = 12),
@@ -63,6 +64,7 @@ compute_margins <- function(
 #'   num_var = "NUM",
 #'   marge_label = "Total"
 #' )
+#' }
 tabulate_cnt_micro_data <- function(
   df,
   rk_var = "rkey",

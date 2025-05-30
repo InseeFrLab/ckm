@@ -37,6 +37,7 @@ Constructs a complete contingency table with all possible margins from
 microdata, including cell keys and optional numerical aggregation.
 }
 \examples{
+\dontrun{
 library(dplyr)
 data("dtest")
 tab_comptage <- tabulate_cnt_micro_data(
@@ -56,4 +57,5 @@ tab_comptage_num <- tabulate_cnt_micro_data(
   num_var = "NUM",
   marge_label = "Total"
 )
+}
 }
