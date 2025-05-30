@@ -22,3 +22,4 @@
 \.git/*
 ^cran-comments\.md$
 images/*
+docs/*
