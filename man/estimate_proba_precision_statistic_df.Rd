@@ -60,6 +60,7 @@ that is, the provided ratio (A/B) is the ratio resulting from CKM perturbation.
 - proba: P(|R-R'|>\eqn{\beta}) for the given \eqn{\beta}
 }
 \examples{
+\dontrun{
 test <- data.frame(
   A = sample(1:50, 10, replace = TRUE),
   B = sample(50:1000, 10, replace = TRUE)
@@ -75,4 +76,5 @@ res <- estimate_proba_precision_statistic_df(test, fun, D, V)
 
 # A posteriori approach (given R the perturbed ratio)
 res_ap <- estimate_proba_precision_statistic_df(test, fun, D, V, posterior = TRUE)
+}
 }

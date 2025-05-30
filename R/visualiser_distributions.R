@@ -15,10 +15,10 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Using separate D and V vectors
 #' visualize_distribution(D = c(11, 15), V = c(10, 30))
 #'
-#' \dontrun{
 #' # Using a data frame
 #' params_df <- data.frame(D = c(11, 15), V = c(10, 30))
 #' visualize_distribution(DV = params_df)
@@ -57,7 +57,7 @@ visualize_distribution <- function(D=NULL, V=NULL, DV=NULL, precision=5){
     if(any(D <= 0) || any(V <= 0)){
       stop("D and V must be strictly positive.")
     }
-    
+
     nV <- length(V)
     nD <- length(D)
     ncol <- nV

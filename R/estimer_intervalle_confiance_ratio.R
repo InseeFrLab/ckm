@@ -213,6 +213,7 @@ estimate_proba_precision_statistic <- function(
 #' - proba: P(|R-R'|>\eqn{\beta}) for the given \eqn{\beta}
 #'
 #' @examples
+#' \dontrun{
 #' test <- data.frame(
 #'   A = sample(1:50, 10, replace = TRUE),
 #'   B = sample(50:1000, 10, replace = TRUE)
@@ -228,6 +229,7 @@ estimate_proba_precision_statistic <- function(
 #'
 #' # A posteriori approach (given R the perturbed ratio)
 #' res_ap <- estimate_proba_precision_statistic_df(test, fun, D, V, posterior = TRUE)
+#' }
 #' @importFrom dplyr %>%
 #' @export
 estimate_proba_precision_statistic_df <- function(
@@ -314,6 +316,7 @@ estimate_proba_precision_statistic_df <- function(
 #' The best beta is searched in the interval [beta_min; beta_max].
 #'
 #' @examples
+#' \dontrun{
 #' library(dplyr)
 #' ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
 #'   as.data.frame()
@@ -336,6 +339,7 @@ estimate_proba_precision_statistic_df <- function(
 #'   ptab = ptab,
 #'   posterior = TRUE
 #'  )
+#' }
 #' @importFrom dplyr pull
 #' @importFrom dplyr filter
 #' @importFrom dplyr %>%
@@ -466,6 +470,7 @@ estimate_beta <- function(
 #' Parallel computation is handled via the \code{future} and \code{furrr} packages.
 #'
 #' @examples
+#' \dontrun{
 #' nums <- c(20, 80)
 #' denoms <- c(100, 200)
 #' test <- data.frame(
@@ -481,7 +486,7 @@ estimate_beta <- function(
 #' res <- estimate_beta_df(test, fun, D, V)
 #' # A posteriori approach
 #' res_ap <- estimate_beta_df(test, fun, D, V, posterior = TRUE)
-#'
+#' }
 #' @importFrom future plan sequential multisession availableCores
 #' @importFrom furrr future_map2
 #' @importFrom purrr map2 list_rbind

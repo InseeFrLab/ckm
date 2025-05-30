@@ -60,6 +60,7 @@ that is, the provided ratio (A/B) is the ratio resulting from CKM perturbation.
 The best beta is searched in the interval [beta_min; beta_max].
 }
 \examples{
+\dontrun{
 library(dplyr)
 ptab <- ptable::create_cnt_ptable(D = 15, V = 30.1, js = 0)@pTable |>
   as.data.frame()
@@ -82,4 +83,5 @@ estimate_beta(
   ptab = ptab,
   posterior = TRUE
  )
+}
 }

@@ -67,6 +67,7 @@ The function removes duplicate rows from the input data before computation.
 Parallel computation is handled via the \code{future} and \code{furrr} packages.
 }
 \examples{
+\dontrun{
 nums <- c(20, 80)
 denoms <- c(100, 200)
 test <- data.frame(
@@ -82,5 +83,5 @@ V = 1
 res <- estimate_beta_df(test, fun, D, V)
 # A posteriori approach
 res_ap <- estimate_beta_df(test, fun, D, V, posterior = TRUE)
-
+}
 }

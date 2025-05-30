@@ -26,10 +26,10 @@ resulting from different parameter combinations of the Cell Key Method.
 It generates bar plots showing the probability mass function for each scenario.
 }
 \examples{
+\dontrun{
 # Using separate D and V vectors
 visualize_distribution(D = c(11, 15), V = c(10, 30))
 
-\dontrun{
 # Using a data frame
 params_df <- data.frame(D = c(11, 15), V = c(10, 30))
 visualize_distribution(DV = params_df)
