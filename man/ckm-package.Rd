@@ -6,7 +6,7 @@
 \alias{ckm-package}
 \title{ckm: Applying the Cell Key Method to Protect Tabular Data}
 \description{
-The package implements the Cell Key Method to protect tabular data and provides tools to choose the best parameters to ensure the balance between data utility and privacy protection. The Cell Key Method is a method for protecting sensitive data in tabular form by applying random keys to cells.
+The Cell Key Method is a method for protecting sensitive data in tabular form by applying random keys to cells. The package implements the method, provides tools to choose the best parameters to ensure the balance between data utility and privacy protection.
 }
 \seealso{
 Useful links:
