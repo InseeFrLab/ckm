@@ -4,9 +4,9 @@
 \name{ckm-package}
 \alias{ckm}
 \alias{ckm-package}
-\title{ckm: Applying the Cell Key Method (CKM) to protect tabular data}
+\title{ckm: Applying the Cell Key Method to Protect Tabular Data}
 \description{
-The ckm package implements the Cell Key Method (CKM) to protect tabular data and provides tools to choose the best parameters to ensure the balance between data utility and privacy protection. The CKM is a method for protecting sensitive data in tabular form by applying random keys to cells.
+The ckm package implements the Cell Key Method to protect tabular data and provides tools to choose the best parameters to ensure the balance between data utility and privacy protection. The Cell Key Method is a method for protecting sensitive data in tabular form by applying random keys to cells.
 }
 \seealso{
 Useful links:
