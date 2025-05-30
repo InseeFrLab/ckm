@@ -124,19 +124,11 @@ describing the tables to construct</p></dd>
     <p>The desc_tab data frame must have the following structure:</p><ul><li><p>TAB: Table name or number</p></li>
 <li><p>VAR: Variable name for the table</p></li>
 <li><p>HRC: Hierarchy name if the variable has hierarchical relationship, NA otherwise</p></li>
-</ul><p>Variables with hierarchical relationships should be listed in decreasing order
-of hierarchy (from broadest to finest level).</p>
-<p>Le data.frame à fournir dans l'argument <code>desc_tab</code> doit être constitué de telle façon que:</p>
-<p>1) Le data.frame doit contenir les 3 colonnes suivantes:
-  * <code>TAB</code>: Nom ou numéro de la table
-  * <code>VAR</code>: Nom d'une variable de la table
-  * <code>HRC</code>: Si la variable a une relation hiérarchique avec une autre des variables de la table
- mentionner un nom pour cette hiérarchie. Sinon, <code>NA</code></p>
-<p>2) Une ligne correspond à une variable d'une table donnée</p>
-<p>3) Deux variables (ex: REGION et DEPARTEMENT) d'une même table ayant une relation hiérarchique
- doivent recevoir la même valeur dans la colonne <code>HRC</code>. Ces variables
- doivent être renseignées dans l'ordre décroissant de la hiérarchie,
- cad du niveau le plus large (ex: REGION) au niveau le plus fin (ex: DEPARTEMENT).</p>
+</ul><p>One row corresponds to one variable in a given table.
+Variables with hierarchical relationships should be listed in decreasing order
+of hierarchy (from broadest to finest level).
+Two variables (e.g., REGION and DEPARTEMENT) in the same table
+with a hierarchical relationship must have the same value in the HRC column.</p>
     </div>
 
     <div class="section level2">
