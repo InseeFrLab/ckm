@@ -138,23 +138,12 @@ convert_desc_table_to_list <- function(desc_tab, prefix = "tab"){
 #'   \item VAR: Variable name for the table
 #'   \item HRC: Hierarchy name if the variable has hierarchical relationship, NA otherwise
 #' }
+#' 
+#' One row corresponds to one variable in a given table.
 #' Variables with hierarchical relationships should be listed in decreasing order
 #' of hierarchy (from broadest to finest level).
-#'
-#' Le data.frame à fournir dans l'argument \code{desc_tab} doit être constitué de telle façon que:
-#'
-#' 1) Le data.frame doit contenir les 3 colonnes suivantes:
-#'   * \code{TAB}: Nom ou numéro de la table
-#'   * \code{VAR}: Nom d'une variable de la table
-#'   * \code{HRC}: Si la variable a une relation hiérarchique avec une autre des variables de la table
-#'  mentionner un nom pour cette hiérarchie. Sinon, \code{NA}
-#'
-#' 2) Une ligne correspond à une variable d'une table donnée
-#'
-#' 3) Deux variables (ex: REGION et DEPARTEMENT) d'une même table ayant une relation hiérarchique
-#'  doivent recevoir la même valeur dans la colonne \code{HRC}. Ces variables
-#'  doivent être renseignées dans l'ordre décroissant de la hiérarchie,
-#'  cad du niveau le plus large (ex: REGION) au niveau le plus fin (ex: DEPARTEMENT).
+#' Two variables (e.g., REGION and DEPARTEMENT) in the same table
+#' with a hierarchical relationship must have the same value in the HRC column.
 #'
 #' @export
 #'
