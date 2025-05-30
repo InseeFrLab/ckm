@@ -1,4 +1,4 @@
-# ckm 1.0.0
+# ckm 1.0.1
 
 Initial CRAN release
 
