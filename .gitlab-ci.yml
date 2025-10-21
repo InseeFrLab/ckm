@@ -1,31 +1,47 @@
+include:
+  - project: "idda/applications/nexus/pipeline-admission/ci-templates"
+    ref: main
+    file: "livraison-package.yaml"
+
 variables:
   GIT_SSL_NO_VERIFY: "1"
-  _R_CHECK_SYSTEM_CLOCK_: 0
-  HTTP_PROXY: http://proxy-app.insee.fr:3128
-  HTTPS_PROXY: http://proxy-app.insee.fr:3128
-  NO_PROXY: insee.test,insee.intra,insee.fr,localhost
   PKG_NAME: "ckm"
 
-image: inseefrlab/onyxia-rstudio:latest
+image: gitlab-registry.insee.fr:443/datascience/registry-prod/onyxia-rstudio:r4.4.2
 
 stages:
-  - 📘 Documentation
+  - 📦️ Package
 
-pages:
-  stage: 📘 Documentation
+Build:
+  stage: 📦️ Package
+  image: inseefrlab/onyxia-rstudio:latest
   retry:
     max: 2
     when: runner_system_failure
-  when: manual
-  only:
-    - main
-    - master
+  rules:
+    - when: manual
   script:
-    - Rscript -e "install.packages(c('htmltools','rmarkdown','dplyr', 'data.table', 'ptable','assertthat','purrr','rlang','utils', 'furrr', 'future', 'tidyr'), repos='https://nexus.insee.fr/repository/r-cran/', method = 'wget', extra = '--no-check-certificate')"
-    - Rscript -e 'devtools::install(dependencies = FALSE)'
-    - Rscript -e "devtools::install_version('pkgdown', version = '2.0.9', dependencies = TRUE)"
-    - Rscript -e "options(pkgdown.internet = FALSE) ; pkgdown::build_site()"
+    - Rscript -e 'devtools::install()'
+    - |
+      set -e
+      R --version
+      R CMD build --no-build-vignettes --no-manual .
   artifacts:
     paths:
-      - public
+      - "*.tar.gz"
 
+Nexus:
+  stage: 📦️ Package
+  variables:
+    DEST_REPOSITORY: "r-local"
+    PATH_ARTEFACT_A_DEPLOYER: "${PKG_NAME}_*.tar.gz"
+    NOM_DU_JOB_CONTENANT_LE_LIVRABLE: "Build"
+  extends: .template:livraison-package
+  retry:
+    max: 2
+    when: runner_system_failure
+  rules:
+    - when: manual
+  needs:
+    - job: Build
+      artifacts: true
