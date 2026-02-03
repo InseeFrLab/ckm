@@ -10,7 +10,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/InseeFrLab/ckm/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/InseeFrLab/ckm/blob/1.0.2/DESCRIPTION)
 
 Jamme J (2026). *ckm: Applying the Cell Key Method to Protect Tabular
 Data*. R package version 1.0.2, <https://github.com/InseeFrLab/ckm>.
