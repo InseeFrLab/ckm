@@ -1,3 +1,8 @@
+# ckm 1.0.2
+
+Improve estimation of frequencies in `compute_frequencies`.
+
+
 # ckm 1.0.1
 
 Original names of the functions have been translated to English:

@@ -7,6 +7,7 @@
 #' @param tableau data.frame. Table generated with tabulate_cnt_micro_data,
 #'   apply_ckm, or tabulate_and_apply_ckm functions
 #' @inheritParams tabulate_cnt_micro_data
+#' @param cnt_var character vector indicating the name of the count variable
 #'
 #' @return data.frame with 3 columns:
 #'   \itemize{
@@ -15,12 +16,15 @@
 #'     \item p_hat: empirical frequency of the count
 #'   }
 #'
+#' @details The function estimates the number of zeroes from
+#' the structure of the input table. In some circumstances, the zeroes
+#' can be underestimated.
+#'
 #' @export
 #' @keywords internal
 #'
 #' @examples
 #' \dontrun{
-#' library(ptable)
 #' library(dplyr)
 #' data("dtest")
 #'
@@ -48,58 +52,53 @@
 #' @importFrom dplyr all_of
 #' @importFrom dplyr across
 #' @importFrom dplyr mutate
-#' @importFrom dplyr full_join
-#' @importFrom dplyr starts_with
-#' @importFrom dplyr where
 #' @importFrom dplyr select
 #' @importFrom dplyr rename
 #' @importFrom dplyr count
+#' @importFrom dplyr pull
+#' @importFrom dplyr bind_rows
 #' @importFrom purrr map
-compute_frequencies <- function(tableau, cat_vars, hrc_vars){
+#' @importFrom purrr reduce
+compute_frequencies <- function(tableau, cat_vars, hrc_vars=NULL, cnt_var = "nb_obs"){
 
-  cnt_var <- "nb_obs"
+  cnts_not_zero <- tableau |>
+    dplyr::count(dplyr::across(dplyr::all_of(cnt_var))) |>
+    dplyr::rename(i = nb_obs, N = n) |>
+    dplyr::filter(i > 0)
 
-  tableau_long <- tableau
-  if(!is.null(hrc_vars)){
+  nb_categories_1 <- NULL
+  nb_categories_2 <- NULL
 
-    l <- length(hrc_vars)
-    for(hrc in names(hrc_vars)){
-      for(vn in hrc_vars[[hrc]]){
-        tableau_long <- tableau_long |>
-          dplyr::mutate(
-            dplyr::across(all_of(vn), ~paste0({{vn}}, "_", .)))
-      }
-      tableau_long <- tidyr::pivot_longer(
-        tableau_long,
-        cols = hrc_vars[[hrc]],
-        names_to = "XYZXYZ",
-        values_to = hrc
-      ) |>
-        dplyr::select(-XYZXYZ)
-    }
+  if(!is.null(cat_vars)){
+
+    nb_categories_1 <- purrr::map(cat_vars, \(v) tableau |> dplyr::pull(v) |> unique() |> length()) |> purrr::list_c()
+    names(nb_categories_1) <- cat_vars
+
   }
 
-  all_cat_vars <- c(cat_vars, names(hrc_vars))
+  if(!is.null(hrc_vars)){
 
-  all_mods_vals <- tableau_long |>
-    dplyr::select(dplyr::all_of(all_cat_vars)) |>
-    purrr::map(
-      \(colvar) unique(colvar)
-    ) |>
-    expand.grid(
-      stringsAsFactors = FALSE,
-      KEEP.OUT.ATTRS = FALSE
-    ) |>
-    dplyr::full_join(
-      tableau_long |>
-        dplyr::select(dplyr::all_of(c(all_cat_vars)), dplyr::starts_with(cnt_var)),
-      by = all_cat_vars
-    ) |>
-    dplyr::mutate(dplyr::across(dplyr::starts_with(cnt_var), ~ifelse(is.na(.), 0, .)))|>
-    dplyr::count(nb_obs) |>
-    dplyr::mutate(p_hat = n/sum(n)) |>
-    dplyr::rename(i = nb_obs, N = n)
+    nb_categories_2 <- purrr::map(
+      names(hrc_vars),
+      \(vl){
+        v <- hrc_vars[[vl]]
+        tableau |> dplyr::select(dplyr::all_of(v)) |> unique() |> nrow()
+      }
+    ) |> purrr::list_c()
+    names(nb_categories_2) <- names(hrc_vars)
 
+  }
+
+  nb_croists_total <- c(nb_categories_1, nb_categories_2) |>
+    purrr::reduce(`*`)
+
+  nb_zeros <- nb_croists_total - sum(cnts_not_zero$N)
+
+  freqs <- data.frame(i=0, N=nb_zeros) |>
+    dplyr::bind_rows(cnts_not_zero) |>
+    dplyr::mutate(p_hat = N/sum(N))
+
+  return(freqs)
 }
 
 #' Calculate deviation set for a given original value

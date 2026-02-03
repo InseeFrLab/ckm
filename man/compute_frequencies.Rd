@@ -4,7 +4,7 @@
 \alias{compute_frequencies}
 \title{Calculate empirical frequencies from aggregated table}
 \usage{
-compute_frequencies(tableau, cat_vars, hrc_vars)
+compute_frequencies(tableau, cat_vars, hrc_vars = NULL, cnt_var = "nb_obs")
 }
 \arguments{
 \item{tableau}{data.frame. Table generated with tabulate_cnt_micro_data,
@@ -13,6 +13,8 @@ apply_ckm, or tabulate_and_apply_ckm functions}
 \item{cat_vars}{Character vector. Categorical variables}
 
 \item{hrc_vars}{Named list. Hierarchical variables}
+
+\item{cnt_var}{character vector indicating the name of the count variable}
 }
 \value{
 data.frame with 3 columns:
@@ -27,9 +29,13 @@ Calculates empirical frequencies of counts from an aggregated table
 constructed with tabulate_cnt_micro_data, apply_ckm,
 or tabulate_and_apply_ckm functions.
 }
+\details{
+The function estimates the number of zeroes from
+the structure of the input table. In some circumstances, the zeroes
+can be underestimated.
+}
 \examples{
 \dontrun{
-library(ptable)
 library(dplyr)
 data("dtest")
 
