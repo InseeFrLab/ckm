@@ -1,7 +1,5 @@
 # ckm 1.0.1
 
-Initial CRAN release
-
 Original names of the functions have been translated to English:
 
 - `construire_cles_indiv` -> `build_individual_keys`
