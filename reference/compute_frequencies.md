@@ -7,7 +7,7 @@ tabulate_and_apply_ckm functions.
 ## Usage
 
 ``` r
-compute_frequencies(tableau, cat_vars, hrc_vars)
+compute_frequencies(tableau, cat_vars, hrc_vars = NULL, cnt_var = "nb_obs")
 ```
 
 ## Arguments
@@ -25,6 +25,10 @@ compute_frequencies(tableau, cat_vars, hrc_vars)
 
   Named list. Hierarchical variables
 
+- cnt_var:
+
+  character vector indicating the name of the count variable
+
 ## Value
 
 data.frame with 3 columns:
@@ -35,11 +39,15 @@ data.frame with 3 columns:
 
 - p_hat: empirical frequency of the count
 
+## Details
+
+The function estimates the number of zeroes from the structure of the
+input table. In some circumstances, the zeroes can be underestimated.
+
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-library(ptable)
 library(dplyr)
 data("dtest")
 
