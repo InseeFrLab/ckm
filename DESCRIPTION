@@ -1,7 +1,7 @@
 Package: ckm
 Type: Package
 Title: Applying the Cell Key Method to Protect Tabular Data
-Version: 1.0.2
+Version: 1.1
 Authors@R: c(
     person("Julien", "Jamme", , "julien.jamme@insee.fr", role = c("aut", "cre")),
     person(, "Institut National de la Statistique et des Études Économiques", , role = "cph")
@@ -14,7 +14,10 @@ Description:
     The Cell Key Method is a method for protecting sensitive data in tabular 
     form by applying random keys to cells. 
     The package implements the method, provides tools to choose the best parameters 
-    to ensure the balance between data utility and privacy protection.
+    to ensure the balance between data utility and privacy protection. References:
+    Enderle et al. (2020) <doi:10.1007/978-3-030-57521-2_11>, 
+    Jamme (2025) <https://www.researchgate.net/publication/405051057_A_Framework_for_Cell_Key_Method_Parameters_Calibration_based_on_a_Risk-Utility_trade-off>,
+    Jamme (2026) <doi:10.13140/RG.2.2.19275.55840>
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -35,11 +38,14 @@ Imports:
     furrr,
     future,
     ggplot2,
-    cowplot
-RoxygenNote: 7.3.3
+    cowplot,
+    Rdpack
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0
+RdMacros: Rdpack
+

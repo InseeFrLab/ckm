@@ -15,7 +15,8 @@ check_inputs_tabulate(
   V,
   js,
   I,
-  J
+  J,
+  stack
 )
 }
 \arguments{
@@ -31,15 +32,18 @@ check_inputs_tabulate(
 
 \item{marge_label}{A character string specifying the label for the margin. Must be a single character string.}
 
-\item{D}{A positive numeric value.}
+\item{D}{integer. Deviation parameter (must be strictly positive)}
 
-\item{V}{A positive numeric value.}
+\item{V}{numeric. Noise variance (must be strictly positive)}
 
-\item{js}{A non-negative numeric value.}
+\item{js}{integer. Threshold for sensitive values (default: 0). If js=0, only value 0 will be forbidden}
 
-\item{I}{A positive numeric value or \code{NULL}.}
+\item{I}{integer vector. Original values to consider}
 
-\item{J}{A non-negative numeric value or \code{NULL}.}
+\item{J}{integer vector. Perturbed values to consider}
+
+\item{stack}{Named list of parameters (D, V, js) to produce a stacked matrix
+with these parameters applied only on the large counts.}
 }
 \value{
 None. The function is called for its side effects (throws an error if any assertion fails).

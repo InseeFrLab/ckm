@@ -19,7 +19,7 @@ create_transition_matrix(D, V, js = 0, ...)
 ptable object containing the transition matrix, or NULL if matrix cannot be constructed
 }
 \description{
-Wrapper function for ptable::create_cnt_ptable that creates a transition matrix 
+Wrapper function for ptable::create_cnt_ptable that creates a transition matrix
 for the Cell Key Method with specified parameters.
 }
 \examples{

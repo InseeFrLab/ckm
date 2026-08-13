@@ -61,4 +61,8 @@ p_hat2 <- compute_frequencies(tab_comptage2, cat_vars2, hrc_vars2)
 }
 
 }
+\references{
+\insertRef{Enderle_Giessing_Tent_2020}{ckm}
+\insertRef{Jamme_2025}{ckm}
+}
 \keyword{internal}

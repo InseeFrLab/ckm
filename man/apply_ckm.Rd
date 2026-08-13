@@ -13,6 +13,7 @@ apply_ckm(
   js = 0,
   I = NULL,
   J = NULL,
+  stack = NULL,
   ...
 )
 }
@@ -32,6 +33,9 @@ apply_ckm(
 \item{I}{integer vector. Original values to consider}
 
 \item{J}{integer vector. Perturbed values to consider}
+
+\item{stack}{Named list of parameters (D, V, js) to produce a stacked matrix
+with these parameters applied only on the large counts.}
 
 \item{...}{Additional parameters passed to transition matrix creation}
 }
@@ -54,8 +58,7 @@ dtest_avec_cles <- build_individual_keys(dtest)
 
 tab_avant <- tabulate_cnt_micro_data(
   df = dtest_avec_cles,
-  cat_vars = c("DIPLOME", "SEXE", "AGE"),
-  hrc_vars = list(GEO = c("REG", "DEP")),
+  cat_vars = c("DIPLOME", "SEXE", "AGE", "REG"),
   marge_label = "Total",
   freq_empiriq = TRUE
 )
@@ -70,10 +73,20 @@ tab_avant2 <- tabulate_cnt_micro_data(
   hrc_vars = list(GEO = c("REG", "DEP")),
   num_var = "NUM",
   marge_label = "Total",
-  freq_empiriq = TRUE #pour pouvoir mesurer le risque
+  freq_empiriq = TRUE #to measure the risk
 )
 
 res_ckm2 <- apply_ckm(tab_avant2, cnt_var = "num_tot", D = 5, V = 2)
 head(res_ckm2$tab)
+
+# With or without a stacked matrix ?
+res_ckm3a <- apply_ckm(tab_avant, D = 15, V = 35, js = 10)
+res_ckm3a$utilite
+
+res_ckm3b <- apply_ckm(tab_avant,
+  D = 15, V = 35, js = 10,
+  stack = list(D = 15, V = 5, js = 0)
+)
+res_ckm3b$utilite
 }
 }
