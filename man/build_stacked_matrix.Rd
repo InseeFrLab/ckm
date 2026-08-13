@@ -7,17 +7,17 @@
 build_stacked_matrix(D, V, js, D1, V1, js1 = 0)
 }
 \arguments{
-\item{D1}{Deviation for small counts}
+\item{D}{Deviation for small counts}
 
-\item{V1}{Variance for small counts}
+\item{V}{Variance for small counts}
 
-\item{js1}{js for small counts}
+\item{js}{js for small counts}
 
-\item{D2}{Deviation for last count}
+\item{D1}{Deviation for last count}
 
-\item{V2}{Variance for last count}
+\item{V1}{Variance for last count}
 
-\item{js2}{js for last count}
+\item{js1}{js for last count}
 }
 \value{
 ptable object

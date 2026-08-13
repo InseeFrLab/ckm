@@ -58,12 +58,12 @@ create_transition_matrix <- function(D, V, js = 0, ...) {
 
 #' Build a matrix as described in the following paper [10.13140/RG.2.2.19275.55840](10.13140/RG.2.2.19275.55840)
 #'
-#' @param D1 Deviation for small counts
-#' @param V1 Variance for small counts
-#' @param js1 js for small counts
-#' @param D2 Deviation for last count
-#' @param V2 Variance for last count
-#' @param js2 js for last count
+#' @param D Deviation for small counts
+#' @param V Variance for small counts
+#' @param js js for small counts
+#' @param D1 Deviation for last count
+#' @param V1 Variance for last count
+#' @param js1 js for last count
 #'
 #' @references
 #' \insertRef{Jamme_2026}{ckm}
