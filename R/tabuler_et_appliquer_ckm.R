@@ -8,11 +8,7 @@
 #' @param hrc_vars A list of hierarchical variable names. All must be present in \code{df}. Can be \code{NULL}.
 #' @param num_var A character string specifying the name of the numerical variable. Must be present in \code{df}. Can be \code{NULL}.
 #' @param marge_label A character string specifying the label for the margin. Must be a single character string.
-#' @param D A positive numeric value.
-#' @param V A positive numeric value.
-#' @param js A non-negative numeric value.
-#' @param I A positive numeric value or \code{NULL}.
-#' @param J A non-negative numeric value or \code{NULL}.
+#' @inheritParams apply_ckm
 #'
 #' @return None. The function is called for its side effects (throws an error if any assertion fails).
 #'
@@ -39,7 +35,7 @@
 #' @importFrom assertthat assert_that
 #' @export
 #' @keywords internal
-check_inputs_tabulate <- function(df, rk_var, cat_vars, hrc_vars, num_var, marge_label, D, V, js, I, J) {
+check_inputs_tabulate <- function(df, rk_var, cat_vars, hrc_vars, num_var, marge_label, D, V, js, I, J, stack) {
 
   assertthat::assert_that(
     is.data.frame(df),
@@ -109,6 +105,11 @@ check_inputs_tabulate <- function(df, rk_var, cat_vars, hrc_vars, num_var, marge
     (!is.null(rk_var) && rk_var %in% names(df)),
     msg = "The individual key is missing from your data."
   )
+
+  assertthat::assert_that(
+    (is.null(stack) || is.list(stack)),
+    msg = "The stack argument is either NULL or a named list with the D, V and js elements"
+  )
 }
 
 #' Build table and apply Cell Key Method
@@ -136,6 +137,16 @@ check_inputs_tabulate <- function(df, rk_var, cat_vars, hrc_vars, num_var, marge
 #'   marge_label = "Total",
 #'   D = 10, V = 15, js = 4
 #' )
+#'
+#' # With a stacked matrix
+#' res_ckm1 <- tabulate_and_apply_ckm(
+#'   df = dtest_avec_cles,
+#'   cat_vars = c("DIPLOME", "SEXE", "AGE"),
+#'   hrc_vars = list(GEO = c("REG", "DEP")),
+#'   marge_label = "Total",
+#'   D = 10, V = 15, js = 4,
+#'   stack = list(D = 10, V = 5, js = 0)
+#' )
 #' }
 tabulate_and_apply_ckm <- function(
     df,
@@ -149,6 +160,7 @@ tabulate_and_apply_ckm <- function(
     js = 0,
     I = NULL,
     J = NULL,
+    stack = NULL,
     ...){
 
   # Check inputs
@@ -163,7 +175,8 @@ tabulate_and_apply_ckm <- function(
     V = V,
     js = js,
     I = I,
-    J = J
+    J = J,
+    stack = stack
   )
 
   freq_empiriq <- ! (is.null(I) | is.null(J))
@@ -187,6 +200,7 @@ tabulate_and_apply_ckm <- function(
   args_trans[["tab_data"]] <- tab_avant
   args_trans[["I"]] <- I
   args_trans[["J"]] <- J
+  args_trans[["stack"]] <- stack
 
   res_ckm <- do.call("apply_ckm", args_trans)
 

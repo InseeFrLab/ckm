@@ -20,6 +20,10 @@
 #' the structure of the input table. In some circumstances, the zeroes
 #' can be underestimated.
 #'
+#' @references
+#' \insertRef{Enderle_Giessing_Tent_2020}{ckm}
+#' \insertRef{Jamme_2025}{ckm}
+#'
 #' @export
 #' @keywords internal
 #'

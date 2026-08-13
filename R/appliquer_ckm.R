@@ -8,6 +8,8 @@
 #' @param ck_var Character. Name of the cell key variable (must be decimal between 0-1)
 #' @inheritParams create_transition_matrix
 #' @inheritParams assess_risk
+#' @param stack Named list of parameters (D, V, js) to produce a stacked matrix
+#' with these parameters applied only on the large counts.
 #' @param ... Additional parameters passed to transition matrix creation
 #'
 #' @return List containing:
@@ -25,8 +27,7 @@
 #'
 #' tab_avant <- tabulate_cnt_micro_data(
 #'   df = dtest_avec_cles,
-#'   cat_vars = c("DIPLOME", "SEXE", "AGE"),
-#'   hrc_vars = list(GEO = c("REG", "DEP")),
+#'   cat_vars = c("DIPLOME", "SEXE", "AGE", "REG"),
 #'   marge_label = "Total",
 #'   freq_empiriq = TRUE
 #' )
@@ -41,11 +42,21 @@
 #'   hrc_vars = list(GEO = c("REG", "DEP")),
 #'   num_var = "NUM",
 #'   marge_label = "Total",
-#'   freq_empiriq = TRUE #pour pouvoir mesurer le risque
+#'   freq_empiriq = TRUE #to measure the risk
 #' )
 #'
 #' res_ckm2 <- apply_ckm(tab_avant2, cnt_var = "num_tot", D = 5, V = 2)
 #' head(res_ckm2$tab)
+#'
+#' # With or without a stacked matrix ?
+#' res_ckm3a <- apply_ckm(tab_avant, D = 15, V = 35, js = 10)
+#' res_ckm3a$utilite
+#'
+#' res_ckm3b <- apply_ckm(tab_avant,
+#'   D = 15, V = 35, js = 10,
+#'   stack = list(D = 15, V = 5, js = 0)
+#' )
+#' res_ckm3b$utilite
 #' }
 #' @importFrom data.table as.data.table setkeyv foverlaps .N .SD :=
 #' @importFrom dplyr mutate rename_with select
@@ -60,6 +71,7 @@ apply_ckm <- function(
   js = 0,
   I = NULL,
   J = NULL,
+  stack = NULL,
   ...
 ) {
 
@@ -111,7 +123,28 @@ apply_ckm <- function(
   args_add <- c(...)
   args_trans <- if (length(args_add) == 0) as.list(c(D = D, V = V, js = js)) else as.list(c(D = D, V = V, js = js, args_add))
 
-  mat_trans <- do.call("create_transition_matrix", args_trans)
+  if(is.null(stack)){
+
+    mat_trans <- do.call("create_transition_matrix", args_trans)
+
+  }else{
+
+    inter_names <- base::intersect(names(stack), c("D", "V", "js"))
+
+    if(length(inter_names) != 3){
+
+      stop("The stack argument is either NULL or a list with three elements respectively named D, V and js")
+
+    }
+
+    stack <- stack[c("D", "V", "js")]
+    names(stack) <- paste0( names(stack), "1")
+
+    args_trans <- append( args_trans, stack )
+    mat_trans <- do.call("build_stacked_matrix", args_trans)
+
+  }
+
   tab_pert <- prepare_perturbation_table(mat_trans)
   max_i <- max(tab_pert$i)
 
