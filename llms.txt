@@ -12,8 +12,16 @@ For more information on the Cell Key Method, you can refer to the
 chapter 5.4 of the [Handbook on Statistical Disclsoure
 Control](https://sdctools.github.io/HandbookSDC/05-frequency-tables.html#sec-CKM_freq).
 
-The package is designed to perturb only frequency tables only for the
-moment.
+About the step by step process used to calibrate the method, you can
+refer to Jamme (2025)
+[10.5281/zenodo.21930561](https://doi.org/10.5281/zenodo.21930561).
+
+For more information on the modification of the transition matrix
+suggested with the `stack` argument, you can refer to Jamme (2026)
+[10.13140/RG.2.2.19275.55840](https://doi.org/10.13140/RG.2.2.19275.55840).
+
+The method and the package are designed to perturb only frequency
+tables.
 
 ## Documentation
 
