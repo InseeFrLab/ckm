@@ -58,8 +58,9 @@ apply_ckm(
 
 - stack:
 
-  Named list of parameters (D, V, js) to produce a stacked matrix with
-  these parameters applied only on the large counts.
+  Named list of parameters (D, V) to produce a stacked matrix with these
+  parameters applied only on the large counts. js is set to 0 for this
+  part.
 
 - ...:
 
@@ -108,7 +109,7 @@ res_ckm3a$utilite
 
 res_ckm3b <- apply_ckm(tab_avant,
   D = 15, V = 35, js = 10,
-  stack = list(D = 15, V = 5, js = 0)
+  stack = list(D = 15, V = 5)
 )
 res_ckm3b$utilite
 } # }

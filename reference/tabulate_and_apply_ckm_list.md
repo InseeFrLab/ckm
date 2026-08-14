@@ -18,6 +18,7 @@ tabulate_and_apply_ckm_list(
   js = 0,
   I = NULL,
   J = NULL,
+  stack = NULL,
   ...
 )
 ```
@@ -66,6 +67,12 @@ tabulate_and_apply_ckm_list(
 - J:
 
   integer vector. Perturbed values to consider
+
+- stack:
+
+  Named list of parameters (D, V) to produce a stacked matrix with these
+  parameters applied only on the large counts. js is set to 0 for this
+  part.
 
 - ...:
 

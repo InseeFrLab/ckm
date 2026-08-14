@@ -59,6 +59,7 @@ to each table based on a description data frame specifying the table structure.<
 <span>  js <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  I <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  J <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  stack <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -106,6 +107,11 @@ describing the tables to construct</p></dd>
 
 <dt id="arg-j">J<a class="anchor" aria-label="anchor" href="#arg-j"></a></dt>
 <dd><p>integer vector. Perturbed values to consider</p></dd>
+
+
+<dt id="arg-stack">stack<a class="anchor" aria-label="anchor" href="#arg-stack"></a></dt>
+<dd><p>Named list of parameters (D, V) to produce a stacked matrix
+with these parameters applied only on the large counts. js is set to 0 for this part.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

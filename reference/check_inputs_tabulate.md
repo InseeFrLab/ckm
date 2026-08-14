@@ -76,8 +76,9 @@ check_inputs_tabulate(
 
 - stack:
 
-  Named list of parameters (D, V, js) to produce a stacked matrix with
-  these parameters applied only on the large counts.
+  Named list of parameters (D, V) to produce a stacked matrix with these
+  parameters applied only on the large counts. js is set to 0 for this
+  part.
 
 ## Value
 
