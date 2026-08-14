@@ -1,12 +1,14 @@
 # Appliquer la méthode des clés aléatoires
 
 ``` r
+
 library(ckm)
 ```
 
 Le package contient un jeu de données pour s’exercer:
 
 ``` r
+
 data("dtest", package = "ckm")
 ```
 
@@ -19,6 +21,7 @@ individuelles qui sont des nombres aléatoires tirés selon une loi
 uniforme entre 0 et 1.
 
 ``` r
+
 set.seed(451919)
 dtest_avec_cles <- build_individual_keys(dtest)
 ```
@@ -27,6 +30,7 @@ On peut vérifier que la distribution des clés individuelles est bien
 uniforme.
 
 ``` r
+
 hist(dtest_avec_cles$rkey)
 ```
 
@@ -47,6 +51,7 @@ Le code ci-dessous va réaliser les étapes suivantes:
 - appliquer la perturbation sur le tableau agrégé.
 
 ``` r
+
 res_ckm <- tabulate_and_apply_ckm(
  df = dtest_avec_cles,
  cat_vars = c("DEP","DIPLOME", "SEXE", "AGE"),
@@ -57,6 +62,7 @@ res_ckm <- tabulate_and_apply_ckm(
 Le résultat renvoyé est une liste de deux éléments:
 
 ``` r
+
 str(res_ckm, max.level = 2)
 #> List of 4
 #>  $ tab    : tibble [3,847 × 6] (S3: tbl_df/tbl/data.frame)
@@ -81,6 +87,7 @@ et la clé de la cellule obtenue en récupérant la partie décimale de la
 somme des clés individuelles.
 
 ``` r
+
 tab_avant <- tabulate_cnt_micro_data(
  df = dtest_avec_cles,
  cat_vars = c("DEP","DIPLOME", "SEXE", "AGE")
@@ -106,10 +113,12 @@ précédente. Il suffit de renseigner, a minima :
     par la moyenne des écarts absolus) le sera.
 
 ``` r
+
 res_ckm <- apply_ckm(tab_avant, D = 5, V = 2)
 ```
 
 ``` r
+
 str(res_ckm, max.level = 2)
 #> List of 4
 #>  $ tab    : tibble [3,847 × 6] (S3: tbl_df/tbl/data.frame)

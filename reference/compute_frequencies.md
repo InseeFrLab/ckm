@@ -44,6 +44,18 @@ data.frame with 3 columns:
 The function estimates the number of zeroes from the structure of the
 input table. In some circumstances, the zeroes can be underestimated.
 
+## References
+
+Enderle T, Giessing S, Tent R (2020). “Calculation of Risk Probabilities
+for the Cell Key Method.” *Privacy in Statistical Databases*, **12276**,
+151–165.
+[doi:10.1007/978-3-030-57521-2_11](https://doi.org/10.1007/978-3-030-57521-2_11)
+. <http://link.springer.com/10.1007/978-3-030-57521-2_11>. Jamme J
+(2025). “A Framework for Cell Key Method Parameters Calibration based on
+a Risk-Utility trade-off.” In *Expert Meeting on Statistical Data
+Confidentiality*.
+<https://www.researchgate.net/publication/405051057_A_Framework_for_Cell_Key_Method_Parameters_Calibration_based_on_a_Risk-Utility_trade-off>.
+
 ## Examples
 
 ``` r

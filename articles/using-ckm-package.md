@@ -18,6 +18,7 @@ steps include:
 First, load the package and example data, then generate individual keys.
 
 ``` r
+
 library(dplyr)
 ```
 
@@ -33,6 +34,7 @@ library(dplyr)
     ##     intersect, setdiff, setequal, union
 
 ``` r
+
 library(ckm)
 
 # Load example microdata
@@ -68,6 +70,7 @@ head(dtest_with_keys)
 ### Step 2.1: Search Feasible Transition Matrices
 
 ``` r
+
 test_matrices(D = 10, js = 4)
 ```
 
@@ -81,6 +84,7 @@ test_matrices(D = 10, js = 4)
     ## [1] 6.5625
 
 ``` r
+
 test_matrices(D = 15, js = 4)
 ```
 
@@ -102,6 +106,7 @@ We compare the transition matrices for different values of D and V using
 `visualiser_distribution`.
 
 ``` r
+
 # Visualize transition matrices for different parameter sets
 visualize_distribution(D = c(10, 15), V = c(10, 20, 30))
 ```
@@ -118,6 +123,7 @@ parameter sets. We set `n_sim = 5` for a quick demonstration and use the
 categorical variables REG, DIPLOME, AGE, and SEXE.
 
 ``` r
+
 # Define the categorical variables
 cat_vars <- c("REG", "DIPLOME", "AGE", "SEXE")
 # Define the parameters D and V (and js if needed) to test:
@@ -135,11 +141,12 @@ sim_results <- simulate_RUs(
 
     ##  ■■■■■■■■■                         25% |  ETA: 10s
 
-    ##  ■■■■■■■■■■■■■■■■                  50% |  ETA:  9s
+    ##  ■■■■■■■■■■■■■■■■                  50% |  ETA:  8s
 
     ##  ■■■■■■■■■■■■■■■■■■■■■■■           75% |  ETA:  5s
 
 ``` r
+
 # Display the results
 sim_results |> 
   group_by(D, V, js, i, j, risk_inference = qij) |>
@@ -164,6 +171,7 @@ Based on the previous results, we select one set of parameters (D = 15,
 V = 10) and apply the Cell Key Method using `tabulate_and_apply_ckm`.
 
 ``` r
+
 # Apply the Cell Key Method with chosen parameters
 res_ckm <- tabulate_and_apply_ckm(
   df = dtest_with_keys,

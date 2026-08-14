@@ -65,6 +65,9 @@ visualizing the theoretical noise distribution.
 
 - [`create_transition_matrix()`](https://inseefrlab.github.io/ckm/reference/create_transition_matrix.md)
   : Create Cell Key Method transition matrix
+- [`build_stacked_matrix()`](https://inseefrlab.github.io/ckm/reference/build_stacked_matrix.md)
+  : Build a matrix as described in the following paper
+  \[10.13140/RG.2.2.19275.55840\](10.13140/RG.2.2.19275.55840)
 - [`prepare_perturbation_table()`](https://inseefrlab.github.io/ckm/reference/prepare_perturbation_table.md)
   : Create perturbation table from transition matrix
 - [`test_matrices()`](https://inseefrlab.github.io/ckm/reference/test_matrices.md)

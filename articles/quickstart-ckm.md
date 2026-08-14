@@ -1,12 +1,14 @@
 # Quick Start: Applying the Cell Key Method
 
 ``` r
+
 library(ckm)
 ```
 
 The package provides a sample dataset for practice:
 
 ``` r
+
 data("dtest", package = "ckm")
 ```
 
@@ -18,6 +20,7 @@ adds a column `rkey` to your dataset, containing individual keys drawn
 from a uniform distribution between 0 and 1.
 
 ``` r
+
 set.seed(451919)
 dtest_with_keys <- build_individual_keys(dtest)
 ```
@@ -25,6 +28,7 @@ dtest_with_keys <- build_individual_keys(dtest)
 You can check that the distribution of individual keys is uniform:
 
 ``` r
+
 hist(dtest_with_keys$rkey)
 ```
 
@@ -44,6 +48,7 @@ The code below will:
 - Apply the perturbation to the aggregated table.
 
 ``` r
+
 res_ckm <- tabulate_and_apply_ckm(
  df = dtest_with_keys,
  cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE"),
@@ -57,6 +62,7 @@ risk and utility measures, and the fourth is the original table. You can
 check the structure of the perturbed table:
 
 ``` r
+
 str(res_ckm$tab)
 #> tibble [3,847 × 6] (S3: tbl_df/tbl/data.frame)
 #>  $ DEP       : chr [1:3847] "56" "79" "01" "2B" ...
@@ -80,6 +86,7 @@ cross-tabulations (including margins) and provides both the counts and
 the cell key (the decimal part of the sum of individual keys).
 
 ``` r
+
 tab_before <- tabulate_cnt_micro_data(
  df = dtest_with_keys,
  cat_vars = c("DEP", "DIPLOME", "SEXE", "AGE")
@@ -104,10 +111,12 @@ need to specify at least:
     the mean absolute deviation).
 
 ``` r
+
 res_ckm <- apply_ckm(tab_before, D = 5, V = 2)
 ```
 
 ``` r
+
 str(res_ckm$tab)
 #> tibble [3,847 × 6] (S3: tbl_df/tbl/data.frame)
 #>  $ DEP       : chr [1:3847] "56" "79" "01" "2B" ...

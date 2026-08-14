@@ -17,7 +17,8 @@ check_inputs_tabulate(
   V,
   js,
   I,
-  J
+  J,
+  stack
 )
 ```
 
@@ -54,23 +55,29 @@ check_inputs_tabulate(
 
 - D:
 
-  A positive numeric value.
+  integer. Deviation parameter (must be strictly positive)
 
 - V:
 
-  A positive numeric value.
+  numeric. Noise variance (must be strictly positive)
 
 - js:
 
-  A non-negative numeric value.
+  integer. Threshold for sensitive values (default: 0). If js=0, only
+  value 0 will be forbidden
 
 - I:
 
-  A positive numeric value or `NULL`.
+  integer vector. Original values to consider
 
 - J:
 
-  A non-negative numeric value or `NULL`.
+  integer vector. Perturbed values to consider
+
+- stack:
+
+  Named list of parameters (D, V, js) to produce a stacked matrix with
+  these parameters applied only on the large counts.
 
 ## Value
 
