@@ -1,3 +1,20 @@
+# ckm 1.1.0
+
+Add the `build_stacked_matrix` function to let user apply a stacked matrix 
+as presented in Jamme (2026) <doi:10.13140/RG.2.2.19275.55840>. This is an 
+effective way to improve the risk-utility trade-off, especially when user 
+has to exclude small counts to lower the risk on them. The stacked matrix lets 
+lower this risk by monitoring the loss on the other counts. 
+
+To use this new feature, the functions `apply_ckm`, `tabulate_and_apply_ckm` and 
+`tabulate_and_apply_ckm_list` propose the `stack` argument. By default `NULL`, the 
+user can activate the stacked matrix by setting this argument with the list of 
+the parameters to apply only on the "big" counts. For example, if the user set the 
+following parameters : `D=15, V=35, js=10, stack = list(D=15, V=5)`, then the transition 
+matrix used to apply the Cell Key Method is built with the first three for all the rows 
+except the last one, and the parameters `D=15, V=5, js=0` will be used on the last row.  
+
+
 # ckm 1.0.2
 
 Improve estimation of frequencies in `compute_frequencies`.
