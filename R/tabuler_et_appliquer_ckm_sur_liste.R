@@ -138,7 +138,7 @@ convert_desc_table_to_list <- function(desc_tab, prefix = "tab"){
 #'   \item VAR: Variable name for the table
 #'   \item HRC: Hierarchy name if the variable has hierarchical relationship, NA otherwise
 #' }
-#' 
+#'
 #' One row corresponds to one variable in a given table.
 #' Variables with hierarchical relationships should be listed in decreasing order
 #' of hierarchy (from broadest to finest level).
@@ -182,6 +182,7 @@ tabulate_and_apply_ckm_list <- function(
     js = 0,
     I = NULL,
     J = NULL,
+    stack = NULL,
     ...){
 
   # Check inputs
@@ -206,7 +207,8 @@ tabulate_and_apply_ckm_list <- function(
     V = V,
     js = js,
     I = I,
-    J = J
+    J = J,
+    stack = stack
   )
 
   args_add <- c(...)
@@ -219,6 +221,7 @@ tabulate_and_apply_ckm_list <- function(
   args_trans[["rk_var"]] <- rk_var
   args_trans[["I"]] <- I
   args_trans[["J"]] <- J
+  args_trans[["stack"]] <- stack
 
   res <- purrr::map(
     listes_tab_vars$tableaux,

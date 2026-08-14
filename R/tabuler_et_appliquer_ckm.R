@@ -145,7 +145,7 @@ check_inputs_tabulate <- function(df, rk_var, cat_vars, hrc_vars, num_var, marge
 #'   hrc_vars = list(GEO = c("REG", "DEP")),
 #'   marge_label = "Total",
 #'   D = 10, V = 15, js = 4,
-#'   stack = list(D = 10, V = 5, js = 0)
+#'   stack = list(D = 10, V = 5)
 #' )
 #' }
 tabulate_and_apply_ckm <- function(

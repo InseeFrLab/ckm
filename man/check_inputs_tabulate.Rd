@@ -42,8 +42,8 @@ check_inputs_tabulate(
 
 \item{J}{integer vector. Perturbed values to consider}
 
-\item{stack}{Named list of parameters (D, V, js) to produce a stacked matrix
-with these parameters applied only on the large counts.}
+\item{stack}{Named list of parameters (D, V) to produce a stacked matrix
+with these parameters applied only on the large counts. js is set to 0 for this part.}
 }
 \value{
 None. The function is called for its side effects (throws an error if any assertion fails).

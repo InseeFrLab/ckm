@@ -15,6 +15,7 @@ tabulate_and_apply_ckm_list(
   js = 0,
   I = NULL,
   J = NULL,
+  stack = NULL,
   ...
 )
 }
@@ -39,6 +40,9 @@ describing the tables to construct}
 \item{I}{integer vector. Original values to consider}
 
 \item{J}{integer vector. Perturbed values to consider}
+
+\item{stack}{Named list of parameters (D, V) to produce a stacked matrix
+with these parameters applied only on the large counts. js is set to 0 for this part.}
 
 \item{...}{Additional parameters passed to transition matrix creation}
 }

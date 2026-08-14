@@ -43,8 +43,8 @@ tabulate_and_apply_ckm(
 
 \item{J}{integer vector. Perturbed values to consider}
 
-\item{stack}{Named list of parameters (D, V, js) to produce a stacked matrix
-with these parameters applied only on the large counts.}
+\item{stack}{Named list of parameters (D, V) to produce a stacked matrix
+with these parameters applied only on the large counts. js is set to 0 for this part.}
 
 \item{...}{Additional parameters passed to transition matrix creation}
 }
@@ -76,7 +76,7 @@ res_ckm1 <- tabulate_and_apply_ckm(
   hrc_vars = list(GEO = c("REG", "DEP")),
   marge_label = "Total",
   D = 10, V = 15, js = 4,
-  stack = list(D = 10, V = 5, js = 0)
+  stack = list(D = 10, V = 5)
 )
 }
 }

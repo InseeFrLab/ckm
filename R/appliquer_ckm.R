@@ -8,8 +8,8 @@
 #' @param ck_var Character. Name of the cell key variable (must be decimal between 0-1)
 #' @inheritParams create_transition_matrix
 #' @inheritParams assess_risk
-#' @param stack Named list of parameters (D, V, js) to produce a stacked matrix
-#' with these parameters applied only on the large counts.
+#' @param stack Named list of parameters (D, V) to produce a stacked matrix
+#' with these parameters applied only on the large counts. js is set to 0 for this part.
 #' @param ... Additional parameters passed to transition matrix creation
 #'
 #' @return List containing:
@@ -54,7 +54,7 @@
 #'
 #' res_ckm3b <- apply_ckm(tab_avant,
 #'   D = 15, V = 35, js = 10,
-#'   stack = list(D = 15, V = 5, js = 0)
+#'   stack = list(D = 15, V = 5)
 #' )
 #' res_ckm3b$utilite
 #' }
@@ -129,16 +129,17 @@ apply_ckm <- function(
 
   }else{
 
-    inter_names <- base::intersect(names(stack), c("D", "V", "js"))
+    inter_names <- base::intersect(names(stack), c("D", "V"))
 
-    if(length(inter_names) != 3){
+    if(length(inter_names) != 2){
 
-      stop("The stack argument is either NULL or a list with three elements respectively named D, V and js")
+      stop("The stack argument is either NULL or a list with three elements respectively named D, V")
 
     }
 
-    stack <- stack[c("D", "V", "js")]
+    stack <- stack[c("D", "V")]
     names(stack) <- paste0( names(stack), "1")
+    # js1 remains 0 (default of build_stacked_matrix)
 
     args_trans <- append( args_trans, stack )
     mat_trans <- do.call("build_stacked_matrix", args_trans)
