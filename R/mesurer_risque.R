@@ -63,11 +63,13 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom purrr map
 #' @importFrom purrr reduce
-compute_frequencies <- function(tableau, cat_vars, hrc_vars=NULL, cnt_var = "nb_obs"){
+compute_frequencies <- function(tableau, cat_vars, hrc_vars=NULL, cnt_var="nb_obs"){
 
-  cnts_not_zero <- tableau |>
-    dplyr::count(dplyr::across(dplyr::all_of(cnt_var))) |>
-    dplyr::rename(i = nb_obs, N = n) |>
+  if(!cnt_var %in% names(tableau)) stop("Column '",cnt_var,"' not found in the table.")
+
+  tableau<-as.data.frame(tableau)
+  cnts_not_zero <- data.frame(i=tableau[[cnt_var]])|>
+    dplyr::count(i, name = "N")|>
     dplyr::filter(i > 0)
 
   nb_categories_1 <- NULL
@@ -304,9 +306,10 @@ assess_risk <- function(matrice_transition, freq, I, J){
 
     qj <- 0
     for(k in Dposs_j){
+      if(!k %in% tab$X) next
       pk <- tab[X == k, p_hat][1]
       pkj <- tab[X == k & Xp == j, p][1]
-      qj <- qj + pk*pkj
+      qj <- qj + ifelse(is.na(pkj),0,pk*pkj)
     }
     return(qj)
   }
